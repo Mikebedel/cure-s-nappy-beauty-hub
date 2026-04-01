@@ -42,7 +42,7 @@ const Index = () => {
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="border-card/30 text-card hover:bg-card/10 text-base">
-                <Link to="/boutique">Nos gammes</Link>
+                <Link to="/nos-gammes">Nos gammes</Link>
               </Button>
             </div>
           </div>
