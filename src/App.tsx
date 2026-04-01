@@ -9,6 +9,10 @@ import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import Index from "./pages/Index";
 import Boutique from "./pages/Boutique";
+import NosGammes from "./pages/NosGammes";
+import Conseils from "./pages/Conseils";
+import APropos from "./pages/APropos";
+import Contact from "./pages/Contact";
 import ProductDetail from "./pages/ProductDetail";
 import Panier from "./pages/Panier";
 import NotFound from "./pages/NotFound";
@@ -26,6 +30,10 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/boutique" element={<Boutique />} />
+            <Route path="/nos-gammes" element={<NosGammes />} />
+            <Route path="/conseils" element={<Conseils />} />
+            <Route path="/a-propos" element={<APropos />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/produit/:id" element={<ProductDetail />} />
             <Route path="/panier" element={<Panier />} />
             <Route path="*" element={<NotFound />} />

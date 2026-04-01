@@ -42,7 +42,7 @@ const Index = () => {
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="border-card/30 text-card hover:bg-card/10 text-base">
-                <Link to="/boutique">Nos gammes</Link>
+                <Link to="/nos-gammes">Nos gammes</Link>
               </Button>
             </div>
           </div>
@@ -178,6 +178,28 @@ const Index = () => {
                 <p className="text-accent font-semibold text-sm">{t.name}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Conseil du moment */}
+      <section className="py-20">
+        <div className="container mx-auto max-w-3xl text-center">
+          <span className="text-primary font-semibold text-sm uppercase tracking-wider">Conseil capillaire</span>
+          <h2 className="font-heading text-3xl font-bold mt-2 mb-4">Le conseil du moment</h2>
+          <div className="bg-card border border-border rounded-2xl p-8 text-left">
+            <h3 className="font-heading text-xl font-semibold mb-3">💧 La méthode LOC pour une hydratation longue durée</h3>
+            <p className="text-muted-foreground leading-relaxed mb-4">
+              Liquid, Oil, Cream : vaporisez de l'eau sur vos cheveux, scellez avec une huile légère, 
+              puis appliquez une crème hydratante. Cette technique permet de maintenir l'hydratation 
+              pendant 2 à 3 jours, même par temps chaud.
+            </p>
+            <Button asChild variant="outline" className="border-primary text-primary hover:bg-primary/5">
+              <Link to="/conseils">
+                Tous nos conseils
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
