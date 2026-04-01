@@ -10,8 +10,10 @@ const Navbar = () => {
   const navLinks = [
     { label: "Accueil", to: "/" },
     { label: "Boutique", to: "/boutique" },
-    { label: "Nos Gammes", to: "/boutique" },
-    { label: "Conseils", to: "/" },
+    { label: "Nos Gammes", to: "/nos-gammes" },
+    { label: "Conseils", to: "/conseils" },
+    { label: "À propos", to: "/a-propos" },
+    { label: "Contact", to: "/contact" },
   ];
 
   return (
