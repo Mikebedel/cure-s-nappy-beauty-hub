@@ -1,6 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, ShoppingBag, Star } from "lucide-react";
-import { products } from "@/data/products";
+import { products, gammes } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/ProductCard";
@@ -39,11 +39,7 @@ const ProductDetail = () => {
           {/* Info */}
           <div>
             <span className="text-primary text-sm font-semibold uppercase tracking-wider">
-              {product.gamme === "hydratation" && "💧 Hydratation Intense"}
-              {product.gamme === "croissance" && "🌱 Croissance & Force"}
-              {product.gamme === "definition" && "✨ Définition Boucles"}
-              {product.gamme === "reparation" && "🛡️ Réparation Profonde"}
-              {product.gamme === "eclat" && "☀️ Éclat & Brillance"}
+              {gammes.find((g) => g.id === product.gamme)?.icon} {gammes.find((g) => g.id === product.gamme)?.name}
             </span>
             <h1 className="font-heading text-2xl md:text-3xl font-bold mt-2 mb-3">{product.name}</h1>
             

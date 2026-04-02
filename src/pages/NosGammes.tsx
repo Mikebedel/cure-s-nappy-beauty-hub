@@ -5,24 +5,24 @@ import { gammes, products } from "@/data/products";
 
 const gammeDescriptions: Record<string, { description: string; objectif: string }> = {
   hydratation: {
-    description: "Notre gamme phare pour des cheveux intensément hydratés. Des formules riches en beurre de karité, aloe vera et huiles végétales qui pénètrent la fibre capillaire en profondeur.",
+    description: "Des crèmes et masques riches en beurre de karité et aloe vera pour hydrater intensément et apporter du volume à vos cheveux.",
     objectif: "Apporter et maintenir l'hydratation des cheveux crépus et bouclés, même dans les climats chauds et humides.",
   },
   croissance: {
-    description: "Des soins concentrés en biotine, huile de ricin et extraits de plantes africaines pour stimuler la pousse et renforcer les racines.",
-    objectif: "Accélérer la croissance capillaire, prévenir la casse et fortifier les cheveux de la racine aux pointes.",
+    description: "Des huiles concentrées en biotine, huile de ricin et extraits naturels pour stimuler la pousse et renforcer les racines.",
+    objectif: "Accélérer la croissance capillaire, prévenir la chute et fortifier les cheveux de la racine aux pointes.",
   },
-  definition: {
-    description: "Des gels et crèmes légères qui définissent vos boucles et twists sans effet carton. Tenue flexible adaptée au climat tropical.",
-    objectif: "Définir et maintenir les boucles naturelles avec un fini souple et sans résidu.",
+  fortifiant: {
+    description: "Des soins fortifiants à base de poudres naturelles et d'huiles africaines pour renforcer la fibre capillaire et prévenir la casse.",
+    objectif: "Fortifier et épaissir les cheveux fragilisés pour une chevelure plus résistante.",
   },
-  reparation: {
-    description: "Des soins profonds à la kératine végétale et aux protéines de soie pour restaurer les cheveux abîmés par la chaleur, les tresses ou les produits chimiques.",
-    objectif: "Réparer et restructurer la fibre capillaire pour des cheveux plus forts et plus résistants.",
+  soin: {
+    description: "Des shampooings doux et bains d'huile pour nettoyer en douceur tout en nourrissant le cuir chevelu et la fibre capillaire.",
+    objectif: "Nettoyer et revitaliser les cheveux sans les agresser, en préservant leur hydratation naturelle.",
   },
-  eclat: {
-    description: "Des sprays et huiles légères qui apportent brillance et éclat instantanés à vos cheveux. Finition parfaite pour tous vos styles.",
-    objectif: "Sublimer vos coiffures avec une brillance miroir et un parfum envoûtant longue durée.",
+  quotidien: {
+    description: "Des sprays et soins sans rinçage légers pour démêler, hydrater et sublimer vos cheveux au quotidien.",
+    objectif: "Simplifier votre routine capillaire avec des produits multi-usage faciles à utiliser chaque jour.",
   },
 };
 
