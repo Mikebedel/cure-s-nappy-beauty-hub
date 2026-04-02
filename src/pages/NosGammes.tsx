@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { gammes, products } from "@/data/products";
+import { gammes, products, gammePacks } from "@/data/products";
+import { useCart } from "@/contexts/CartContext";
 
 const gammeDescriptions: Record<string, { description: string; objectif: string }> = {
   hydratation: {
@@ -35,12 +36,61 @@ const NosGammes = () => {
             Nos Gammes
           </h1>
           <p className="text-primary-foreground/70 max-w-md mx-auto">
-            5 gammes spécialisées pour répondre à chaque besoin de vos cheveux naturels.
+            Des gammes complètes pour répondre à chaque besoin de vos cheveux naturels.
           </p>
         </div>
       </section>
 
+      {/* Gamme Packs */}
+      <section className="container mx-auto py-12">
+        <h2 className="font-heading text-2xl md:text-3xl font-bold text-center mb-3">
+          Nos packs gammes
+        </h2>
+        <p className="text-muted-foreground text-center max-w-lg mx-auto mb-10">
+          Économisez en choisissant une gamme complète adaptée à vos besoins capillaires.
+        </p>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {gammePacks.map((pack) => (
+            <div
+              key={pack.id}
+              className="bg-card border border-border rounded-2xl overflow-hidden hover:shadow-lg transition-shadow group"
+            >
+              <div className="aspect-square overflow-hidden">
+                <img
+                  src={pack.image}
+                  alt={pack.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                />
+              </div>
+              <div className="p-5">
+                <h3 className="font-heading text-lg font-bold mb-1">{pack.name}</h3>
+                <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{pack.description}</p>
+                <div className="flex flex-wrap gap-1.5 mb-4">
+                  {pack.benefits.map((b, i) => (
+                    <span key={i} className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                      {b}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xl font-bold text-primary">{pack.price.toLocaleString()} FCFA</span>
+                  <Button size="sm" className="bg-action text-action-foreground hover:bg-action/90">
+                    <ShoppingBag className="h-4 w-4 mr-1" />
+                    Commander
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Gammes par catégorie */}
       <div className="container mx-auto py-12 space-y-16">
+        <h2 className="font-heading text-2xl md:text-3xl font-bold text-center mb-3">
+          Nos catégories de produits
+        </h2>
         {gammes.map((g, i) => {
           const gammeProducts = products.filter((p) => p.gamme === g.id);
           const info = gammeDescriptions[g.id];
@@ -51,7 +101,7 @@ const NosGammes = () => {
               <div className="grid md:grid-cols-2 gap-8 items-start">
                 <div className={isEven ? "" : "md:order-2"}>
                   <span className="text-4xl">{g.icon}</span>
-                  <h2 className="font-heading text-2xl md:text-3xl font-bold mt-3 mb-2">{g.name}</h2>
+                  <h3 className="font-heading text-2xl md:text-3xl font-bold mt-3 mb-2">{g.name}</h3>
                   {info && (
                     <>
                       <p className="text-muted-foreground mb-4">{info.description}</p>
@@ -70,9 +120,9 @@ const NosGammes = () => {
                 </div>
 
                 <div className={isEven ? "" : "md:order-1"}>
-                  <h3 className="font-heading font-semibold mb-4 text-sm uppercase tracking-wider text-primary">
+                  <h4 className="font-heading font-semibold mb-4 text-sm uppercase tracking-wider text-primary">
                     Produits de la gamme
-                  </h3>
+                  </h4>
                   <div className="space-y-3">
                     {gammeProducts.map((p) => (
                       <Link
