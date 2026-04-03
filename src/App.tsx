@@ -15,7 +15,18 @@ import APropos from "./pages/APropos";
 import Contact from "./pages/Contact";
 import ProductDetail from "./pages/ProductDetail";
 import Panier from "./pages/Panier";
+import Checkout from "./pages/Checkout";
 import NotFound from "./pages/NotFound";
+import AdminLayout from "./layouts/AdminLayout";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminOrders from "./pages/admin/AdminOrders";
+import AdminProducts from "./pages/admin/AdminProducts";
+import AdminClients from "./pages/admin/AdminClients";
+import AdminAnalytics from "./pages/admin/AdminAnalytics";
+import AdminMarketing from "./pages/admin/AdminMarketing";
+import AdminReviews from "./pages/admin/AdminReviews";
+import AdminReports from "./pages/admin/AdminReports";
+import AdminSupport from "./pages/admin/AdminSupport";
 
 const queryClient = new QueryClient();
 
@@ -26,20 +37,41 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Navbar />
           <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/boutique" element={<Boutique />} />
-            <Route path="/nos-gammes" element={<NosGammes />} />
-            <Route path="/conseils" element={<Conseils />} />
-            <Route path="/a-propos" element={<APropos />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/produit/:id" element={<ProductDetail />} />
-            <Route path="/panier" element={<Panier />} />
-            <Route path="*" element={<NotFound />} />
+            {/* Admin routes - no Navbar/Footer */}
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="commandes" element={<AdminOrders />} />
+              <Route path="produits" element={<AdminProducts />} />
+              <Route path="clients" element={<AdminClients />} />
+              <Route path="analytics" element={<AdminAnalytics />} />
+              <Route path="marketing" element={<AdminMarketing />} />
+              <Route path="avis" element={<AdminReviews />} />
+              <Route path="rapports" element={<AdminReports />} />
+              <Route path="support" element={<AdminSupport />} />
+            </Route>
+
+            {/* Public routes */}
+            <Route path="*" element={
+              <>
+                <Navbar />
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/boutique" element={<Boutique />} />
+                  <Route path="/nos-gammes" element={<NosGammes />} />
+                  <Route path="/conseils" element={<Conseils />} />
+                  <Route path="/a-propos" element={<APropos />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/produit/:id" element={<ProductDetail />} />
+                  <Route path="/panier" element={<Panier />} />
+                  <Route path="/checkout" element={<Checkout />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+                <Footer />
+                <WhatsAppButton />
+              </>
+            } />
           </Routes>
-          <Footer />
-          <WhatsAppButton />
         </BrowserRouter>
       </CartProvider>
     </TooltipProvider>
