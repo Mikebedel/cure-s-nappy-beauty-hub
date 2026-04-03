@@ -84,8 +84,8 @@ const Panier = () => {
                 <span className="text-primary">{totalPrice.toLocaleString()} FCFA</span>
               </div>
             </div>
-            <Button className="w-full bg-action text-action-foreground hover:bg-action/90 text-base" size="lg">
-              Passer la commande
+            <Button asChild className="w-full bg-action text-action-foreground hover:bg-action/90 text-base" size="lg">
+              <Link to="/checkout">Passer la commande</Link>
             </Button>
             <p className="text-xs text-muted-foreground text-center mt-3">
               Mobile Money · Paiement à la livraison
