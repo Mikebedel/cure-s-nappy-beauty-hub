@@ -1,26 +1,43 @@
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useEffect, useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Search, Users, UserPlus, UserCheck } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
-const mockClients = [
-  { id: "1", name: "Aminata Koné", phone: "+225 07 01 02 03", email: "aminata@mail.com", orders: 5, totalSpent: 125000, lastOrder: "2026-04-03", segment: "Fidèle" },
-  { id: "2", name: "Fatou Diallo", phone: "+225 05 04 05 06", email: "fatou@mail.com", orders: 3, totalSpent: 78000, lastOrder: "2026-04-02", segment: "Fidèle" },
-  { id: "3", name: "Marie Aké", phone: "+225 01 07 08 09", email: "marie@mail.com", orders: 1, totalSpent: 18500, lastOrder: "2026-04-01", segment: "Nouveau" },
-  { id: "4", name: "Awa Bamba", phone: "+225 07 10 11 12", email: "", orders: 1, totalSpent: 12000, lastOrder: "2026-03-15", segment: "Nouveau" },
-  { id: "5", name: "Cécile Touré", phone: "+225 01 13 14 15", email: "cecile@mail.com", orders: 8, totalSpent: 230000, lastOrder: "2026-03-28", segment: "Fidèle" },
-];
+interface Customer {
+  id: string;
+  name: string;
+  phone: string;
+  email: string | null;
+  orders_count: number | null;
+  total_spent: number | null;
+  segment: string | null;
+}
 
 const segmentColor: Record<string, string> = {
-  "Nouveau": "bg-blue-100 text-blue-700",
-  "Fidèle": "bg-green-100 text-green-700",
-  "Inactif": "bg-gray-100 text-gray-700",
+  nouveau: "bg-blue-100 text-blue-700",
+  fidele: "bg-green-100 text-green-700",
+  inactif: "bg-gray-100 text-gray-700",
+};
+const segmentLabel: Record<string, string> = {
+  nouveau: "Nouveau", fidele: "Fidèle", inactif: "Inactif",
 };
 
 const AdminClients = () => {
+  const [clients, setClients] = useState<Customer[]>([]);
   const [search, setSearch] = useState("");
-  const filtered = mockClients.filter(c => c.name.toLowerCase().includes(search.toLowerCase()) || c.phone.includes(search));
+
+  useEffect(() => {
+    const fetch = async () => {
+      const { data } = await supabase.from("customers").select("*").order("created_at", { ascending: false });
+      if (data) setClients(data);
+    };
+    fetch();
+  }, []);
+
+  const filtered = clients.filter(c => c.name.toLowerCase().includes(search.toLowerCase()) || c.phone.includes(search));
+  const newCount = clients.filter(c => c.segment === "nouveau").length;
+  const loyalCount = clients.filter(c => c.segment === "fidele").length;
 
   return (
     <div className="space-y-6">
@@ -30,9 +47,9 @@ const AdminClients = () => {
       </div>
 
       <div className="grid grid-cols-3 gap-4">
-        <Card><CardContent className="p-4 flex items-center gap-3"><Users className="h-8 w-8 text-primary" /><div><div className="text-xl font-bold">{mockClients.length}</div><div className="text-xs text-muted-foreground">Total clients</div></div></CardContent></Card>
-        <Card><CardContent className="p-4 flex items-center gap-3"><UserPlus className="h-8 w-8 text-blue-500" /><div><div className="text-xl font-bold">2</div><div className="text-xs text-muted-foreground">Nouveaux</div></div></CardContent></Card>
-        <Card><CardContent className="p-4 flex items-center gap-3"><UserCheck className="h-8 w-8 text-green-500" /><div><div className="text-xl font-bold">3</div><div className="text-xs text-muted-foreground">Fidèles</div></div></CardContent></Card>
+        <Card><CardContent className="p-4 flex items-center gap-3"><Users className="h-8 w-8 text-primary" /><div><div className="text-xl font-bold">{clients.length}</div><div className="text-xs text-muted-foreground">Total clients</div></div></CardContent></Card>
+        <Card><CardContent className="p-4 flex items-center gap-3"><UserPlus className="h-8 w-8 text-blue-500" /><div><div className="text-xl font-bold">{newCount}</div><div className="text-xs text-muted-foreground">Nouveaux</div></div></CardContent></Card>
+        <Card><CardContent className="p-4 flex items-center gap-3"><UserCheck className="h-8 w-8 text-green-500" /><div><div className="text-xl font-bold">{loyalCount}</div><div className="text-xs text-muted-foreground">Fidèles</div></div></CardContent></Card>
       </div>
 
       <div className="relative">
@@ -41,6 +58,7 @@ const AdminClients = () => {
       </div>
 
       <div className="space-y-3">
+        {filtered.length === 0 && <p className="text-sm text-muted-foreground">Aucun client pour le moment</p>}
         {filtered.map(c => (
           <Card key={c.id}>
             <CardContent className="p-4 flex items-center justify-between">
@@ -50,10 +68,12 @@ const AdminClients = () => {
               </div>
               <div className="flex items-center gap-4 text-right">
                 <div>
-                  <div className="text-sm font-bold">{c.totalSpent.toLocaleString()} FCFA</div>
-                  <div className="text-xs text-muted-foreground">{c.orders} commandes</div>
+                  <div className="text-sm font-bold">{(c.total_spent || 0).toLocaleString()} FCFA</div>
+                  <div className="text-xs text-muted-foreground">{c.orders_count || 0} commandes</div>
                 </div>
-                <span className={`text-xs px-2 py-0.5 rounded-full ${segmentColor[c.segment]}`}>{c.segment}</span>
+                <span className={`text-xs px-2 py-0.5 rounded-full ${segmentColor[c.segment || "nouveau"]}`}>
+                  {segmentLabel[c.segment || "nouveau"]}
+                </span>
               </div>
             </CardContent>
           </Card>

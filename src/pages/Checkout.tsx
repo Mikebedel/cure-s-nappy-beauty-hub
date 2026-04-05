@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const communes = [
   { name: "Cocody", zone: "abidjan" },
@@ -61,19 +62,72 @@ const Checkout = () => {
     }
     setLoading(true);
 
-    // Generate order number
-    const orderNumber = `CN-${Date.now().toString(36).toUpperCase()}`;
+    try {
+      const customerName = `${form.firstName} ${form.lastName}`;
 
-    // Redirect to Fineo Pay
-    window.open("https://app.fineopay.com/cures_nappy/marie_marcelle/checkout", "_blank");
+      // Create order in database
+      const { data: order, error: orderError } = await supabase
+        .from("orders")
+        .insert({
+          order_number: `CN-${Date.now().toString(36).toUpperCase()}`,
+          customer_name: customerName,
+          customer_phone: form.phone,
+          customer_email: form.email || null,
+          delivery_commune: form.commune,
+          delivery_address: form.address,
+          delivery_fee: deliveryFee,
+          subtotal: totalPrice,
+          total: grandTotal,
+          payment_method: form.paymentMethod,
+          status: "nouvelle",
+        })
+        .select()
+        .single();
 
-    toast({
-      title: "Commande enregistrée !",
-      description: `Commande ${orderNumber} confirmée. Merci pour votre achat !`,
-    });
+      if (orderError) throw orderError;
 
-    clearCart();
-    setTimeout(() => navigate("/"), 2000);
+      // Create order items
+      const orderItems = items.map(({ product, quantity }) => ({
+        order_id: order.id,
+        product_name: product.name,
+        product_price: product.price,
+        quantity,
+      }));
+
+      const { error: itemsError } = await supabase
+        .from("order_items")
+        .insert(orderItems);
+
+      if (itemsError) throw itemsError;
+
+      // Upsert customer
+      await supabase.from("customers").upsert(
+        {
+          name: customerName,
+          phone: form.phone,
+          email: form.email || null,
+          total_spent: grandTotal,
+          orders_count: 1,
+          last_order_at: new Date().toISOString(),
+        },
+        { onConflict: "phone", ignoreDuplicates: false }
+      );
+
+      // Redirect to Fineo Pay
+      window.open("https://app.fineopay.com/cures_nappy/marie_marcelle/checkout", "_blank");
+
+      toast({
+        title: "Commande enregistrée !",
+        description: `Commande ${order.order_number} confirmée. Merci pour votre achat !`,
+      });
+
+      clearCart();
+      setTimeout(() => navigate("/"), 2000);
+    } catch (error) {
+      console.error("Order error:", error);
+      toast({ title: "Erreur", description: "Une erreur est survenue. Veuillez réessayer.", variant: "destructive" });
+    }
+
     setLoading(false);
   };
 
@@ -99,9 +153,7 @@ const Checkout = () => {
 
         <form onSubmit={handleSubmit}>
           <div className="grid lg:grid-cols-3 gap-8">
-            {/* Left: Form */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Personal info */}
               <div className="bg-card border border-border rounded-lg p-6">
                 <h2 className="font-heading font-semibold text-lg mb-4 flex items-center gap-2">
                   <User className="h-5 w-5 text-primary" /> Informations personnelles
@@ -126,7 +178,6 @@ const Checkout = () => {
                 </div>
               </div>
 
-              {/* Delivery */}
               <div className="bg-card border border-border rounded-lg p-6">
                 <h2 className="font-heading font-semibold text-lg mb-4 flex items-center gap-2">
                   <MapPin className="h-5 w-5 text-primary" /> Adresse de livraison
@@ -158,7 +209,6 @@ const Checkout = () => {
                 )}
               </div>
 
-              {/* Payment */}
               <div className="bg-card border border-border rounded-lg p-6">
                 <h2 className="font-heading font-semibold text-lg mb-4 flex items-center gap-2">
                   <CreditCard className="h-5 w-5 text-primary" /> Mode de paiement
@@ -183,7 +233,6 @@ const Checkout = () => {
               </div>
             </div>
 
-            {/* Right: Summary */}
             <div className="bg-card border border-border rounded-lg p-6 h-fit sticky top-24">
               <h2 className="font-heading font-semibold text-lg mb-4">Récapitulatif</h2>
               <div className="space-y-3 mb-4">
