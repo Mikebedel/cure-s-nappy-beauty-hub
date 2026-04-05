@@ -6,24 +6,24 @@ import { useCart } from "@/contexts/CartContext";
 
 const gammeDescriptions: Record<string, { description: string; objectif: string }> = {
   hydratation: {
-    description: "Des crèmes et masques riches en beurre de karité et aloe vera pour hydrater intensément et apporter du volume à vos cheveux.",
-    objectif: "Apporter et maintenir l'hydratation des cheveux crépus et bouclés, même dans les climats chauds et humides.",
+    description: "Des crèmes, masques, huiles et sprays riches en beurre de karité et aloe vera pour hydrater intensément et nourrir vos cheveux en profondeur.",
+    objectif: "Apporter et maintenir l'hydratation et la nutrition des cheveux crépus et bouclés, même dans les climats chauds et humides.",
   },
-  croissance: {
-    description: "Des huiles concentrées en biotine, huile de ricin et extraits naturels pour stimuler la pousse et renforcer les racines.",
-    objectif: "Accélérer la croissance capillaire, prévenir la chute et fortifier les cheveux de la racine aux pointes.",
+  volume: {
+    description: "Des huiles concentrées en biotine, huile de ricin et extraits naturels pour stimuler la pousse et apporter du volume aux cheveux.",
+    objectif: "Accélérer la croissance capillaire, apporter du volume et de la longueur à vos cheveux.",
   },
   fortifiant: {
-    description: "Des soins fortifiants à base de poudres naturelles et d'huiles africaines pour renforcer la fibre capillaire et prévenir la casse.",
-    objectif: "Fortifier et épaissir les cheveux fragilisés pour une chevelure plus résistante.",
+    description: "Des soins fortifiants à base de poudres naturelles et d'huiles africaines pour renforcer la fibre capillaire, prévenir la casse et lutter contre la chute.",
+    objectif: "Fortifier et épaissir les cheveux fragilisés, lutter contre la chute pour une chevelure plus résistante.",
   },
   soin: {
-    description: "Des shampooings doux et bains d'huile pour nettoyer en douceur tout en nourrissant le cuir chevelu et la fibre capillaire.",
-    objectif: "Nettoyer et revitaliser les cheveux sans les agresser, en préservant leur hydratation naturelle.",
+    description: "Des shampooings doux et nettoyants pour nettoyer en douceur tout en éliminant les pellicules et apaisant les démangeaisons.",
+    objectif: "Nettoyer et revitaliser les cheveux sans les agresser, traiter les problèmes de pellicules et de cuir chevelu.",
   },
-  quotidien: {
-    description: "Des sprays et soins sans rinçage légers pour démêler, hydrater et sublimer vos cheveux au quotidien.",
-    objectif: "Simplifier votre routine capillaire avec des produits multi-usage faciles à utiliser chaque jour.",
+  boucle: {
+    description: "Des crèmes coiffantes spécialement conçues pour définir et sublimer les boucles naturelles de vos cheveux.",
+    objectif: "Définir parfaitement vos boucles avec une tenue longue durée et un effet anti-frisottis.",
   },
 };
 
