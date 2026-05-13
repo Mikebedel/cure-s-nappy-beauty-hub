@@ -3,14 +3,25 @@ import { ArrowRight, Leaf, Droplets, Sun, Truck, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { products, gammes } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
 import heroImage from "@/assets/hero-image.jpg";
 import productsShowcase from "@/assets/products-showcase.jpg";
+import slide1 from "@/assets/gamme-complete.jpg";
+import slide2 from "@/assets/gamme-soin-profond.jpg";
+import slide3 from "@/assets/gamme-hydratation-intense.jpg";
+import slide4 from "@/assets/gamme-minie-plus.jpg";
+import slide5 from "@/assets/gamme-minie.jpg";
 
-const testimonials = [
-  { name: "Aminata K.", text: "Mes cheveux n'ont jamais été aussi hydratés ! La crème au karité est un miracle.", rating: 5 },
-  { name: "Fatou D.", text: "Le sérum pousse rapide a changé ma vie. Résultats visibles en 3 semaines !", rating: 5 },
+const retours = [
+  { name: "Aminata K.", text: "Mes cheveux n'ont jamais été aussi hydratés ! La crème hydratante est un miracle.", rating: 5 },
+  { name: "Fatou D.", text: "L'Huile Extra Pousse a changé ma vie. Résultats visibles en 3 semaines !", rating: 5 },
   { name: "Marie-Claire A.", text: "Enfin des produits qui comprennent nos cheveux. Qualité premium à Abidjan !", rating: 5 },
+  { name: "Sandra B.", text: "La Gamme Minie+ a totalement transformé ma routine. Je recommande à 100%.", rating: 5 },
+  { name: "Awa T.", text: "Le Masque Fortifiant est incroyable, mes cheveux ont retrouvé force et éclat.", rating: 5 },
 ];
+
+const slides = [slide1, slide2, slide3, slide4, slide5];
 
 const Index = () => {
   const popularProducts = products.slice(0, 4);
@@ -26,7 +37,7 @@ const Index = () => {
         <div className="container mx-auto relative z-10 py-20">
           <div className="max-w-xl">
             <span className="inline-block bg-accent/20 text-accent px-4 py-1.5 rounded-full text-sm font-semibold mb-6 backdrop-blur-sm">
-              🌿 Soins naturels depuis Abidjan
+              🌿 Le meilleur remède pour tous vos bobos capillaires
             </span>
             <h1 className="font-heading text-4xl md:text-6xl font-bold text-card mb-6 leading-tight">
               Révélez la force naturelle de vos cheveux.
@@ -49,6 +60,29 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Slide défilant */}
+      <section className="py-12 bg-secondary">
+        <div className="container mx-auto">
+          <Carousel
+            opts={{ loop: true, align: "start" }}
+            plugins={[Autoplay({ delay: 3000, stopOnInteraction: false })]}
+            className="w-full"
+          >
+            <CarouselContent>
+              {slides.map((src, i) => (
+                <CarouselItem key={i} className="md:basis-1/2 lg:basis-1/3">
+                  <div className="aspect-square overflow-hidden rounded-2xl bg-card">
+                    <img src={src} alt={`Cure's Nappy ${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="hidden md:flex" />
+            <CarouselNext className="hidden md:flex" />
+          </Carousel>
+        </div>
+      </section>
+
       {/* Brand intro */}
       <section className="py-20 bg-secondary">
         <div className="container mx-auto">
@@ -60,8 +94,10 @@ const Index = () => {
               </h2>
               <p className="text-muted-foreground leading-relaxed mb-6">
                 Cure's Nappy est née à Abidjan avec une mission simple : offrir des soins capillaires naturels, 
-                efficaces et adaptés aux cheveux crépus et bouclés. Nos formules combinent le meilleur des 
-                ingrédients africains avec la science cosmétique moderne.
+                efficaces et adaptés aux cheveux crépus et bouclés.
+              </p>
+              <p className="italic text-primary font-semibold mb-6">
+                "Le meilleur remède pour tous vos bobos capillaires."
               </p>
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center p-4 bg-card rounded-lg">
@@ -159,26 +195,36 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Testimonials */}
+      {/* Retours clients (anciennement Témoignages) */}
       <section className="py-20 bg-primary">
-        <div className="container mx-auto text-center">
-          <span className="text-accent font-semibold text-sm uppercase tracking-wider">Témoignages</span>
-          <h2 className="font-heading text-3xl md:text-4xl font-bold mt-2 mb-10 text-primary-foreground">
-            Ce que disent nos clientes
-          </h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {testimonials.map((t, i) => (
-              <div key={i} className="bg-primary-foreground/10 backdrop-blur-sm rounded-lg p-6 text-left">
-                <div className="flex gap-1 mb-3">
-                  {Array.from({ length: t.rating }).map((_, j) => (
-                    <Star key={j} className="h-4 w-4 fill-accent text-accent" />
-                  ))}
-                </div>
-                <p className="text-primary-foreground/90 text-sm mb-4 italic">"{t.text}"</p>
-                <p className="text-accent font-semibold text-sm">{t.name}</p>
-              </div>
-            ))}
+        <div className="container mx-auto">
+          <div className="text-center mb-10">
+            <span className="text-accent font-semibold text-sm uppercase tracking-wider">Avis vérifiés</span>
+            <h2 className="font-heading text-3xl md:text-4xl font-bold mt-2 text-primary-foreground">
+              Retours clients
+            </h2>
           </div>
+          <Carousel
+            opts={{ loop: true, align: "start" }}
+            plugins={[Autoplay({ delay: 4000, stopOnInteraction: false })]}
+            className="max-w-5xl mx-auto"
+          >
+            <CarouselContent>
+              {retours.map((t, i) => (
+                <CarouselItem key={i} className="md:basis-1/2 lg:basis-1/3">
+                  <div className="bg-primary-foreground/10 backdrop-blur-sm rounded-lg p-6 text-left h-full">
+                    <div className="flex gap-1 mb-3">
+                      {Array.from({ length: t.rating }).map((_, j) => (
+                        <Star key={j} className="h-4 w-4 fill-accent text-accent" />
+                      ))}
+                    </div>
+                    <p className="text-primary-foreground/90 text-sm mb-4 italic">"{t.text}"</p>
+                    <p className="text-accent font-semibold text-sm">{t.name}</p>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
         </div>
       </section>
 
@@ -188,11 +234,10 @@ const Index = () => {
           <span className="text-primary font-semibold text-sm uppercase tracking-wider">Conseil capillaire</span>
           <h2 className="font-heading text-3xl font-bold mt-2 mb-4">Le conseil du moment</h2>
           <div className="bg-card border border-border rounded-2xl p-8 text-left">
-            <h3 className="font-heading text-xl font-semibold mb-3">💧 La méthode LOC pour une hydratation longue durée</h3>
+            <h3 className="font-heading text-xl font-semibold mb-3">🌿 Stimulez la pousse avec le massage du cuir chevelu</h3>
             <p className="text-muted-foreground leading-relaxed mb-4">
-              Liquid, Oil, Cream : vaporisez de l'eau sur vos cheveux, scellez avec une huile légère, 
-              puis appliquez une crème hydratante. Cette technique permet de maintenir l'hydratation 
-              pendant 2 à 3 jours, même par temps chaud.
+              Quelques gouttes d'Huile Extra Pousse, 5 à 10 minutes de massage circulaire, 3 à 4 fois par semaine. 
+              Vous activez la circulation sanguine et nourrissez les follicules pour des cheveux plus forts et plus longs.
             </p>
             <Button asChild variant="outline" className="border-primary text-primary hover:bg-primary/5">
               <Link to="/conseils">
