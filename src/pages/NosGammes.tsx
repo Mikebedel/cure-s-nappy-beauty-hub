@@ -53,9 +53,9 @@ const NosGammes = () => {
           {gammePacks.map((pack) => (
             <div
               key={pack.id}
-              className="bg-card border border-border rounded-2xl overflow-hidden hover:shadow-lg transition-shadow group"
+              className="bg-card border border-border rounded-2xl overflow-hidden hover:shadow-lg transition-shadow group flex flex-col"
             >
-              <div className="aspect-square overflow-hidden">
+              <div className="aspect-square overflow-hidden bg-secondary">
                 <img
                   src={pack.image}
                   alt={pack.name}
@@ -63,9 +63,22 @@ const NosGammes = () => {
                   loading="lazy"
                 />
               </div>
-              <div className="p-5">
+              <div className="p-5 flex flex-col flex-1">
                 <h3 className="font-heading text-lg font-bold mb-1">{pack.name}</h3>
-                <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{pack.description}</p>
+                <p className="text-sm text-muted-foreground mb-3">{pack.description}</p>
+                {pack.contains && pack.contains.length > 0 && (
+                  <div className="mb-3">
+                    <p className="text-xs font-semibold text-primary mb-1">Contient :</p>
+                    <ul className="text-xs text-muted-foreground space-y-0.5">
+                      {pack.contains.map((c, i) => (
+                        <li key={i}>• {c}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {pack.note && (
+                  <p className="text-xs italic text-primary/80 mb-3">NB : {pack.note}</p>
+                )}
                 <div className="flex flex-wrap gap-1.5 mb-4">
                   {pack.benefits.map((b, i) => (
                     <span key={i} className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
@@ -73,11 +86,13 @@ const NosGammes = () => {
                     </span>
                   ))}
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mt-auto">
                   <span className="text-xl font-bold text-primary">{pack.price.toLocaleString()} FCFA</span>
-                  <Button size="sm" className="bg-action text-action-foreground hover:bg-action/90">
-                    <ShoppingBag className="h-4 w-4 mr-1" />
-                    Commander
+                  <Button size="sm" asChild className="bg-action text-action-foreground hover:bg-action/90">
+                    <a href="https://wa.me/c/2250100848479" target="_blank" rel="noopener noreferrer">
+                      <ShoppingBag className="h-4 w-4 mr-1" />
+                      Commander
+                    </a>
                   </Button>
                 </div>
               </div>

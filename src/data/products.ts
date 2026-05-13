@@ -9,9 +9,8 @@ import cremeHydratanteVolume from "@/assets/creme-hydratante-volume.jpg";
 import bainDhuile from "@/assets/bain-dhuile.jpg";
 
 import gammeComplete from "@/assets/gamme-complete.jpg";
-import gammeSemiComplete from "@/assets/gamme-semi-complete.jpg";
-import gammeHydratante from "@/assets/gamme-hydratante.jpg";
-import gammeNourrissante from "@/assets/gamme-nourrissante.jpg";
+import gammeSoinProfond from "@/assets/gamme-soin-profond.jpg";
+import gammeHydratationIntense from "@/assets/gamme-hydratation-intense.jpg";
 import gammeMiniePlus from "@/assets/gamme-minie-plus.jpg";
 import gammeMinie from "@/assets/gamme-minie.jpg";
 
@@ -35,9 +34,12 @@ export interface GammePack {
   id: string;
   name: string;
   description: string;
+  longDescription?: string;
   price: number;
   image: string;
   benefits: string[];
+  contains: string[];
+  note?: string;
 }
 
 export const gammes = [
@@ -50,52 +52,90 @@ export const gammes = [
 
 export const gammePacks: GammePack[] = [
   {
-    id: "gamme-complete",
-    name: "Gamme Complète",
-    description: "Lutte contre tous vos problèmes capillaires - Définition des boucles",
-    price: 56000,
+    id: "gamme-complete-supreme",
+    name: "Gamme Complète Suprême",
+    description: "Permet d'atteindre tous vos objectifs capillaires & met fin à tous vos problèmes de cheveux.",
+    longDescription: "La gamme ultime qui combine l'ensemble de nos soins pour répondre à 100% des besoins capillaires : hydratation, nutrition, croissance, fortification, anti-chute et définition.",
+    price: 61000,
     image: gammeComplete,
-    benefits: ["Tous les produits inclus", "Définition des boucles", "Solution complète"],
+    benefits: ["Tous les produits inclus", "Solution complète", "Tous problèmes capillaires"],
+    contains: [
+      "Bain d'huile",
+      "Shampoing doux & clarifiant",
+      "Masque hydratant & protéiné",
+      "Masque fortifiant",
+      "Leave-in conditioner",
+      "Magical Spray",
+      "Crème hydratante & volume +",
+      "Crème bouclante",
+      "Huile Extra Pousse",
+      "Huile 2 en 1",
+    ],
   },
   {
-    id: "gamme-semi-complete",
-    name: "Gamme Semi-Complète",
-    description: "Lutte contre tous vos problèmes capillaires",
-    price: 49000,
-    image: gammeSemiComplete,
-    benefits: ["Soin complet", "Anti-problèmes capillaires", "Résultats durables"],
+    id: "gamme-soin-profond",
+    name: "Gamme Soin Profond & Réparateur",
+    description: "Répare & traite efficacement les cheveux très fragiles, ternes, rêches, abîmés et très cassants. Redonne vie et éclat à vos cheveux.",
+    price: 27000,
+    image: gammeSoinProfond,
+    benefits: ["Répare en profondeur", "Anti-casse", "Redonne éclat"],
+    contains: [
+      "Shampoing doux & clarifiant",
+      "Masque hydratant & protéiné",
+      "Masque fortifiant",
+      "Leave-in conditioner",
+      "Huile 2 en 1",
+    ],
   },
   {
-    id: "gamme-hydratante",
-    name: "Gamme Hydratante",
-    description: "Hydratation & Nutrition renforcées pour cheveux très secs / Abîmés",
-    price: 26000,
-    image: gammeHydratante,
-    benefits: ["Hydratation intense", "Nutrition renforcée", "Cheveux secs & abîmés"],
-  },
-  {
-    id: "gamme-nourrissante",
-    name: "Gamme Fortifiante & Nourrissante",
-    description: "Nourrit - Répare - Fortifie - Protège - Redonne de l'éclat - Améliore la santé capillaire - Lutte contre la casse",
-    price: 16000,
-    image: gammeNourrissante,
-    benefits: ["Nourrit & Répare", "Fortifie & Protège", "Anti-casse"],
+    id: "gamme-hydratation-intense",
+    name: "Gamme Hydratation Intense",
+    description: "Hydrate profondément et durablement pour des cheveux très souples, faciles à démêler et brillants.",
+    note: "Parfaite pour cheveux très secs, abîmés et difficiles à peigner.",
+    price: 38500,
+    image: gammeHydratationIntense,
+    benefits: ["Hydratation intense", "Démêlage facile", "Brillance"],
+    contains: [
+      "Bain d'huile",
+      "Shampoing doux",
+      "Masque hydratant",
+      "Leave-in",
+      "Spray",
+      "Crème hydratante",
+      "Huile 2 en 1",
+    ],
   },
   {
     id: "gamme-minie-plus",
     name: "Gamme Minie+",
-    description: "Hydratation - Pousse extra - Lavage doux & Nettoyant - Traitement anti-pelliculaire & démangeaisons - Anti-chutes",
-    price: 26500,
+    description: "Complète et renforce l'action de la Gamme Minie en stimulant la croissance rapide, stoppant la casse, les irritations du cuir chevelu et facilitant la circulation sanguine.",
+    note: "Idéale pour celles qui veulent un plus au soin de base.",
+    price: 33500,
     image: gammeMiniePlus,
-    benefits: ["Hydratation & Pousse", "Anti-pelliculaire", "Anti-chutes"],
+    benefits: ["Croissance rapide", "Anti-casse", "Anti-irritations"],
+    contains: [
+      "Shampoing doux & clarifiant",
+      "Leave-in conditioner",
+      "Magical Spray",
+      "Crème hydratante & volume+",
+      "Huile Extra Pousse",
+      "Huile 2 en 1",
+    ],
   },
   {
     id: "gamme-minie",
-    name: "Gamme Minie Débutante",
-    description: "Hydratation - Pousse - Lavage doux & Nettoyant",
-    price: 21000,
+    name: "Gamme Minie",
+    description: "Conçue pour une routine capillaire de base, simple et efficace, facilitant le coiffage au quotidien.",
+    note: "Idéale pour débuter une routine capillaire et corriger les problèmes de base.",
+    price: 22000,
     image: gammeMinie,
-    benefits: ["Hydratation", "Pousse", "Lavage doux"],
+    benefits: ["Routine simple", "Coiffage facile", "Pour débuter"],
+    contains: [
+      "Shampoing doux & clarifiant",
+      "Leave-in conditioner",
+      "Magical Spray",
+      "Crème hydratante & volume+",
+    ],
   },
 ];
 
@@ -133,7 +173,7 @@ export const products: Product[] = [
   {
     id: "3",
     name: "Leave-in Conditionner",
-    description: "Après-shampooing sans rinçage qui démêle, hydrate et protège les cheveux au quotidien. Adapté à tous types de cheveux : naturels, bouclés et défrisés. Testé et approuvé.",
+    description: "Après-shampooing sans rinçage qui démêle, hydrate et protège les cheveux au quotidien. Adapté à tous types de cheveux : naturels, bouclés et défrisés.",
     shortDescription: "Hydrate (effet durable) - Protège - Répare - Révitalise - Coiffe",
     price: 5000,
     image: leaveInConditionner,
@@ -141,20 +181,20 @@ export const products: Product[] = [
     volume: "100ml",
     benefits: ["Hydratation durable", "Protège & Répare", "Révitalise", "Coiffe facilement"],
     ingredients: ["Eau de coco", "Aloe vera", "Provitamine B5", "Extrait de bambou"],
-    usage: "Appliquer sur cheveux humides après le shampooing. Ne pas rincer. Démêler avec un peigne à dents larges.",
+    usage: "Appliquer sur cheveux humides après le shampooing. Ne pas rincer.",
     rating: 4.8,
     reviews: 178,
   },
   {
     id: "4",
     name: "Huile 2 en 1",
-    description: "Une huile nourrissante qui fortifie la fibre capillaire et prévient la casse. Adaptée à tous types de cheveux : naturels, bouclés et défrisés. Booste 2x plus l'efficacité du masque fortifiant.",
-    shortDescription: "Booste 2x plus l'efficacité du masque fortifiant",
-    price: 4000,
+    description: "Une huile fortifiante & scellante qui fortifie la fibre capillaire et prévient la casse. Adaptée à tous types de cheveux.",
+    shortDescription: "Fortifie - Scelle l'hydratation - Anti-casse",
+    price: 5000,
     image: huileFortifiante,
     gamme: "hydratation",
     volume: "100ml",
-    benefits: ["Fortifie la fibre", "Anti-casse", "Booste le masque fortifiant", "Brillance naturelle"],
+    benefits: ["Fortifie la fibre", "Anti-casse", "Scelle l'hydratation", "Brillance naturelle"],
     ingredients: ["Huile de baobab", "Huile de moringa", "Kératine végétale", "Vitamine E"],
     usage: "Appliquer quelques gouttes sur les longueurs et pointes. Utiliser comme scellant après la crème.",
     rating: 4.7,
@@ -163,7 +203,7 @@ export const products: Product[] = [
   {
     id: "5",
     name: "Magical Spray",
-    description: "Un spray magique multi-usage qui hydrate, démêle et apporte brillance instantanée. Adapté à tous types de cheveux. Parfait pour rafraîchir votre coiffure au quotidien.",
+    description: "Un spray multi-usage qui hydrate, démêle et apporte brillance instantanée. Parfait pour rafraîchir votre coiffure au quotidien.",
     shortDescription: "Hydrate instantanément les cheveux au quotidien",
     price: 5000,
     image: magicalSpray,
@@ -178,23 +218,23 @@ export const products: Product[] = [
   {
     id: "6",
     name: "Crème Hydratante",
-    description: "Une crème riche qui hydrate en profondeur tout en apportant du volume aux cheveux. Adaptée à tous types de cheveux : naturels, bouclés et défrisés.",
-    shortDescription: "Scelle l'hydratation - Ramollit - Donne du volume",
-    price: 5500,
+    description: "Une crème riche qui hydrate en profondeur. Adaptée à tous types de cheveux : naturels, bouclés et défrisés.",
+    shortDescription: "Scelle l'hydratation - Ramollit - Nourrit",
+    price: 6000,
     image: cremeHydratanteVolume,
     gamme: "hydratation",
-    benefits: ["Scelle l'hydratation", "Ramollit les cheveux", "Donne du volume", "Protection"],
+    benefits: ["Scelle l'hydratation", "Ramollit les cheveux", "Nourrit", "Protection"],
     ingredients: ["Beurre de karité", "Huile de coco", "Aloe vera", "Vitamine E"],
-    usage: "Appliquer sur cheveux humides, mèche par mèche. Sceller avec une huile légère.",
+    usage: "Appliquer sur cheveux humides, mèche par mèche.",
     rating: 4.8,
     reviews: 167,
   },
   {
     id: "7",
     name: "Masque Hydratant & Protéiné",
-    description: "Un masque profond qui combine hydratation et protéines pour restaurer les cheveux abîmés. Adapté à tous types de cheveux. Résultats visibles dès la première utilisation.",
+    description: "Un masque profond qui combine hydratation et protéines pour restaurer les cheveux abîmés. Résultats visibles dès la première utilisation.",
     shortDescription: "Hydrate - Nourrit 2x plus - Sublime les cheveux",
-    price: 5000,
+    price: 6000,
     image: masqueHydratantProteine,
     gamme: "hydratation",
     benefits: ["Hydrate en profondeur", "Nourrit 2x plus", "Sublime les cheveux", "Douceur extrême"],
@@ -206,8 +246,8 @@ export const products: Product[] = [
   {
     id: "8",
     name: "Huile Extra Pousse",
-    description: "Une huile concentrée qui stimule la croissance capillaire et renforce les racines. Formulée avec des ingrédients naturels adaptés à tous types de cheveux : naturels, bouclés et défrisés.",
-    shortDescription: "Active la pousse rapide des cheveux - Lutte contre les alopécies - Tonifie les racines",
+    description: "Une huile concentrée qui stimule la croissance capillaire et renforce les racines. Formulée avec des ingrédients naturels.",
+    shortDescription: "Active la pousse rapide - Lutte contre les alopécies - Tonifie les racines",
     price: 6500,
     image: huileExtraPousse,
     gamme: "volume",
@@ -221,9 +261,9 @@ export const products: Product[] = [
   {
     id: "9",
     name: "Crème Hydratante & Volume+",
-    description: "Une crème riche qui hydrate en profondeur tout en apportant du volume aux cheveux. Adaptée à tous types de cheveux : naturels, bouclés et défrisés.",
+    description: "Une crème riche qui hydrate en profondeur tout en apportant du volume aux cheveux.",
     shortDescription: "Scelle l'hydratation - Ramollit - Donne du volume",
-    price: 5500,
+    price: 6000,
     image: cremeHydratanteVolume,
     gamme: "volume",
     benefits: ["Scelle l'hydratation", "Ramollit les cheveux", "Donne du volume", "Protection"],
@@ -235,7 +275,7 @@ export const products: Product[] = [
   {
     id: "10",
     name: "Masque Fortifiant",
-    description: "Un masque 100% naturel à base de poudres africaines qui fortifie et épaissit les cheveux. Adapté à tous types de cheveux. Le meilleur remède pour tous vos bobos capillaires.",
+    description: "Un masque 100% naturel à base de poudres africaines qui fortifie et épaissit les cheveux.",
     shortDescription: "Fortifie - Anti-chutes - Donne du volume & l'éclat",
     price: 5000,
     image: masqueFortifiant,
@@ -249,22 +289,22 @@ export const products: Product[] = [
   {
     id: "11",
     name: "Huile 2 en 1 Fortifiante",
-    description: "Une huile nourrissante qui fortifie la fibre capillaire et prévient la casse. Adaptée à tous types de cheveux : naturels, bouclés et défrisés.",
+    description: "Une huile nourrissante qui fortifie la fibre capillaire et prévient la casse.",
     shortDescription: "Fortifie - Nourrit - Prévient la casse",
-    price: 4000,
+    price: 5000,
     image: huileFortifiante,
     gamme: "fortifiant",
     volume: "100ml",
     benefits: ["Fortifie la fibre", "Anti-casse", "Nourrit en profondeur", "Brillance naturelle"],
     ingredients: ["Huile de baobab", "Huile de moringa", "Kératine végétale", "Vitamine E"],
-    usage: "Appliquer quelques gouttes sur les longueurs et pointes. Utiliser comme scellant après la crème.",
+    usage: "Appliquer quelques gouttes sur les longueurs et pointes.",
     rating: 4.7,
     reviews: 145,
   },
   {
     id: "12",
     name: "Shampoing Doux & Clarifiant Anti-pelliculaire",
-    description: "Un shampooing nettoyant ultra-doux qui clarifie le cuir chevelu et élimine les pellicules. Adapté à tous types de cheveux.",
+    description: "Un shampooing nettoyant ultra-doux qui clarifie le cuir chevelu et élimine les pellicules.",
     shortDescription: "Nettoie - Apaise - Élimine les pellicules - Anti-démangeaisons",
     price: 6000,
     image: shampoingDouxClarifiant,
@@ -279,7 +319,7 @@ export const products: Product[] = [
   {
     id: "13",
     name: "Crème Bouclante",
-    description: "Une crème coiffante qui définit parfaitement les boucles de vos cheveux. Adaptée à tous types de cheveux bouclés et naturels pour des boucles sublimes et bien dessinées.",
+    description: "Une crème coiffante qui définit parfaitement les boucles de vos cheveux. Pour des boucles sublimes et bien dessinées.",
     shortDescription: "Définit parfaitement les boucles de vos cheveux",
     price: 8500,
     image: cremeHydratanteVolume,
