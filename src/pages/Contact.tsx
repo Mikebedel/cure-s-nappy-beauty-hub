@@ -40,7 +40,7 @@ const Contact = () => {
             <div className="space-y-6">
               {[
                 { icon: MapPin, label: "Adresse", value: "Abidjan, Côte d'Ivoire" },
-                { icon: Phone, label: "Téléphone", value: "+225 07 00 00 00 00" },
+                { icon: Phone, label: "Téléphone", value: "+225 01 00 84 84 79" },
                 { icon: Mail, label: "Email", value: "contact@curesnappy.ci" },
               ].map((item, i) => (
                 <div key={i} className="flex items-start gap-4">
@@ -64,7 +64,7 @@ const Contact = () => {
                 Pour une réponse rapide, contactez-nous directement sur WhatsApp.
               </p>
               <Button asChild className="bg-green-600 hover:bg-green-700 text-white">
-                <a href="https://wa.me/2250700000000" target="_blank" rel="noopener noreferrer">
+                <a href="https://wa.me/c/2250100848479" target="_blank" rel="noopener noreferrer">
                   Écrire sur WhatsApp
                 </a>
               </Button>

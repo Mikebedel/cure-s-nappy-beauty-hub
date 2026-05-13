@@ -37,8 +37,9 @@ const Footer = () => {
             <h4 className="font-semibold mb-3 text-sm uppercase tracking-wider">Contact</h4>
             <div className="flex flex-col gap-2 text-sm text-primary-foreground/70">
               <p>Abidjan, Côte d'Ivoire</p>
-              <p>+225 07 00 00 00 00</p>
+              <p>+225 01 00 84 84 79</p>
               <p>contact@curesnappy.ci</p>
+              <p className="italic mt-2">"Le meilleur remède pour tous vos bobos capillaires."</p>
             </div>
           </div>
         </div>
