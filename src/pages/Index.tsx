@@ -228,6 +228,9 @@ const Index = () => {
         </div>
       </section>
 
+      {/* ============ BANNIÈRE 3 IMAGES — APRÈS DEUX RITUELS ============ */}
+      <BoutiqueBanner images={[slide1, slide4, slide6]} />
+
       {/* ============ À NE PAS MANQUER ============ */}
       <section className="py-24 bg-secondary">
         <div className="container mx-auto">
@@ -245,11 +248,14 @@ const Index = () => {
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             {selection.map((p) => (
-              <ProductCard key={p.id} product={p} />
+              <ProductCard key={p.id} product={p} hideBadge />
             ))}
           </div>
         </div>
       </section>
+
+      {/* ============ BANNIÈRE 3 IMAGES — APRÈS À NE PAS MANQUER ============ */}
+      <BoutiqueBanner images={[slide2, slide3, slide5]} />
 
       {/* ============ NÉE À ABIDJAN ============ */}
       <section className="py-28 bg-primary text-primary-foreground">
