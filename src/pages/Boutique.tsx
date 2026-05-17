@@ -1,10 +1,11 @@
 import { useMemo, useState } from "react";
-import { useSearchParams, Link } from "react-router-dom";
+import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import { ChevronDown, ShoppingBag, MapPin, Sparkles, ArrowRight } from "lucide-react";
-import { products, gammes, gammePacks } from "@/data/products";
+import { products, gammes, gammePacks, packToProduct } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { toast } from "sonner";
 
 const Boutique = () => {
   const [searchParams] = useSearchParams();
@@ -12,6 +13,13 @@ const Boutique = () => {
   const [activeFilter, setActiveFilter] = useState<string>(initialGamme ?? "all");
   const [gammesOpen, setGammesOpen] = useState(false);
   const { addToCart } = useCart();
+  const navigate = useNavigate();
+
+  const handleAddPack = (pack: typeof gammePacks[number]) => {
+    addToCart(packToProduct(pack));
+    toast.success(`${pack.name} ajouté au panier`);
+    navigate("/panier");
+  };
 
   const filtered = useMemo(
     () => (activeFilter === "all" ? products : products.filter((p) => p.gamme === activeFilter)),
@@ -168,8 +176,9 @@ const Boutique = () => {
                   onClick={(e) => {
                     e.preventDefault();
                     addToCart(p);
+                    toast.success(`${p.name} ajouté au panier`);
                   }}
-                  className="absolute bottom-3 right-3 bg-primary text-primary-foreground rounded-full p-2.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-accent hover:text-accent-foreground"
+                  className="absolute bottom-3 right-3 bg-action text-white rounded-full p-2.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-action/90 shadow-lg"
                   aria-label="Ajouter au panier"
                 >
                   <ShoppingBag className="h-4 w-4" />
@@ -187,12 +196,17 @@ const Boutique = () => {
               <div className="mt-2 text-primary font-semibold">
                 {p.price.toLocaleString()} FCFA
               </div>
-              <Link
-                to={`/produit/${p.id}`}
-                className="mt-3 text-[11px] tracking-[0.2em] uppercase text-foreground/70 hover:text-primary inline-flex items-center gap-1"
+              <Button
+                size="sm"
+                onClick={() => {
+                  addToCart(p);
+                  toast.success(`${p.name} ajouté au panier`);
+                }}
+                className="mt-3 bg-action text-white hover:bg-action/90 font-semibold rounded-full"
               >
-                Voir le détail <ArrowRight className="h-3 w-3" />
-              </Link>
+                <ShoppingBag className="h-4 w-4 mr-1" />
+                Ajouter
+              </Button>
             </article>
           ))}
         </div>
@@ -249,16 +263,11 @@ const Boutique = () => {
                         </span>
                         <Button
                           size="sm"
-                          asChild
-                          className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full"
+                          onClick={() => handleAddPack(pack)}
+                          className="bg-action text-white hover:bg-action/90 rounded-full font-semibold"
                         >
-                          <a
-                            href="https://wa.me/c/2250100848479"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            Commander
-                          </a>
+                          <ShoppingBag className="h-4 w-4 mr-1" />
+                          Ajouter
                         </Button>
                       </div>
                     </div>
