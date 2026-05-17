@@ -8,6 +8,8 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import ScrollToTop from "@/components/ScrollToTop";
+import SplashScreen from "@/components/SplashScreen";
 import Index from "./pages/Index";
 import Boutique from "./pages/Boutique";
 import NosGammes from "./pages/NosGammes";
@@ -47,7 +49,9 @@ const App = () => (
         <CartProvider>
           <Toaster />
           <Sonner />
+          <SplashScreen />
           <BrowserRouter>
+            <ScrollToTop />
             <Routes>
               {/* Admin login */}
               <Route path="/admin/login" element={<AdminLogin />} />
