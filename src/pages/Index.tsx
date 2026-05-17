@@ -350,4 +350,34 @@ const Index = () => {
   );
 };
 
+const BoutiqueBanner = ({ images }: { images: string[] }) => (
+  <section className="py-12 md:py-16 bg-background">
+    <div className="container mx-auto px-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+        {images.map((src, i) => (
+          <Link
+            key={i}
+            to="/boutique"
+            className="relative group overflow-hidden rounded-2xl aspect-[16/9] md:aspect-[4/3] block"
+          >
+            <img
+              src={src}
+              alt={`Cure's Nappy — boutique ${i + 1}`}
+              loading="lazy"
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-primary/85 via-primary/30 to-transparent" />
+            <div className="absolute inset-0 flex items-end p-6">
+              <span className="inline-flex items-center gap-2 bg-action text-white px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider shadow-lg group-hover:gap-3 transition-all">
+                Voir la boutique
+                <ArrowRight className="h-4 w-4" />
+              </span>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
 export default Index;
