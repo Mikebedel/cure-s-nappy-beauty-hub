@@ -139,6 +139,21 @@ export const gammePacks: GammePack[] = [
   },
 ];
 
+export const packToProduct = (pack: GammePack): Product => ({
+  id: `pack-${pack.id}`,
+  name: pack.name,
+  description: pack.description,
+  shortDescription: pack.description,
+  price: pack.price,
+  image: pack.image,
+  gamme: "pack",
+  benefits: pack.benefits,
+  ingredients: [],
+  usage: "",
+  rating: 5,
+  reviews: 0,
+});
+
 export const products: Product[] = [
   {
     id: "1",
