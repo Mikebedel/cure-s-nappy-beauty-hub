@@ -108,7 +108,37 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ============ NOS PIÈCES DU MOMENT ============ */}
+      {/* ============ LIFESTYLE SLIDER ============ */}
+      <section className="py-16 md:py-20 bg-background">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-10">
+            <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">L'univers</span>
+            <h2 className="font-heading text-3xl md:text-4xl font-bold mt-3">
+              Notre <em className="italic text-accent font-medium">communauté</em>
+            </h2>
+          </div>
+          <Carousel
+            opts={{ loop: true, align: "start" }}
+            plugins={[Autoplay({ delay: 3500, stopOnInteraction: false })]}
+          >
+            <CarouselContent>
+              {lifestyleSlides.map((src, i) => (
+                <CarouselItem key={i} className="basis-2/3 sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
+                  <div className="aspect-[3/4] overflow-hidden rounded-2xl bg-secondary group">
+                    <img
+                      src={src}
+                      alt={`Cure's Nappy — moment ${i + 1}`}
+                      loading="lazy"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
+        </div>
+      </section>
+
       <section className="py-24">
         <div className="container mx-auto">
           <div className="flex items-end justify-between mb-12 flex-wrap gap-6">
