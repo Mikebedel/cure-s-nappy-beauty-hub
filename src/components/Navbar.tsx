@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ShoppingBag, Menu, X, Home } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import logo from "@/assets/logo.jpg";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,31 +26,79 @@ const Navbar = () => {
     { label: "Contact", to: "/contact" },
   ];
 
+  // Animated indicator
+  const listRef = useRef<HTMLDivElement>(null);
+  const itemRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+  const [hoverIdx, setHoverIdx] = useState<number | null>(null);
+  const [indicator, setIndicator] = useState({ left: 0, width: 0, opacity: 0 });
+
+  const activeIdx = navLinks.findIndex((l) => l.to === location.pathname);
+
+  useLayoutEffect(() => {
+    const idx = hoverIdx ?? activeIdx;
+    const el = itemRefs.current[idx];
+    const list = listRef.current;
+    if (el && list) {
+      const rect = el.getBoundingClientRect();
+      const parentRect = list.getBoundingClientRect();
+      setIndicator({
+        left: rect.left - parentRect.left,
+        width: rect.width,
+        opacity: idx === -1 ? 0 : 1,
+      });
+    } else {
+      setIndicator((s) => ({ ...s, opacity: 0 }));
+    }
+  }, [hoverIdx, activeIdx, location.pathname]);
+
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "py-2" : "py-4"}`}>
       <div className="container mx-auto flex items-center justify-between gap-4">
         <Link
           to="/"
-          className={`font-heading text-xl md:text-2xl font-bold transition-colors ${
-            scrolled ? "text-primary" : "text-primary-foreground drop-shadow"
-          }`}
+          className="flex items-center gap-2 transition-colors"
         >
-          Cure's <em className="text-accent not-italic">Nappy</em>
+          <img
+            src={logo}
+            alt="Cure's Nappy"
+            className="h-10 w-10 md:h-12 md:w-12 rounded-full object-cover ring-2 ring-accent/40 shadow-sm bg-background"
+          />
+          <span className={`font-heading text-lg md:text-xl font-bold hidden sm:inline ${
+            scrolled ? "text-primary" : "text-primary-foreground drop-shadow"
+          }`}>
+            Cure's <em className="text-accent not-italic">Nappy</em>
+          </span>
         </Link>
 
-        {/* Desktop pill nav */}
-        <div className="hidden lg:flex items-center gap-1 bg-background/90 backdrop-blur-md border border-border rounded-full px-2 py-1.5 shadow-sm">
-          {navLinks.map((link) => {
-            const active = location.pathname === link.to;
+        {/* Desktop pill nav with animated indicator */}
+        <div
+          ref={listRef}
+          className="hidden lg:flex items-center gap-1 bg-background/90 backdrop-blur-md border border-border rounded-full px-2 py-1.5 shadow-sm relative"
+          onMouseLeave={() => setHoverIdx(null)}
+        >
+          {/* Animated highlight */}
+          <span
+            className="absolute top-1.5 bottom-1.5 rounded-full bg-accent shadow-sm transition-all duration-300 ease-out pointer-events-none"
+            style={{
+              left: indicator.left,
+              width: indicator.width,
+              opacity: indicator.opacity,
+            }}
+          />
+          {navLinks.map((link, i) => {
+            const active = activeIdx === i;
+            const hovered = hoverIdx === i;
             const Icon = link.icon;
             return (
               <Link
                 key={link.label}
                 to={link.to}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all inline-flex items-center gap-1.5 ${
-                  active
-                    ? "bg-accent text-accent-foreground shadow-sm"
-                    : "text-foreground/70 hover:text-primary"
+                ref={(el) => (itemRefs.current[i] = el)}
+                onMouseEnter={() => setHoverIdx(i)}
+                className={`relative z-10 px-4 py-2 rounded-full text-sm font-medium transition-colors inline-flex items-center gap-1.5 ${
+                  active || hovered
+                    ? "text-accent-foreground"
+                    : "text-foreground/70"
                 }`}
               >
                 {Icon && <Icon className="h-3.5 w-3.5" />}

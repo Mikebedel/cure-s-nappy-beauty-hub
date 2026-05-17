@@ -4,11 +4,19 @@ import { Product } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 
-const ProductCard = ({ product }: { product: Product }) => {
+const gammeLabels: Record<string, string> = {
+  hydratation: "💧 Hydratation",
+  volume: "📏 Volume",
+  fortifiant: "🛡️ Fortifiant",
+  soin: "✨ Soin",
+  boucle: "🌀 Boucle",
+};
+
+const ProductCard = ({ product, hideBadge = false }: { product: Product; hideBadge?: boolean }) => {
   const { addToCart } = useCart();
 
   return (
-    <div className="group bg-card rounded-lg overflow-hidden border border-border hover:shadow-lg transition-shadow">
+    <div className="group bg-card rounded-lg overflow-hidden border border-border hover:shadow-lg transition-shadow flex flex-col">
       <Link to={`/produit/${product.id}`}>
         <div className="aspect-square bg-muted relative overflow-hidden">
           <img
@@ -17,16 +25,14 @@ const ProductCard = ({ product }: { product: Product }) => {
             loading="lazy"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
-          <span className="absolute top-3 left-3 bg-primary text-primary-foreground text-xs font-semibold px-2 py-1 rounded-sm">
-            {product.gamme === "hydratation" && "💧 Hydratation"}
-            {product.gamme === "croissance" && "🌱 Croissance"}
-            {product.gamme === "definition" && "✨ Définition"}
-            {product.gamme === "reparation" && "🛡️ Réparation"}
-            {product.gamme === "eclat" && "☀️ Éclat"}
-          </span>
+          {!hideBadge && gammeLabels[product.gamme] && (
+            <span className="absolute top-3 left-3 bg-primary text-primary-foreground text-xs font-semibold px-2 py-1 rounded-sm">
+              {gammeLabels[product.gamme]}
+            </span>
+          )}
         </div>
       </Link>
-      <div className="p-4">
+      <div className="p-4 flex flex-col flex-1">
         <Link to={`/produit/${product.id}`}>
           <h3 className="font-heading font-semibold text-base mb-1 line-clamp-2 hover:text-primary transition-colors">
             {product.name}
@@ -38,11 +44,11 @@ const ProductCard = ({ product }: { product: Product }) => {
           <span className="text-xs font-medium">{product.rating}</span>
           <span className="text-xs text-muted-foreground">({product.reviews} avis)</span>
         </div>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mt-auto gap-2">
           <span className="text-lg font-bold text-primary">{product.price.toLocaleString()} FCFA</span>
           <Button
             size="sm"
-            className="bg-action text-action-foreground hover:bg-action/90"
+            className="bg-action text-white hover:bg-action/90 font-semibold"
             onClick={() => addToCart(product)}
           >
             <ShoppingBag className="h-4 w-4 mr-1" />
