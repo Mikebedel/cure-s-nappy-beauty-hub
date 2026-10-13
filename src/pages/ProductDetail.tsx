@@ -38,9 +38,9 @@ const ProductDetail = () => {
 
           {/* Info */}
           <div>
-            <span className="text-primary text-sm font-semibold uppercase tracking-wider">
+            {product.gamme !== "hydratation" && <span className="text-primary text-sm font-semibold uppercase tracking-wider">
               {gammes.find((g) => g.id === product.gamme)?.icon} {gammes.find((g) => g.id === product.gamme)?.name}
-            </span>
+            </span>}
             <h1 className="font-heading text-2xl md:text-3xl font-bold mt-2 mb-3">{product.name}</h1>
             
             <div className="flex items-center gap-2 mb-4">

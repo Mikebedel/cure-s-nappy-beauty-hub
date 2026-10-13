@@ -8,7 +8,7 @@ const Panier = () => {
 
   if (items.length === 0) {
     return (
-      <div className="container mx-auto py-20 text-center">
+      <div className="container mx-auto pt-32 pb-20 text-center">
         <ShoppingBag className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
         <h1 className="font-heading text-2xl font-bold mb-3">Votre panier est vide</h1>
         <p className="text-muted-foreground mb-6">Découvrez nos produits et commencez votre routine capillaire.</p>
@@ -21,7 +21,7 @@ const Panier = () => {
 
   return (
     <div className="min-h-screen">
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto pt-28 pb-8">
         <Link to="/boutique" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-6">
           <ArrowLeft className="h-4 w-4 mr-1" /> Continuer les achats
         </Link>
@@ -42,25 +42,28 @@ const Panier = () => {
                   </Link>
                   <p className="text-primary font-bold mt-1">{product.price.toLocaleString()} FCFA</p>
                   <div className="flex items-center gap-3 mt-2">
-                    <button
+                    <Button
+                      variant="ghost" size="icon" aria-label={`Diminuer la quantité de ${product.name}`}
                       onClick={() => updateQuantity(product.id, quantity - 1)}
-                      className="h-7 w-7 rounded-full border border-border flex items-center justify-center hover:bg-muted"
+                      className="h-8 w-8 hover:bg-muted"
                     >
                       <Minus className="h-3 w-3" />
-                    </button>
+                    </Button>
                     <span className="text-sm font-medium w-6 text-center">{quantity}</span>
-                    <button
+                    <Button
+                      variant="ghost" size="icon" aria-label={`Augmenter la quantité de ${product.name}`}
                       onClick={() => updateQuantity(product.id, quantity + 1)}
-                      className="h-7 w-7 rounded-full border border-border flex items-center justify-center hover:bg-muted"
+                      className="h-8 w-8 hover:bg-muted"
                     >
                       <Plus className="h-3 w-3" />
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                      variant="ghost" size="icon" aria-label={`Retirer ${product.name}`}
                       onClick={() => removeFromCart(product.id)}
                       className="ml-auto text-destructive hover:text-destructive/80"
                     >
                       <Trash2 className="h-4 w-4" />
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>

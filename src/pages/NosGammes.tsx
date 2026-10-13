@@ -35,7 +35,7 @@ const NosGammes = () => {
             <span className="h-px w-8 bg-accent" />
           </div>
           <h1 className="font-heading text-4xl md:text-6xl font-bold leading-tight mb-4">
-            Des rituels <span className="italic text-accent">complets</span>
+            Des rituels <span className="not-italic text-accent">complets</span>
           </h1>
           <p className="text-primary-foreground/75 max-w-xl mx-auto">
             Chaque gamme rassemble les soins essentiels pour atteindre un objectif capillaire précis.
@@ -50,7 +50,7 @@ const NosGammes = () => {
           <div>
             <div className="text-[11px] tracking-[0.3em] uppercase text-muted-foreground mb-3">Coffrets</div>
             <h2 className="font-heading text-3xl md:text-4xl font-bold">
-              Nos <span className="italic text-primary">gammes complètes</span>
+              Nos <span className="not-italic text-primary">gammes complètes</span>
             </h2>
           </div>
           <div className="text-sm text-muted-foreground">{gammePacks.length} coffrets</div>
@@ -82,7 +82,7 @@ const NosGammes = () => {
                       <li key={i}>— {c}</li>
                     ))}
                     {pack.contains.length > 4 && (
-                      <li className="italic">+ {pack.contains.length - 4} autres soins</li>
+                      <li className="not-italic">+ {pack.contains.length - 4} autres soins</li>
                     )}
                   </ul>
                 )}
@@ -93,7 +93,7 @@ const NosGammes = () => {
                   <Button
                     size="sm"
                     onClick={() => handleAddPack(pack)}
-                    className="bg-action text-white hover:bg-action/90 font-semibold rounded-full"
+                    className="bg-action text-action-foreground hover:bg-action/90 font-semibold rounded-full"
                   >
                     <ShoppingBag className="h-4 w-4 mr-1" />
                     Ajouter
@@ -111,7 +111,7 @@ const NosGammes = () => {
           <div className="text-center">
             <div className="text-[11px] tracking-[0.3em] uppercase text-muted-foreground mb-3">Thématiques</div>
             <h2 className="font-heading text-3xl md:text-4xl font-bold">
-              Soins par <span className="italic text-primary">objectif capillaire</span>
+              Soins par <span className="not-italic text-primary">objectif capillaire</span>
             </h2>
           </div>
 

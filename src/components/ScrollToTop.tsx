@@ -2,10 +2,13 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
 const ScrollToTop = () => {
-  const { pathname } = useLocation();
+  const { pathname, state } = useLocation();
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" as ScrollBehavior });
-  }, [pathname]);
+    const frame = requestAnimationFrame(() => {
+      window.scrollTo({ top: typeof state?.restoreScroll === "number" ? state.restoreScroll : 0, left: 0, behavior: "instant" as ScrollBehavior });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [pathname, state]);
   return null;
 };
 

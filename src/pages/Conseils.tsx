@@ -136,9 +136,7 @@ const ItemCard = ({ item }: { item: Item }) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button className="text-left bg-card border border-border rounded-2xl p-6 hover:border-primary hover:shadow-lg transition-all group flex flex-col h-full">
-          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-            <Icon className="h-5 w-5 text-primary group-hover:text-primary-foreground" />
-          </div>
+          <Icon className="h-6 w-6 text-primary mb-4" strokeWidth={1.5} />
           <h3 className="font-heading text-lg font-bold mb-2 leading-tight">{item.title}</h3>
           <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{item.intro}</p>
           <span className="mt-auto text-xs uppercase tracking-wider font-semibold text-action">
@@ -149,9 +147,7 @@ const ItemCard = ({ item }: { item: Item }) => {
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center gap-3 mb-2">
-            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <Icon className="h-5 w-5 text-primary" />
-            </div>
+            <Icon className="h-5 w-5 shrink-0 text-primary" strokeWidth={1.5} />
             <DialogTitle className="font-heading text-xl md:text-2xl text-left">
               {item.title}
             </DialogTitle>
@@ -170,9 +166,9 @@ const Conseils = () => {
       <section className="bg-primary py-20 text-center">
         <div className="container mx-auto">
           <h1 className="font-heading text-4xl md:text-6xl font-bold text-primary-foreground mb-3">
-            Astuces & <em className="italic text-accent">Conseils</em>
+            Astuces & <span className="not-italic text-accent">Conseils</span>
           </h1>
-          <p className="text-primary-foreground/70 max-w-md mx-auto italic">
+          <p className="text-primary-foreground/70 max-w-md mx-auto not-italic">
             "Le meilleur remède pour tous vos bobos capillaires."
           </p>
         </div>
@@ -202,7 +198,7 @@ const Conseils = () => {
         </div>
 
         <div className="mt-12 max-w-md mx-auto">
-          <Button asChild size="lg" className="w-full bg-action text-white hover:bg-action/90 rounded-full font-semibold">
+          <Button asChild size="lg" className="w-full bg-action text-action-foreground hover:bg-action/90 rounded-full font-semibold">
             <Link to="/boutique">
               <ShoppingBag className="mr-2 h-5 w-5" />
               Voir la boutique

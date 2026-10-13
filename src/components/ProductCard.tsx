@@ -5,11 +5,10 @@ import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 
 const gammeLabels: Record<string, string> = {
-  hydratation: "💧 Hydratation",
-  volume: "📏 Volume",
-  fortifiant: "🛡️ Fortifiant",
-  soin: "✨ Soin",
-  boucle: "🌀 Boucle",
+  volume: "Volume",
+  fortifiant: "Fortifiant",
+  soin: "Soin",
+  boucle: "Boucle",
 };
 
 const ProductCard = ({ product, hideBadge = false }: { product: Product; hideBadge?: boolean }) => {
@@ -48,7 +47,7 @@ const ProductCard = ({ product, hideBadge = false }: { product: Product; hideBad
           <span className="text-lg font-bold text-primary">{product.price.toLocaleString()} FCFA</span>
           <Button
             size="sm"
-            className="bg-action text-white hover:bg-action/90 font-semibold"
+            className="bg-action text-action-foreground hover:bg-action/90 font-semibold"
             onClick={() => addToCart(product)}
           >
             <ShoppingBag className="h-4 w-4 mr-1" />

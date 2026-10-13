@@ -1,14 +1,34 @@
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ShoppingBag, Menu, X, Home } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
-import logo from "@/assets/logo.jpg";
+import wordmark from "@/assets/brand-wordmark.png";
+import { Button } from "@/components/ui/button";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { totalItems } = useCart();
   const location = useLocation();
+  const navigate = useNavigate();
+  const returnPage = useRef({ path: "/boutique", scroll: 0 });
+  const cartOpen = location.pathname === "/panier";
+
+  useEffect(() => {
+    if (location.pathname !== "/panier") {
+      returnPage.current = { path: location.pathname + location.search + location.hash, scroll: 0 };
+    }
+  }, [location.pathname, location.search, location.hash]);
+
+  const toggleCart = () => {
+    setIsOpen(false);
+    if (cartOpen) {
+      navigate(returnPage.current.path, { state: { restoreScroll: returnPage.current.scroll } });
+    } else {
+      returnPage.current = { path: location.pathname + location.search + location.hash, scroll: window.scrollY };
+      navigate("/panier");
+    }
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -52,22 +72,18 @@ const Navbar = () => {
   }, [hoverIdx, activeIdx, location.pathname]);
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "py-2" : "py-4"}`}>
+    <nav className={`fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border transition-all duration-300 ${scrolled ? "py-2" : "py-4"}`}>
       <div className="container mx-auto flex items-center justify-between gap-4">
         <Link
           to="/"
           className="flex items-center gap-2 transition-colors"
         >
           <img
-            src={logo}
-            alt="Cure's Nappy"
-            className="h-10 w-10 md:h-12 md:w-12 rounded-full object-cover ring-2 ring-accent/40 shadow-sm bg-background"
+            src="/favicon.ico"
+            alt=""
+            className="h-9 w-9 object-contain shrink-0"
           />
-          <span className={`font-heading text-lg md:text-xl font-bold hidden sm:inline ${
-            scrolled ? "text-primary" : "text-primary-foreground drop-shadow"
-          }`}>
-            Cure's <em className="text-accent not-italic">Nappy</em>
-          </span>
+          <img src={wordmark} alt="Cure's Nappy" className="w-32 md:w-40 h-auto object-contain" />
         </Link>
 
         {/* Desktop pill nav with animated indicator */}
@@ -109,25 +125,33 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <Link
-            to="/panier"
-            className="relative h-11 w-11 rounded-full bg-background/90 backdrop-blur-md border border-border flex items-center justify-center hover:bg-accent hover:text-accent-foreground hover:border-accent transition-colors shadow-sm"
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleCart}
+            aria-label={cartOpen ? "Fermer le panier" : "Ouvrir le panier"}
+            title={cartOpen ? "Fermer le panier" : "Ouvrir le panier"}
+            aria-expanded={cartOpen}
+            className="relative h-11 w-11 text-foreground hover:text-primary hover:bg-transparent"
           >
             <ShoppingBag className="h-4 w-4" />
             {totalItems > 0 && (
-              <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-accent text-accent-foreground text-[10px] flex items-center justify-center font-bold border-2 border-background">
+              <span className="absolute top-0 right-0 text-action text-xs font-bold">
                 {totalItems}
               </span>
             )}
-          </Link>
+          </Button>
 
-          <button
-            className="lg:hidden h-11 w-11 rounded-full bg-background/90 backdrop-blur-md border border-border flex items-center justify-center shadow-sm"
+          <Button
+            variant="ghost"
+            size="icon"
+            className="lg:hidden h-11 w-11 hover:bg-transparent text-foreground"
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Menu"
+            aria-expanded={isOpen}
           >
             {isOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-          </button>
+          </Button>
         </div>
       </div>
 
