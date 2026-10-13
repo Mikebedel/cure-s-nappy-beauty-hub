@@ -136,9 +136,7 @@ const ItemCard = ({ item }: { item: Item }) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button className="text-left bg-card border border-border rounded-2xl p-6 hover:border-primary hover:shadow-lg transition-all group flex flex-col h-full">
-          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-            <Icon className="h-5 w-5 text-primary group-hover:text-primary-foreground" />
-          </div>
+          <Icon className="h-6 w-6 text-primary mb-4" strokeWidth={1.5} />
           <h3 className="font-heading text-lg font-bold mb-2 leading-tight">{item.title}</h3>
           <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{item.intro}</p>
           <span className="mt-auto text-xs uppercase tracking-wider font-semibold text-action">
@@ -149,9 +147,7 @@ const ItemCard = ({ item }: { item: Item }) => {
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center gap-3 mb-2">
-            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <Icon className="h-5 w-5 text-primary" />
-            </div>
+            <Icon className="h-5 w-5 shrink-0 text-primary" strokeWidth={1.5} />
             <DialogTitle className="font-heading text-xl md:text-2xl text-left">
               {item.title}
             </DialogTitle>

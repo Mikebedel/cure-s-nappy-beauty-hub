@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useSearchParams, Link, useNavigate } from "react-router-dom";
-import { ChevronDown, ShoppingBag, MapPin, Sparkles, ArrowRight } from "lucide-react";
+import { ChevronDown, ShoppingBag, ArrowRight, Check } from "lucide-react";
 import { products, gammes, gammePacks, packToProduct } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
@@ -40,29 +40,50 @@ const Boutique = () => {
             backgroundSize: "48px 48px",
           }}
         />
-        <div className="container mx-auto relative z-10 grid md:grid-cols-2 gap-10 px-4 py-16 md:py-24">
+        <div className="container mx-auto relative z-10 grid md:grid-cols-2 gap-10 px-4 pt-28 pb-16 md:pt-32 md:pb-24">
           {/* Texte */}
           <div className="flex flex-col justify-center">
             <div className="flex items-center gap-3 text-xs tracking-[0.25em] uppercase text-accent mb-6">
               <span className="h-px w-8 bg-accent" />
               Cure&apos;s Nappy · Boutique principale · Soins capillaires d&apos;exception
             </div>
-            <h1 className="font-heading text-5xl md:text-7xl leading-[1.05] mb-4">
-              Plus qu&apos;un soin,
-              <br />
-              <span className="italic text-accent">un rituel.</span>
+            <h1 className="font-heading text-4xl md:text-5xl font-bold leading-tight mb-4">
+              Huile Extra Pousse
             </h1>
-            <p className="text-primary-foreground/75 max-w-md mb-8">
-              Des formules pensées pour les cheveux afro, bouclés, défrisés et naturels.
-              Efficacité, ingrédients nobles, résultats visibles.
+            <p className="text-lg text-accent mb-4">
+              Tu rêves de cheveux plus longs, plus denses et plus forts ?
             </p>
+            <p className="text-primary-foreground/80 mb-5 leading-relaxed">
+              L’Huile Extra Pousse Cure’s Nappy est conçue pour stimuler naturellement la pousse rapide et aider tes cheveux à révéler tout leur potentiel.
+            </p>
+            <p className="text-primary-foreground/80 mb-3">Grâce à sa composition riche en huiles végétales puissantes, elle :</p>
+            <ul className="space-y-2 mb-6 text-primary-foreground/80">
+              {[
+                "Stimule la circulation sanguine du cuir chevelu",
+                "Nourrit profondément le bulbe capillaire",
+                "Aide à réduire la chute et la casse",
+                "Favorise une pousse saine, rapide et régulière",
+              ].map((benefit) => (
+                <li key={benefit} className="flex items-start gap-2"><Check className="h-4 w-4 shrink-0 mt-1 text-accent" />{benefit}</li>
+              ))}
+            </ul>
+            <div className="border-y border-primary-foreground/20 py-5 mb-6">
+              <p className="font-semibold text-accent mb-2">Le vrai secret ? La régularité + le massage du cuir chevelu.</p>
+              <p className="text-primary-foreground/80 leading-relaxed">Quelques minutes de massage permettent de mieux activer la circulation et d’optimiser l’action de l’huile.</p>
+            </div>
+            <h2 className="text-xl font-bold mb-3">Comment l’utiliser ?</h2>
+            <ul className="list-disc pl-5 space-y-2 text-primary-foreground/80 mb-7">
+              <li>Applique quelques gouttes directement sur le cuir chevelu et la devanture.</li>
+              <li>Masse délicatement pendant 3 à 5 minutes pour stimuler la circulation sanguine.</li>
+              <li>À utiliser quotidiennement ou tous les 2 jours par semaine pour de meilleurs résultats.</li>
+            </ul>
             <div className="flex flex-wrap gap-3">
               <Button
                 size="lg"
-                className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full px-7"
-                asChild
+                className="bg-action text-action-foreground hover:bg-action/90 px-7"
+                onClick={() => { addToCart(featured); toast.success(`${featured.name} ajouté au panier`); navigate("/panier"); }}
               >
-                <a href="#catalogue">Découvrir la collection</a>
+                <ShoppingBag className="h-4 w-4" /> Commande dès maintenant !
               </Button>
               <Button
                 size="lg"
@@ -74,35 +95,10 @@ const Boutique = () => {
               </Button>
             </div>
 
-            {/* Stats row */}
-            <div className="mt-12 grid grid-cols-3 gap-6 border-t border-primary-foreground/15 pt-8">
-              <div>
-                <div className="font-heading text-3xl">{products.length}</div>
-                <div className="text-[11px] tracking-[0.2em] uppercase text-primary-foreground/60 mt-1">
-                  Soins disponibles
-                </div>
-              </div>
-              <div>
-                <div className="font-heading text-3xl flex items-center gap-1">
-                  ABJ <MapPin className="h-5 w-5 text-accent" />
-                </div>
-                <div className="text-[11px] tracking-[0.2em] uppercase text-primary-foreground/60 mt-1">
-                  Livraison Abidjan
-                </div>
-              </div>
-              <div>
-                <div className="font-heading text-3xl flex items-center gap-1">
-                  <Sparkles className="h-5 w-5 text-accent" />
-                </div>
-                <div className="text-[11px] tracking-[0.2em] uppercase text-primary-foreground/60 mt-1">
-                  Qualité certifiée
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* Pièce du moment */}
-          <div className="relative">
+          <div className="relative md:self-start md:sticky md:top-28">
             <div className="relative aspect-[4/5] overflow-hidden rounded-sm border border-primary-foreground/10">
               <img src={featured.image} alt={featured.name} className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent" />
@@ -184,9 +180,9 @@ const Boutique = () => {
                   <ShoppingBag className="h-4 w-4" />
                 </button>
               </Link>
-              <div className="text-[10px] tracking-[0.25em] uppercase text-muted-foreground mb-1">
+              {p.gamme !== "hydratation" && <div className="text-[10px] tracking-[0.25em] uppercase text-muted-foreground mb-1">
                 {gammes.find((g) => g.id === p.gamme)?.name ?? "Soin"}
-              </div>
+              </div>}
               <Link
                 to={`/produit/${p.id}`}
                 className="font-heading text-lg leading-tight hover:text-primary transition-colors"

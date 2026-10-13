@@ -40,9 +40,7 @@ const APropos = () => {
         <div className="container mx-auto">
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center p-8 bg-card rounded-2xl border border-border">
-              <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                <Eye className="h-7 w-7 text-primary" />
-              </div>
+              <Eye className="h-7 w-7 text-primary mx-auto mb-4" strokeWidth={1.5} />
               <h3 className="font-heading text-xl font-bold mb-3">Notre Vision</h3>
               <p className="text-muted-foreground text-sm leading-relaxed">
                 Devenir la marque de référence en soins capillaires naturels en Afrique de l'Ouest, 
@@ -50,9 +48,7 @@ const APropos = () => {
               </p>
             </div>
             <div className="text-center p-8 bg-card rounded-2xl border border-border">
-              <div className="h-14 w-14 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
-                <Target className="h-7 w-7 text-accent" />
-              </div>
+              <Target className="h-7 w-7 text-accent mx-auto mb-4" strokeWidth={1.5} />
               <h3 className="font-heading text-xl font-bold mb-3">Notre Mission</h3>
               <p className="text-muted-foreground text-sm leading-relaxed">
                 Aider les femmes à aimer et prendre soin de leurs cheveux naturels grâce à des produits 
@@ -60,9 +56,7 @@ const APropos = () => {
               </p>
             </div>
             <div className="text-center p-8 bg-card rounded-2xl border border-border">
-              <div className="h-14 w-14 rounded-full bg-action/10 flex items-center justify-center mx-auto mb-4">
-                <Heart className="h-7 w-7 text-action" />
-              </div>
+              <Heart className="h-7 w-7 text-action mx-auto mb-4" strokeWidth={1.5} />
               <h3 className="font-heading text-xl font-bold mb-3">Nos Valeurs</h3>
               <p className="text-muted-foreground text-sm leading-relaxed">
                 Authenticité, naturalité, accessibilité et célébration de la beauté africaine 

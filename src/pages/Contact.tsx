@@ -44,9 +44,7 @@ const Contact = () => {
                 { icon: Mail, label: "Email", value: "contact@curesnappy.ci" },
               ].map((item, i) => (
                 <div key={i} className="flex items-start gap-4">
-                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                    <item.icon className="h-5 w-5 text-primary" />
-                  </div>
+                  <item.icon className="h-5 w-5 mt-1 text-primary shrink-0" strokeWidth={1.5} />
                   <div>
                     <p className="font-semibold text-sm">{item.label}</p>
                     <p className="text-muted-foreground text-sm">{item.value}</p>
