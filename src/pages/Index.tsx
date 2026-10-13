@@ -55,7 +55,7 @@ const Index = () => {
             </div>
             <h1 className="font-heading text-primary-foreground leading-[0.95] mb-8">
               <span className="block text-5xl md:text-7xl font-bold">Soins capillaires</span>
-              <span className="block text-4xl md:text-6xl italic text-accent font-medium mt-2">
+              <span className="block text-4xl md:text-6xl not-italic text-accent font-medium mt-2">
                 qui révèlent votre nature.
               </span>
             </h1>
@@ -98,7 +98,7 @@ const Index = () => {
           {[...Array(4)].map((_, group) => (
             <div key={group} className="flex items-center shrink-0">
               {tickerItems.map((item, i) => (
-                <span key={`${group}-${i}`} className="flex items-center mx-8 font-heading italic text-xl md:text-2xl">
+                <span key={`${group}-${i}`} className="flex items-center mx-8 font-heading not-italic text-xl md:text-2xl">
                   {item}
                   <span className="ml-8 text-accent">✦</span>
                 </span>
@@ -114,7 +114,7 @@ const Index = () => {
           <div className="text-center mb-10">
             <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">L'univers</span>
             <h2 className="font-heading text-3xl md:text-4xl font-bold mt-3">
-              Notre <em className="italic text-accent font-medium">communauté</em>
+              Notre <span className="not-italic text-accent font-medium">communauté</span>
             </h2>
           </div>
           <Carousel
@@ -145,7 +145,7 @@ const Index = () => {
             <div>
               <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">La collection</span>
               <h2 className="font-heading text-4xl md:text-5xl font-bold mt-3 leading-tight">
-                Nos soins <em className="italic text-accent font-medium">du moment</em>
+                Nos soins <span className="not-italic text-accent font-medium">du moment</span>
               </h2>
             </div>
             <Link to="/boutique" className="group inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wider border-b border-foreground pb-1 hover:text-accent hover:border-accent transition-colors">
@@ -171,12 +171,12 @@ const Index = () => {
             <div className="max-w-md">
               <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">La marque</span>
               <h2 className="font-heading text-4xl md:text-5xl font-bold mt-3 mb-6 leading-tight">
-                L'élégance <em className="italic text-primary font-medium">au quotidien</em>
+                L'élégance <span className="not-italic text-primary font-medium">au quotidien</span>
               </h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
                 Des formulations soignées, des actifs naturels sélectionnés avec exigence. Un rituel capillaire qui vous ressemble.
               </p>
-              <p className="italic text-primary font-medium mb-8">
+              <p className="not-italic text-primary font-medium mb-8">
                 « Le meilleur remède pour tous vos bobos capillaires. »
               </p>
               <Button asChild className="bg-foreground text-background hover:bg-foreground/90 rounded-full px-8 py-6 uppercase tracking-wider text-xs font-semibold">
@@ -193,7 +193,7 @@ const Index = () => {
           <div className="text-center mb-14">
             <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Nos gammes</span>
             <h2 className="font-heading text-4xl md:text-5xl font-bold mt-3 leading-tight">
-              Deux rituels, <em className="italic text-accent font-medium">une même signature</em>
+              Deux rituels, <span className="not-italic text-accent font-medium">une même signature</span>
             </h2>
           </div>
           <div className="grid md:grid-cols-2 gap-6">
@@ -238,7 +238,7 @@ const Index = () => {
             <div>
               <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Sélection</span>
               <h2 className="font-heading text-4xl md:text-5xl font-bold mt-3 leading-tight">
-                À ne pas <em className="italic text-accent font-medium">manquer</em>
+                À ne pas <span className="not-italic text-accent font-medium">manquer</span>
               </h2>
             </div>
             <Link to="/boutique" className="group inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wider border-b border-foreground pb-1 hover:text-accent hover:border-accent transition-colors">
@@ -257,10 +257,10 @@ const Index = () => {
       {/* ============ NÉE À ABIDJAN ============ */}
       <section className="py-28 bg-primary text-primary-foreground">
         <div className="container mx-auto max-w-4xl text-center">
-          <span className="font-heading text-7xl md:text-8xl italic text-accent block leading-none mb-4">CN</span>
+          <span className="font-heading text-7xl md:text-8xl not-italic text-accent block leading-none mb-4">CN</span>
           <span className="text-xs uppercase tracking-[0.3em] text-primary-foreground/60">La marque</span>
           <h2 className="font-heading text-4xl md:text-6xl font-bold mt-4 mb-8 leading-tight">
-            Née à Abidjan, <em className="italic text-accent font-medium">portée partout.</em>
+            Née à Abidjan, <span className="not-italic text-accent font-medium">portée partout.</span>
           </h2>
           <p className="text-primary-foreground/80 text-lg leading-relaxed max-w-2xl mx-auto mb-10">
             Cure's Nappy est née d'une conviction simple : chaque femme africaine mérite des soins
@@ -279,7 +279,7 @@ const Index = () => {
           <div className="text-center mb-12">
             <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Avis vérifiés</span>
             <h2 className="font-heading text-4xl md:text-5xl font-bold mt-3 leading-tight">
-              Retours <em className="italic text-accent font-medium">clientes</em>
+              Retours <span className="not-italic text-accent font-medium">clientes</span>
             </h2>
           </div>
           <Carousel
@@ -297,7 +297,7 @@ const Index = () => {
               ].map((t, i) => (
                 <CarouselItem key={i} className="md:basis-1/2 lg:basis-1/3">
                   <div className="border border-border rounded-2xl p-8 h-full bg-card">
-                    <p className="font-heading text-2xl italic text-foreground leading-snug mb-6">"{t.text}"</p>
+                    <p className="font-heading text-2xl not-italic text-foreground leading-snug mb-6">"{t.text}"</p>
                     <div className="flex items-center gap-3">
                       <div className="h-px w-8 bg-accent" />
                       <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground font-semibold">{t.name}</p>
@@ -315,7 +315,7 @@ const Index = () => {
         <div className="container mx-auto text-center max-w-3xl">
           <span className="text-xs uppercase tracking-[0.3em] opacity-70">Offre en cours</span>
           <h2 className="font-heading text-4xl md:text-6xl font-bold mt-3 mb-6 leading-tight">
-            La <em className="italic">Gamme Suprême</em> à 61 000 FCFA
+            La <span className="not-italic">Gamme Suprême</span> à 61 000 FCFA
           </h2>
           <p className="text-base md:text-lg opacity-80 mb-8 max-w-xl mx-auto">
             Tout votre rituel capillaire complet. Hydratation, nutrition, croissance et définition réunis.
@@ -365,7 +365,7 @@ const BoutiqueBanner = ({ images }: { images: string[] }) => (
             />
             <div className="absolute inset-0 bg-gradient-to-t from-primary/85 via-primary/30 to-transparent" />
             <div className="absolute inset-0 flex items-end p-6">
-              <span className="inline-flex items-center gap-2 bg-action text-white px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider shadow-lg group-hover:gap-3 transition-all">
+              <span className="inline-flex items-center gap-2 bg-action text-action-foreground px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider shadow-lg group-hover:gap-3 transition-all">
                 Voir la boutique
                 <ArrowRight className="h-4 w-4" />
               </span>

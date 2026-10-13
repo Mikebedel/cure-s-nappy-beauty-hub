@@ -39,7 +39,7 @@ const Footer = () => {
               <p>Abidjan, Côte d'Ivoire</p>
               <p>+225 01 00 84 84 79</p>
               <p>contact@curesnappy.ci</p>
-              <p className="italic mt-2">"Le meilleur remède pour tous vos bobos capillaires."</p>
+              <p className="not-italic mt-2">"Le meilleur remède pour tous vos bobos capillaires."</p>
             </div>
           </div>
         </div>

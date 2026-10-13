@@ -134,7 +134,7 @@ const Boutique = () => {
               La collection
             </div>
             <h2 className="font-heading text-4xl md:text-5xl">
-              Tous les <span className="italic text-primary">soins</span>
+              Tous les <span className="not-italic text-primary">soins</span>
             </h2>
           </div>
           <div className="text-sm text-muted-foreground">{filtered.length} pièces</div>
@@ -174,7 +174,7 @@ const Boutique = () => {
                     addToCart(p);
                     toast.success(`${p.name} ajouté au panier`);
                   }}
-                  className="absolute bottom-3 right-3 bg-action text-white rounded-full p-2.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-action/90 shadow-lg"
+                  className="absolute bottom-3 right-3 bg-action text-action-foreground rounded-full p-2.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-action/90 shadow-lg"
                   aria-label="Ajouter au panier"
                 >
                   <ShoppingBag className="h-4 w-4" />
@@ -198,7 +198,7 @@ const Boutique = () => {
                   addToCart(p);
                   toast.success(`${p.name} ajouté au panier`);
                 }}
-                className="mt-3 bg-action text-white hover:bg-action/90 font-semibold rounded-full"
+                className="mt-3 bg-action text-action-foreground hover:bg-action/90 font-semibold rounded-full"
               >
                 <ShoppingBag className="h-4 w-4 mr-1" />
                 Ajouter
@@ -218,7 +218,7 @@ const Boutique = () => {
                   Coffrets
                 </div>
                 <h2 className="font-heading text-3xl md:text-4xl">
-                  Nos <span className="italic text-primary">gammes</span> complètes
+                  Nos <span className="not-italic text-primary">gammes</span> complètes
                 </h2>
               </div>
               <ChevronDown
@@ -251,7 +251,7 @@ const Boutique = () => {
                         </ul>
                       )}
                       {pack.note && (
-                        <p className="text-xs italic text-primary/80 mb-4">NB : {pack.note}</p>
+                        <p className="text-xs not-italic text-primary/80 mb-4">NB : {pack.note}</p>
                       )}
                       <div className="flex items-center justify-between mt-auto pt-4 border-t border-border">
                         <span className="font-heading text-xl text-primary">
@@ -260,7 +260,7 @@ const Boutique = () => {
                         <Button
                           size="sm"
                           onClick={() => handleAddPack(pack)}
-                          className="bg-action text-white hover:bg-action/90 rounded-full font-semibold"
+                          className="bg-action text-action-foreground hover:bg-action/90 rounded-full font-semibold"
                         >
                           <ShoppingBag className="h-4 w-4 mr-1" />
                           Ajouter
