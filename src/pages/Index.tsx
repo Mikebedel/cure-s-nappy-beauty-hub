@@ -254,9 +254,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ============ BANNIÈRE 3 IMAGES — APRÈS À NE PAS MANQUER ============ */}
-      <BoutiqueBanner images={[slide2, slide3, slide5]} />
-
       {/* ============ NÉE À ABIDJAN ============ */}
       <section className="py-28 bg-primary text-primary-foreground">
         <div className="container mx-auto max-w-4xl text-center">
