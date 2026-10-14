@@ -1,101 +1,62 @@
-import { Link } from "react-router-dom";
-import { Trash2, Plus, Minus, ArrowLeft, ShoppingBag } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Trash2, Plus, Minus, ArrowLeft, ShoppingBag, X } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
 
 const Panier = () => {
   const { items, updateQuantity, removeFromCart, totalPrice } = useCart();
 
-  if (items.length === 0) {
-    return (
-      <div className="container mx-auto pt-32 pb-20 text-center">
-        <ShoppingBag className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-        <h1 className="font-heading text-2xl font-bold mb-3">Votre panier est vide</h1>
-        <p className="text-muted-foreground mb-6">Découvrez nos produits et commencez votre routine capillaire.</p>
-        <Button asChild className="bg-action text-action-foreground hover:bg-action/90">
-          <Link to="/boutique">Voir la boutique</Link>
-        </Button>
-      </div>
-    );
-  }
+  const location = useLocation();
+  const navigate = useNavigate();
+  const close = () => navigate(location.state?.cartOrigin ?? "/boutique", { state: { restoreScroll: location.state?.cartScroll ?? 0 } });
+  useEffect(() => {
+    const handleKey = (event: KeyboardEvent) => { if (event.key === "Escape") close(); };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [location.state]);
 
   return (
-    <div className="min-h-screen">
-      <div className="container mx-auto pt-28 pb-8">
-        <Link to="/boutique" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-6">
-          <ArrowLeft className="h-4 w-4 mr-1" /> Continuer les achats
-        </Link>
-
-        <h1 className="font-heading text-2xl md:text-3xl font-bold mb-8">Votre panier</h1>
-
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Items */}
-          <div className="lg:col-span-2 space-y-4">
-            {items.map(({ product, quantity }) => (
-              <div key={product.id} className="flex gap-4 bg-card border border-border rounded-lg p-4">
-                <div className="h-20 w-20 rounded-md bg-muted overflow-hidden flex-shrink-0">
-                  <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <Link to={`/produit/${product.id}`} className="font-heading font-semibold text-sm hover:text-primary line-clamp-1">
-                    {product.name}
-                  </Link>
-                  <p className="text-primary font-bold mt-1">{product.price.toLocaleString()} FCFA</p>
-                  <div className="flex items-center gap-3 mt-2">
-                    <Button
-                      variant="ghost" size="icon" aria-label={`Diminuer la quantité de ${product.name}`}
-                      onClick={() => updateQuantity(product.id, quantity - 1)}
-                      className="h-8 w-8 hover:bg-muted"
-                    >
-                      <Minus className="h-3 w-3" />
-                    </Button>
-                    <span className="text-sm font-medium w-6 text-center">{quantity}</span>
-                    <Button
-                      variant="ghost" size="icon" aria-label={`Augmenter la quantité de ${product.name}`}
-                      onClick={() => updateQuantity(product.id, quantity + 1)}
-                      className="h-8 w-8 hover:bg-muted"
-                    >
-                      <Plus className="h-3 w-3" />
-                    </Button>
-                    <Button
-                      variant="ghost" size="icon" aria-label={`Retirer ${product.name}`}
-                      onClick={() => removeFromCart(product.id)}
-                      className="ml-auto text-destructive hover:text-destructive/80"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+    <div className="fixed inset-0 z-40 bg-foreground/25 backdrop-blur-sm pt-24 pb-5 px-3 flex items-start justify-end" onClick={close}>
+      <section role="dialog" aria-modal="true" aria-labelledby="cart-title" className="cart-panel bg-background border border-border shadow-xl rounded-lg w-full max-w-md max-h-[calc(100dvh-7rem)] flex flex-col overflow-hidden" onClick={event => event.stopPropagation()}>
+        <header className="flex items-center justify-between px-5 py-4 border-b border-border">
+          <h1 id="cart-title" className="font-heading font-bold text-xl">Votre panier <span className="text-sm text-muted-foreground">({items.length})</span></h1>
+          <Button variant="ghost" size="icon" aria-label="Fermer votre panier" onClick={close}><X /></Button>
+        </header>
+        {items.length === 0 ? (
+          <div className="p-8 text-center space-y-4">
+            <ShoppingBag className="h-8 w-8 mx-auto text-primary" />
+            <p className="font-semibold">Votre panier est vide</p>
+            <Button asChild className="bg-action text-action-foreground hover:bg-action/90"><Link to="/boutique">Voir la boutique</Link></Button>
+          </div>
+        ) : (
+          <>
+            <div className="overflow-y-auto px-5 divide-y divide-border">
+              {items.map(({ product, quantity }) => (
+                <div key={product.id} className="flex gap-3 py-4">
+                  <img src={product.image} alt={product.name} className="h-16 w-16 rounded-sm object-cover bg-muted shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm leading-5">{product.name}</p>
+                    <p className="text-sm text-primary font-bold mt-1">{product.price.toLocaleString("fr-FR")} FCFA</p>
+                    <div className="flex items-center mt-1 gap-1">
+                      <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`Diminuer la quantité de ${product.name}`} onClick={() => updateQuantity(product.id, quantity - 1)}><Minus /></Button>
+                      <span className="w-6 text-center text-sm">{quantity}</span>
+                      <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`Augmenter la quantité de ${product.name}`} onClick={() => updateQuantity(product.id, quantity + 1)}><Plus /></Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 ml-auto text-muted-foreground" aria-label={`Retirer ${product.name}`} onClick={() => removeFromCart(product.id)}><Trash2 /></Button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Summary */}
-          <div className="bg-card border border-border rounded-lg p-6 h-fit sticky top-24">
-            <h2 className="font-heading font-semibold text-lg mb-4">Résumé</h2>
-            <div className="space-y-3 mb-6">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Sous-total</span>
-                <span>{totalPrice.toLocaleString()} FCFA</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Livraison</span>
-                <span className="text-primary font-medium">Gratuite à Abidjan</span>
-              </div>
-              <div className="border-t border-border pt-3 flex justify-between font-bold text-lg">
-                <span>Total</span>
-                <span className="text-primary">{totalPrice.toLocaleString()} FCFA</span>
-              </div>
+              ))}
             </div>
-            <Button asChild className="w-full bg-action text-action-foreground hover:bg-action/90 text-base" size="lg">
-              <Link to="/checkout">Passer la commande</Link>
-            </Button>
-            <p className="text-xs text-muted-foreground text-center mt-3">
-              Mobile Money · Paiement à la livraison
-            </p>
-          </div>
-        </div>
-      </div>
+            <footer className="border-t border-border p-5 space-y-4">
+              <div className="flex justify-between font-bold"><span>Sous-total</span><span className="text-primary">{totalPrice.toLocaleString("fr-FR")} FCFA</span></div>
+              <p className="text-xs text-muted-foreground">Livraison calculée à l’étape suivante.</p>
+              <Button asChild className="w-full bg-action text-action-foreground hover:bg-action/90"><Link to="/checkout">Passer la commande</Link></Button>
+              <Button variant="ghost" className="w-full" onClick={close}><ArrowLeft />Continuer les achats</Button>
+            </footer>
+          </>
+        )}
+      </section>
     </div>
   );
 };

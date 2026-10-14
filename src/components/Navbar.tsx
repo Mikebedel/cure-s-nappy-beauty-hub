@@ -23,10 +23,10 @@ const Navbar = () => {
   const toggleCart = () => {
     setIsOpen(false);
     if (cartOpen) {
-      navigate(returnPage.current.path, { state: { restoreScroll: returnPage.current.scroll } });
+      navigate(location.state?.cartOrigin ?? returnPage.current.path, { state: { restoreScroll: location.state?.cartScroll ?? returnPage.current.scroll } });
     } else {
       returnPage.current = { path: location.pathname + location.search + location.hash, scroll: window.scrollY };
-      navigate("/panier");
+      navigate("/panier", { state: { backgroundLocation: location, cartOrigin: returnPage.current.path, cartScroll: returnPage.current.scroll } });
     }
   };
 

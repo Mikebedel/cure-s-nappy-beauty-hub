@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate, useLocation } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -42,6 +42,33 @@ const ProtectedAdmin = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+const PublicStore = () => {
+  const location = useLocation();
+  const background = location.state?.backgroundLocation;
+  const isCart = location.pathname === "/panier";
+  return (
+    <>
+      <Navbar />
+      <div key={(background ?? location).pathname} className="store-page">
+        <Routes location={isCart ? background ?? { ...location, pathname: "/boutique" } : location}>
+          <Route path="/" element={<Index />} />
+          <Route path="/boutique" element={<Boutique />} />
+          <Route path="/nos-gammes" element={<NosGammes />} />
+          <Route path="/conseils" element={<Conseils />} />
+          <Route path="/a-propos" element={<APropos />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/produit/:id" element={<ProductDetail />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <Footer />
+      </div>
+      {!isCart && <WhatsAppButton />}
+      {isCart && <Panier />}
+    </>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -74,25 +101,7 @@ const App = () => (
               </Route>
 
               {/* Public routes */}
-              <Route path="*" element={
-                <>
-                  <Navbar />
-                  <Routes>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/boutique" element={<Boutique />} />
-                    <Route path="/nos-gammes" element={<NosGammes />} />
-                    <Route path="/conseils" element={<Conseils />} />
-                    <Route path="/a-propos" element={<APropos />} />
-                    <Route path="/contact" element={<Contact />} />
-                    <Route path="/produit/:id" element={<ProductDetail />} />
-                    <Route path="/panier" element={<Panier />} />
-                    <Route path="/checkout" element={<Checkout />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                  <Footer />
-                  <WhatsAppButton />
-                </>
-              } />
+              <Route path="*" element={<PublicStore />} />
             </Routes>
           </BrowserRouter>
         </CartProvider>
