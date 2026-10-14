@@ -22,6 +22,7 @@ export interface Product {
   price: number;
   image: string;
   gamme: string;
+  categories?: string[];
   benefits: string[];
   ingredients: string[];
   usage: string;
@@ -178,6 +179,7 @@ export const products: Product[] = [
     price: 6000,
     image: shampoingDouxClarifiant,
     gamme: "hydratation",
+    categories: ["hydratation", "soin"],
     volume: "250ml",
     benefits: ["Nettoie efficacement", "Apaise le cuir chevelu", "Élimine les pellicules", "Préserve l'hydratation"],
     ingredients: ["Extrait de moringa", "Hibiscus", "Protéine de soie", "Eau de rose"],
@@ -208,6 +210,7 @@ export const products: Product[] = [
     price: 5000,
     image: huileFortifiante,
     gamme: "hydratation",
+    categories: ["hydratation", "fortifiant"],
     volume: "100ml",
     benefits: ["Fortifie la fibre", "Anti-casse", "Scelle l'hydratation", "Brillance naturelle"],
     ingredients: ["Huile de baobab", "Huile de moringa", "Kératine végétale", "Vitamine E"],
@@ -229,20 +232,6 @@ export const products: Product[] = [
     usage: "Vaporiser sur cheveux secs ou humides. Peut être réappliqué dans la journée.",
     rating: 4.7,
     reviews: 112,
-  },
-  {
-    id: "6",
-    name: "Crème Hydratante",
-    description: "Une crème riche qui hydrate en profondeur. Adaptée à tous types de cheveux : naturels, bouclés et défrisés.",
-    shortDescription: "Scelle l'hydratation - Ramollit - Nourrit",
-    price: 6000,
-    image: cremeHydratanteVolume,
-    gamme: "hydratation",
-    benefits: ["Scelle l'hydratation", "Ramollit les cheveux", "Nourrit", "Protection"],
-    ingredients: ["Beurre de karité", "Huile de coco", "Aloe vera", "Vitamine E"],
-    usage: "Appliquer sur cheveux humides, mèche par mèche.",
-    rating: 4.8,
-    reviews: 167,
   },
   {
     id: "7",
@@ -281,6 +270,7 @@ export const products: Product[] = [
     price: 6000,
     image: cremeHydratanteVolume,
     gamme: "volume",
+    categories: ["hydratation", "volume"],
     benefits: ["Scelle l'hydratation", "Ramollit les cheveux", "Donne du volume", "Protection"],
     ingredients: ["Beurre de karité", "Huile de coco", "Aloe vera", "Vitamine E"],
     usage: "Appliquer sur cheveux humides, mèche par mèche. Sceller avec une huile légère.",
@@ -302,36 +292,6 @@ export const products: Product[] = [
     reviews: 98,
   },
   {
-    id: "11",
-    name: "Huile 2 en 1 Fortifiante",
-    description: "Une huile nourrissante qui fortifie la fibre capillaire et prévient la casse.",
-    shortDescription: "Fortifie - Nourrit - Prévient la casse",
-    price: 5000,
-    image: huileFortifiante,
-    gamme: "fortifiant",
-    volume: "100ml",
-    benefits: ["Fortifie la fibre", "Anti-casse", "Nourrit en profondeur", "Brillance naturelle"],
-    ingredients: ["Huile de baobab", "Huile de moringa", "Kératine végétale", "Vitamine E"],
-    usage: "Appliquer quelques gouttes sur les longueurs et pointes.",
-    rating: 4.7,
-    reviews: 145,
-  },
-  {
-    id: "12",
-    name: "Shampoing Doux & Clarifiant Anti-pelliculaire",
-    description: "Un shampooing nettoyant ultra-doux qui clarifie le cuir chevelu et élimine les pellicules.",
-    shortDescription: "Nettoie - Apaise - Élimine les pellicules - Anti-démangeaisons",
-    price: 6000,
-    image: shampoingDouxClarifiant,
-    gamme: "soin",
-    volume: "250ml",
-    benefits: ["Nettoie efficacement", "Anti-pelliculaire", "Apaise les démangeaisons", "Préserve l'hydratation"],
-    ingredients: ["Extrait de moringa", "Hibiscus", "Protéine de soie", "Eau de rose"],
-    usage: "Appliquer sur cheveux mouillés, masser le cuir chevelu délicatement. Rincer abondamment.",
-    rating: 4.8,
-    reviews: 127,
-  },
-  {
     id: "13",
     name: "Crème Bouclante",
     description: "Une crème coiffante qui définit parfaitement les boucles de vos cheveux. Pour des boucles sublimes et bien dessinées.",
@@ -346,3 +306,6 @@ export const products: Product[] = [
     reviews: 74,
   },
 ];
+
+export const productMatchesCategory = (product: Product, category: string) =>
+  product.gamme === category || product.categories?.includes(category) === true;
