@@ -1,5 +1,5 @@
+import { useCartNavigation } from "@/hooks/use-cart-navigation";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { ShoppingBag, Plus } from "lucide-react";
 import { gammePacks, packToProduct, products } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 export const GammesSection = () => {
   const { addToCart } = useCart();
-  const navigate = useNavigate();
+  const openCart = useCartNavigation();
   return (
     <section id="gammes" className="bg-secondary/50 border-y border-border scroll-mt-24">
       <div className="container mx-auto px-4 py-12">
@@ -22,7 +22,7 @@ export const GammesSection = () => {
                 <p className="text-xs text-muted-foreground line-clamp-3 min-h-12">{pack.description}</p>
                 <details className="text-xs text-muted-foreground"><summary className="cursor-pointer text-primary">Les {pack.contains.length} soins inclus</summary><ul className="mt-2 space-y-1">{pack.contains.map(item => <li key={item}>{item}</li>)}</ul>{pack.note && <p className="mt-2">{pack.note}</p>}</details>
                 <p className="font-bold text-primary mt-auto">{pack.price.toLocaleString("fr-FR")} FCFA</p>
-                <Button size="sm" className="w-full bg-action text-action-foreground hover:bg-action/90" onClick={() => { addToCart(packToProduct(pack)); navigate("/panier"); }}><ShoppingBag />Ajouter</Button>
+                <Button size="sm" className="w-full bg-action text-action-foreground hover:bg-action/90" onClick={() => { addToCart(packToProduct(pack)); openCart(); }}><ShoppingBag />Ajouter</Button>
               </div>
             </article>
           ))}
@@ -36,7 +36,7 @@ export const DuosSection = () => {
   const [firstId, setFirstId] = useState("8");
   const [secondId, setSecondId] = useState("9");
   const { addToCart } = useCart();
-  const navigate = useNavigate();
+  const openCart = useCartNavigation();
   const first = products.find(product => product.id === firstId);
   const second = products.find(product => product.id === secondId);
   if (!first || !second) return null;
@@ -55,7 +55,7 @@ export const DuosSection = () => {
           <h3 className="font-heading text-xl font-bold">Votre duo sur mesure</h3>
           <p className="text-sm text-muted-foreground">Deux soins au choix, au prix de chaque produit.</p>
           <p className="text-xl font-bold text-primary">{(first.price + second.price).toLocaleString("fr-FR")} FCFA</p>
-          <Button className="bg-action text-action-foreground hover:bg-action/90" onClick={() => { addToCart(first); addToCart(second); navigate("/panier"); }}><ShoppingBag />Ajouter le duo</Button>
+          <Button className="bg-action text-action-foreground hover:bg-action/90" onClick={() => { addToCart(first); addToCart(second); openCart(); }}><ShoppingBag />Ajouter le duo</Button>
         </div>
       </div>
     </section>

@@ -1,5 +1,6 @@
+import { useCartNavigation } from "@/hooks/use-cart-navigation";
 import { useMemo, useState } from "react";
-import { useSearchParams, Link, useNavigate } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import { ShoppingBag, ArrowRight, Check } from "lucide-react";
 import { products, gammes, productMatchesCategory } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
@@ -12,7 +13,7 @@ const Boutique = () => {
   const initialGamme = searchParams.get("gamme");
   const [activeFilter, setActiveFilter] = useState<string>(initialGamme ?? "all");
   const { addToCart } = useCart();
-  const navigate = useNavigate();
+  const openCart = useCartNavigation();
 
   const filtered = useMemo(
     () => (activeFilter === "all" ? products : products.filter((p) => productMatchesCategory(p, activeFilter))),
@@ -74,7 +75,7 @@ const Boutique = () => {
               <Button
                 size="lg"
                 className="bg-action text-action-foreground hover:bg-action/90 px-7"
-                onClick={() => { addToCart(featured); toast.success(`${featured.name} ajouté au panier`); navigate("/panier"); }}
+                onClick={() => { addToCart(featured); toast.success(`${featured.name} ajouté au panier`); openCart(); }}
               >
                 <ShoppingBag className="h-4 w-4" /> Commande dès maintenant !
               </Button>

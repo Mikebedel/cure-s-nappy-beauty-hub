@@ -1,4 +1,5 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useCartNavigation } from "@/hooks/use-cart-navigation";
+import { Link } from "react-router-dom";
 import { ArrowRight, ShieldCheck, Truck, Sparkles, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { products, gammePacks, packToProduct } from "@/data/products";
@@ -28,9 +29,7 @@ const tickerItems = [
 
 const Index = () => {
   const { addToCart } = useCart();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const openCart = () => navigate("/panier", { state: { backgroundLocation: location, cartOrigin: location.pathname, cartScroll: window.scrollY } });
+  const openCart = useCartNavigation();
   const featured = products.slice(0, 4);
   const selection = products.slice(4, 8);
   const heroPack = gammePacks[0];
