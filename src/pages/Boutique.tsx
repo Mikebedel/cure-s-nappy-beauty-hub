@@ -1,32 +1,25 @@
 import { useMemo, useState } from "react";
 import { useSearchParams, Link, useNavigate } from "react-router-dom";
-import { ChevronDown, ShoppingBag, ArrowRight, Check } from "lucide-react";
-import { products, gammes, gammePacks, packToProduct } from "@/data/products";
+import { ShoppingBag, ArrowRight, Check } from "lucide-react";
+import { products, gammes, productMatchesCategory } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { GammesSection, DuosSection } from "@/components/CollectionSections";
 import { toast } from "sonner";
 
 const Boutique = () => {
   const [searchParams] = useSearchParams();
   const initialGamme = searchParams.get("gamme");
   const [activeFilter, setActiveFilter] = useState<string>(initialGamme ?? "all");
-  const [gammesOpen, setGammesOpen] = useState(false);
   const { addToCart } = useCart();
   const navigate = useNavigate();
 
-  const handleAddPack = (pack: typeof gammePacks[number]) => {
-    addToCart(packToProduct(pack));
-    toast.success(`${pack.name} ajouté au panier`);
-    navigate("/panier");
-  };
-
   const filtered = useMemo(
-    () => (activeFilter === "all" ? products : products.filter((p) => p.gamme === activeFilter)),
+    () => (activeFilter === "all" ? products : products.filter((p) => productMatchesCategory(p, activeFilter))),
     [activeFilter],
   );
 
-  const featured = products[7]; // Huile Extra Pousse — "Pièce du moment"
+  const featured = products.find((product) => product.id === "8") ?? products[0]; // Huile Extra Pousse — "Pièce du moment"
 
   return (
     <div className="min-h-screen bg-background">
@@ -126,14 +119,18 @@ const Boutique = () => {
         </div>
       </section>
 
+      <nav aria-label="Collections" className="container mx-auto flex flex-wrap gap-3 px-4 pt-8">
+        {[{ id: "catalogue", label: "Tous les soins" }, { id: "gammes", label: "Nos Gammes" }, { id: "duos", label: "Nos Duos" }].map(section => <Button key={section.id} asChild variant="outline"><a href={`#${section.id}`}>{section.label}</a></Button>)}
+      </nav>
+
       {/* CATALOGUE */}
-      <section id="catalogue" className="container mx-auto px-4 py-16 md:py-24">
+      <section id="catalogue" className="container mx-auto px-4 py-10 scroll-mt-24">
         <div className="flex items-end justify-between flex-wrap gap-4 mb-10">
           <div>
             <div className="text-[11px] tracking-[0.3em] uppercase text-muted-foreground mb-3">
               La collection
             </div>
-            <h2 className="font-heading text-4xl md:text-5xl">
+            <h2 className="font-heading text-3xl font-bold">
               Tous les <span className="not-italic text-primary">soins</span>
             </h2>
           </div>
@@ -141,7 +138,7 @@ const Boutique = () => {
         </div>
 
         {/* Filtres */}
-        <div className="flex flex-wrap gap-2 mb-12 border-b border-border pb-6">
+        <div className="flex flex-wrap gap-2 mb-6 border-b border-border pb-6">
           <FilterChip active={activeFilter === "all"} onClick={() => setActiveFilter("all")}>
             Toutes les catégories
           </FilterChip>
@@ -151,129 +148,29 @@ const Boutique = () => {
               active={activeFilter === g.id}
               onClick={() => setActiveFilter(g.id)}
             >
-              {g.icon} {g.name}
+              {g.name}
             </FilterChip>
           ))}
         </div>
 
-        {/* Grille éditoriale */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-5">
           {filtered.map((p) => (
-            <article key={p.id} className="group flex flex-col">
-              <Link to={`/produit/${p.id}`} className="block relative overflow-hidden bg-secondary aspect-[4/5] mb-4">
-                <img
-                  src={p.image}
-                  alt={p.name}
-                  loading="lazy"
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    addToCart(p);
-                    toast.success(`${p.name} ajouté au panier`);
-                  }}
-                  className="absolute bottom-3 right-3 bg-action text-action-foreground rounded-full p-2.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-action/90 shadow-lg"
-                  aria-label="Ajouter au panier"
-                >
-                  <ShoppingBag className="h-4 w-4" />
-                </button>
+            <article key={p.id} data-product-id={p.id} className="group flex flex-col min-w-0 border border-border bg-card rounded-md overflow-hidden">
+              <Link to={`/produit/${p.id}`} className="block overflow-hidden bg-secondary aspect-square shrink-0">
+                <img src={p.image} alt={p.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               </Link>
-              {p.gamme !== "hydratation" && <div className="text-[10px] tracking-[0.25em] uppercase text-muted-foreground mb-1">
-                {gammes.find((g) => g.id === p.gamme)?.name ?? "Soin"}
-              </div>}
-              <Link
-                to={`/produit/${p.id}`}
-                className="font-heading text-lg leading-tight hover:text-primary transition-colors"
-              >
-                {p.name}
-              </Link>
-              <div className="mt-2 text-primary font-semibold">
-                {p.price.toLocaleString()} FCFA
+              <div className="p-3 flex flex-col gap-3">
+                <Link to={`/produit/${p.id}`} className="font-heading font-semibold text-sm leading-5 h-10 line-clamp-2 hover:text-primary">{p.name}</Link>
+                <div className="text-primary font-bold text-sm">{p.price.toLocaleString("fr-FR")} FCFA</div>
+                <Button size="sm" onClick={() => { addToCart(p); toast.success(`${p.name} ajouté au panier`); }} className="w-full bg-action text-action-foreground hover:bg-action/90"><ShoppingBag />Ajouter</Button>
               </div>
-              <Button
-                size="sm"
-                onClick={() => {
-                  addToCart(p);
-                  toast.success(`${p.name} ajouté au panier`);
-                }}
-                className="mt-3 bg-action text-action-foreground hover:bg-action/90 font-semibold rounded-full"
-              >
-                <ShoppingBag className="h-4 w-4 mr-1" />
-                Ajouter
-              </Button>
             </article>
           ))}
         </div>
       </section>
 
-      {/* Gammes — menu déroulant éditorial */}
-      <section className="bg-secondary/60 border-y border-border">
-        <div className="container mx-auto px-4 py-16">
-          <Collapsible open={gammesOpen} onOpenChange={setGammesOpen}>
-            <CollapsibleTrigger className="w-full flex items-center justify-between group">
-              <div className="text-left">
-                <div className="text-[11px] tracking-[0.3em] uppercase text-muted-foreground mb-2">
-                  Coffrets
-                </div>
-                <h2 className="font-heading text-3xl md:text-4xl">
-                  Nos <span className="not-italic text-primary">gammes</span> complètes
-                </h2>
-              </div>
-              <ChevronDown
-                className={`h-6 w-6 text-primary transition-transform ${gammesOpen ? "rotate-180" : ""}`}
-              />
-            </CollapsibleTrigger>
-            <CollapsibleContent className="pt-10">
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {gammePacks.map((pack) => (
-                  <article
-                    key={pack.id}
-                    className="bg-card border border-border overflow-hidden flex flex-col group hover:border-primary transition-colors"
-                  >
-                    <div className="aspect-[4/5] overflow-hidden bg-secondary">
-                      <img
-                        src={pack.image}
-                        alt={pack.name}
-                        loading="lazy"
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      />
-                    </div>
-                    <div className="p-6 flex flex-col flex-1">
-                      <h3 className="font-heading text-xl mb-2">{pack.name}</h3>
-                      <p className="text-sm text-muted-foreground mb-4">{pack.description}</p>
-                      {pack.contains && (
-                        <ul className="text-xs text-muted-foreground space-y-1 mb-4">
-                          {pack.contains.map((c, i) => (
-                            <li key={i}>— {c}</li>
-                          ))}
-                        </ul>
-                      )}
-                      {pack.note && (
-                        <p className="text-xs not-italic text-primary/80 mb-4">NB : {pack.note}</p>
-                      )}
-                      <div className="flex items-center justify-between mt-auto pt-4 border-t border-border">
-                        <span className="font-heading text-xl text-primary">
-                          {pack.price.toLocaleString()} FCFA
-                        </span>
-                        <Button
-                          size="sm"
-                          onClick={() => handleAddPack(pack)}
-                          className="bg-action text-action-foreground hover:bg-action/90 rounded-full font-semibold"
-                        >
-                          <ShoppingBag className="h-4 w-4 mr-1" />
-                          Ajouter
-                        </Button>
-                      </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
-        </div>
-      </section>
+      <GammesSection />
+      <DuosSection />
     </div>
   );
 };
@@ -287,8 +184,9 @@ const FilterChip = ({
   onClick: () => void;
   children: React.ReactNode;
 }) => (
-  <button
-    type="button"
+  <Button
+    variant="outline"
+    aria-pressed={active}
     onClick={onClick}
     className={`px-4 py-2 rounded-full text-xs tracking-wider uppercase border transition-colors ${
       active
@@ -297,7 +195,7 @@ const FilterChip = ({
     }`}
   >
     {children}
-  </button>
+  </Button>
 );
 
 export default Boutique;
