@@ -1,7 +1,9 @@
+import { useCartNavigation } from "@/hooks/use-cart-navigation";
 import { Link } from "react-router-dom";
 import { ArrowRight, ShieldCheck, Truck, Sparkles, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { products, gammePacks } from "@/data/products";
+import { products, gammePacks, packToProduct } from "@/data/products";
+import { useCart } from "@/contexts/CartContext";
 import ProductCard from "@/components/ProductCard";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
@@ -26,6 +28,8 @@ const tickerItems = [
 ];
 
 const Index = () => {
+  const { addToCart } = useCart();
+  const openCart = useCartNavigation();
   const featured = products.slice(0, 4);
   const selection = products.slice(4, 8);
   const heroPack = gammePacks[0];
@@ -179,8 +183,8 @@ const Index = () => {
               <p className="not-italic text-primary font-medium mb-8">
                 « Le meilleur remède pour tous vos bobos capillaires. »
               </p>
-              <Button asChild className="bg-foreground text-background hover:bg-foreground/90 rounded-full px-8 py-6 uppercase tracking-wider text-xs font-semibold">
-                <Link to="/boutique">Commander maintenant</Link>
+              <Button onClick={openCart} className="bg-foreground text-background hover:bg-foreground/90 rounded-full px-8 py-6 uppercase tracking-wider text-xs font-semibold">
+                Commander maintenant
               </Button>
             </div>
           </div>
@@ -277,36 +281,31 @@ const Index = () => {
       <section className="py-24">
         <div className="container mx-auto">
           <div className="text-center mb-12">
-            <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Avis vérifiés</span>
+            <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">La Cure’s Nappy Family</span>
             <h2 className="font-heading text-4xl md:text-5xl font-bold mt-3 leading-tight">
-              Retours <span className="not-italic text-accent font-medium">clientes</span>
+              Retours <span className="not-italic text-accent font-medium">clients</span>
             </h2>
           </div>
-          <Carousel
-            opts={{ loop: true, align: "start" }}
-            plugins={[Autoplay({ delay: 4500, stopOnInteraction: false })]}
-            className="max-w-6xl mx-auto"
-          >
-            <CarouselContent>
-              {[
-                { name: "Aminata K.", text: "Mes cheveux n'ont jamais été aussi hydratés. La Crème Hydratante est un miracle." },
-                { name: "Fatou D.", text: "L'Huile Extra Pousse a changé ma vie. Résultats visibles en 3 semaines." },
-                { name: "Marie-Claire A.", text: "Enfin des produits qui comprennent nos cheveux. Qualité premium à Abidjan." },
-                { name: "Sandra B.", text: "La Gamme Suprême a totalement transformé ma routine. Je recommande." },
-                { name: "Awa T.", text: "Le Masque Fortifiant est incroyable, mes cheveux ont retrouvé force et éclat." },
-              ].map((t, i) => (
-                <CarouselItem key={i} className="md:basis-1/2 lg:basis-1/3">
-                  <div className="border border-border rounded-2xl p-8 h-full bg-card">
-                    <p className="font-heading text-2xl not-italic text-foreground leading-snug mb-6">"{t.text}"</p>
-                    <div className="flex items-center gap-3">
-                      <div className="h-px w-8 bg-accent" />
-                      <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground font-semibold">{t.name}</p>
-                    </div>
-                  </div>
-                </CarouselItem>
+          <div className="reviews-marquee overflow-hidden" aria-label="Commentaires de nos clientes">
+            <div className="reviews-track flex w-max">
+              {[0, 1].map(copy => (
+                <div key={copy} aria-hidden={copy === 1 ? true : undefined} className="flex shrink-0 gap-8 pr-8">
+                  {[
+                    { name: "郭佩億", text: "C'est magnifique, j'adore le packaging et les gammes complètes" },
+                    { name: "Prefinal Maima", text: "Je confirme je suis le témoignage vivant de tout vos produits" },
+                    { name: "Ago Jackie Emmanuelle Niambe", text: "Le duo qui opère des miracles par possible" },
+                    { name: "Sophie Koffi", text: "Testez et restez y'a rien même ❤️❤️❤️ Cure's NAPPY_Officiel" },
+                    { name: "Faithfulness De Jésus", text: "Cure's nappy the best ❤️❤️❤️" },
+                  ].map(review => (
+                    <figure key={review.name} className="w-64 md:w-80 border-l-2 border-primary pl-5 py-2">
+                      <blockquote className="text-base leading-relaxed mb-4">« {review.text} »</blockquote>
+                      <figcaption className="text-xs text-primary font-semibold">{review.name}</figcaption>
+                    </figure>
+                  ))}
+                </div>
               ))}
-            </CarouselContent>
-          </Carousel>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -320,8 +319,8 @@ const Index = () => {
           <p className="text-base md:text-lg opacity-80 mb-8 max-w-xl mx-auto">
             Tout votre rituel capillaire complet. Hydratation, nutrition, croissance et définition réunis.
           </p>
-          <Button asChild size="lg" className="bg-foreground text-background hover:bg-foreground/90 rounded-full px-10 py-6 uppercase tracking-wider text-xs font-semibold">
-            <Link to="/nos-gammes">En profiter</Link>
+          <Button onClick={() => { addToCart(packToProduct(heroPack)); openCart(); }} size="lg" className="bg-foreground text-background hover:bg-foreground/90 rounded-full px-10 py-6 uppercase tracking-wider text-xs font-semibold">
+            En profiter
           </Button>
         </div>
       </section>
