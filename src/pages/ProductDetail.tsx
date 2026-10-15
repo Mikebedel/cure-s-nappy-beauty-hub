@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, ShoppingBag, Star } from "lucide-react";
+import { ArrowLeft, ShoppingBag } from "lucide-react";
 import { products, gammes } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
@@ -25,7 +25,7 @@ const ProductDetail = () => {
 
   return (
     <div className="min-h-screen">
-      <div className="container mx-auto py-6">
+      <div className="container mx-auto pt-28 pb-8">
         <Link to="/boutique" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-6">
           <ArrowLeft className="h-4 w-4 mr-1" /> Retour à la boutique
         </Link>
@@ -42,19 +42,10 @@ const ProductDetail = () => {
               {gammes.find((g) => g.id === product.gamme)?.icon} {gammes.find((g) => g.id === product.gamme)?.name}
             </span>}
             <h1 className="font-heading text-2xl md:text-3xl font-bold mt-2 mb-3">{product.name}</h1>
-            
-            <div className="flex items-center gap-2 mb-4">
-              <div className="flex gap-0.5">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} className={`h-4 w-4 ${i < Math.floor(product.rating) ? 'fill-accent text-accent' : 'text-border'}`} />
-                ))}
-              </div>
-              <span className="text-sm font-medium">{product.rating}</span>
-              <span className="text-sm text-muted-foreground">({product.reviews} avis)</span>
-            </div>
+            {product.volume && <p className="text-muted-foreground mb-4">{product.volume}</p>}
 
-            <p className="text-2xl font-bold text-primary mb-6">{product.price.toLocaleString()} FCFA</p>
-            <p className="text-muted-foreground leading-relaxed mb-6">{product.description}</p>
+            <p className="text-xl font-bold text-primary mb-4">{product.price.toLocaleString("fr-FR")} FCFA</p>
+            <p className="text-base leading-7 mb-6">{product.shortDescription}</p>
 
             <Button
               size="lg"
@@ -66,25 +57,27 @@ const ProductDetail = () => {
             </Button>
 
             {/* Benefits */}
-            <div className="mb-6">
-              <h3 className="font-heading font-semibold mb-3">Bienfaits</h3>
-              <div className="flex flex-wrap gap-2">
+            <div className="border-t border-border pt-6 mb-6">
+              <h2 className="font-heading font-semibold mb-3">Le soin en détail</h2>
+              <p className="text-base text-muted-foreground leading-7 mb-6">{product.description}</p>
+              <h3 className="font-heading font-semibold mb-3">Bienfaits indiqués par la marque</h3>
+              <ul className="space-y-2 list-disc pl-5">
                 {product.benefits.map((b) => (
-                  <span key={b} className="bg-primary/10 text-primary text-sm px-3 py-1 rounded-full">{b}</span>
+                  <li key={b} className="text-base text-muted-foreground">{b}</li>
                 ))}
-              </div>
+              </ul>
             </div>
 
             {/* Usage */}
-            <div className="mb-6">
+            <div className="border-t border-border pt-6 mb-6">
               <h3 className="font-heading font-semibold mb-2">Conseils d'utilisation</h3>
-              <p className="text-sm text-muted-foreground">{product.usage}</p>
+              <p className="text-base leading-7 text-muted-foreground">{product.usage}</p>
             </div>
 
             {/* Ingredients */}
-            <div>
+            <div className="border-t border-border pt-6">
               <h3 className="font-heading font-semibold mb-2">Ingrédients</h3>
-              <p className="text-sm text-muted-foreground">{product.ingredients.join(" · ")}</p>
+              <p className="text-base leading-7 text-muted-foreground">{product.ingredients.join(" · ")}</p>
             </div>
           </div>
         </div>
@@ -93,7 +86,7 @@ const ProductDetail = () => {
         {similar.length > 0 && (
           <div className="mb-16">
             <h2 className="font-heading text-2xl font-bold mb-6">Produits similaires</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            <div className="product-grid">
               {similar.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}

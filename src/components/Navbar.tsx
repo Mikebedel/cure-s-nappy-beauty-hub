@@ -72,8 +72,8 @@ const Navbar = () => {
   }, [hoverIdx, activeIdx, location.pathname]);
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border transition-all duration-300 ${scrolled ? "py-2" : "py-4"}`}>
-      <div className="container mx-auto flex items-center justify-between gap-4">
+    <nav aria-label="Navigation principale" className={`fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border transition-all duration-200 ${scrolled ? "py-2" : "py-4"}`}>
+      <div className="container mx-auto flex items-center justify-between gap-2">
         <Link
           to="/"
           className="flex items-center gap-2 transition-colors"
@@ -83,7 +83,7 @@ const Navbar = () => {
             alt=""
             className="h-9 w-9 object-contain shrink-0"
           />
-          <img src={wordmark} alt="Cure's Nappy" className="w-32 md:w-40 h-auto object-contain" />
+          <img src={wordmark} alt="Cure's Nappy" className="w-28 sm:w-32 md:w-40 h-auto object-contain" />
         </Link>
 
         {/* Desktop pill nav with animated indicator */}
@@ -109,6 +109,7 @@ const Navbar = () => {
               <Link
                 key={link.label}
                 to={link.to}
+                aria-current={active ? "page" : undefined}
                 ref={(el) => (itemRefs.current[i] = el)}
                 onMouseEnter={() => setHoverIdx(i)}
                 className={`relative z-10 px-4 py-2 rounded-full text-sm font-medium transition-colors inline-flex items-center gap-1.5 ${
@@ -136,7 +137,7 @@ const Navbar = () => {
           >
             <ShoppingBag className="h-4 w-4" />
             {totalItems > 0 && (
-              <span className="absolute top-0 right-0 text-action text-xs font-bold">
+              <span key={totalItems} className="first-add-notice absolute top-0 right-0 text-action text-xs font-bold" aria-label={`${totalItems} articles dans le panier`}>
                 {totalItems}
               </span>
             )}
