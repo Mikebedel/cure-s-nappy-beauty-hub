@@ -18,7 +18,7 @@ const NosGammes = () => {
           <h1 className="font-heading text-4xl md:text-6xl font-bold leading-tight mb-4">
             Nos Gammes
           </h1>
-          <p className="text-primary-foreground/75 max-w-xl mx-auto">
+          <p className="text-primary-foreground/90 max-w-xl mx-auto">
             Chaque gamme rassemble les soins essentiels pour atteindre un objectif capillaire précis.
             Économisez en commandant la routine complète.
           </p>
@@ -59,7 +59,7 @@ const NosGammes = () => {
                     Voir tout <ArrowRight className="h-3 w-3" />
                   </Link>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                <div className="product-grid">
                   {gProducts.map((p) => (
                     <ProductCard key={p.id} product={p} hideBadge />
                   ))}

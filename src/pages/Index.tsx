@@ -38,15 +38,15 @@ const Index = () => {
   return (
     <div className="bg-background">
       {/* ============ HERO CINEMATOGRAPHIQUE ============ */}
-      <section className="relative min-h-[92vh] flex items-end overflow-hidden bg-primary">
+      <section className="relative min-h-[660px] md:min-h-[720px] flex items-end overflow-hidden bg-primary">
         <div className="absolute inset-0">
           <img
             src={heroImage}
             alt="Cure's Nappy — soins capillaires naturels"
-            className="w-full h-full object-cover opacity-70"
+            className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/70 to-primary/30" />
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/80 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/30 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/50 via-transparent to-transparent" />
         </div>
 
         <div className="container mx-auto relative z-10 pb-20 pt-32">
@@ -58,8 +58,8 @@ const Index = () => {
               </span>
             </div>
             <h1 className="font-heading text-primary-foreground leading-[0.95] mb-8">
-              <span className="block text-5xl md:text-7xl font-bold">Soins capillaires</span>
-              <span className="block text-4xl md:text-6xl not-italic text-accent font-medium mt-2">
+              <span className="block text-[32px] md:text-[52px] font-bold">Soins capillaires</span>
+              <span className="block text-[32px] md:text-[48px] not-italic text-accent font-medium mt-2">
                 qui révèlent votre nature.
               </span>
             </h1>
@@ -69,10 +69,10 @@ const Index = () => {
               Le meilleur remède pour tous vos bobos capillaires.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full px-8 py-6 text-sm font-semibold uppercase tracking-wider">
+              <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-8 py-6 text-sm font-semibold uppercase tracking-wider">
                 <Link to="/boutique">Découvrir la boutique</Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="rounded-full px-8 py-6 text-sm font-semibold uppercase tracking-wider border-primary-foreground/40 bg-transparent text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+              <Button asChild size="lg" variant="outline" className="rounded-md px-8 py-6 text-sm font-semibold uppercase tracking-wider border-primary-foreground/40 bg-transparent text-primary-foreground hover:bg-primary-foreground hover:text-primary">
                 <Link to="/nos-gammes">Nos gammes</Link>
               </Button>
             </div>
@@ -96,6 +96,23 @@ const Index = () => {
         </div>
       </section>
 
+      {/* ============ GARANTIES ============ */}
+      <section className="py-20 bg-background border-t border-border">
+        <div className="container mx-auto grid grid-cols-2 md:grid-cols-4 gap-10">
+          {[
+            { icon: ShieldCheck, title: "Qualité garantie", desc: "Chaque produit est contrôlé avant expédition." },
+            { icon: Truck, title: "Livraison Abidjan", desc: "1 500 à 2 000 FCFA selon votre zone." },
+            { icon: Sparkles, title: "Commande simple", desc: "Mobile Money, Fineo Pay, WhatsApp." },
+            { icon: RotateCcw, title: "Conseils inclus", desc: "Routines personnalisées pour vos cheveux." },
+          ].map((f, i) => (
+            <div key={i} className="text-center md:text-left">
+              <f.icon className="h-7 w-7 text-accent mb-4 mx-auto md:mx-0" strokeWidth={1.5} />
+              <h3 className="font-heading text-lg font-semibold mb-2">{f.title}</h3>
+              <p className="text-sm text-muted-foreground">{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
       {/* ============ MARQUEE TICKER ============ */}
       <section className="bg-foreground text-background py-5 overflow-hidden border-y border-foreground">
         <div className="flex animate-marquee whitespace-nowrap">
@@ -112,43 +129,13 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ============ LIFESTYLE SLIDER ============ */}
-      <section className="py-16 md:py-20 bg-background">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-10">
-            <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">L'univers</span>
-            <h2 className="font-heading text-3xl md:text-4xl font-bold mt-3">
-              Notre <span className="not-italic text-accent font-medium">communauté</span>
-            </h2>
-          </div>
-          <Carousel
-            opts={{ loop: true, align: "start" }}
-            plugins={[Autoplay({ delay: 3500, stopOnInteraction: false })]}
-          >
-            <CarouselContent>
-              {lifestyleSlides.map((src, i) => (
-                <CarouselItem key={i} className="basis-2/3 sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
-                  <div className="aspect-[3/4] overflow-hidden rounded-2xl bg-secondary group">
-                    <img
-                      src={src}
-                      alt={`Cure's Nappy — moment ${i + 1}`}
-                      loading="lazy"
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-          </Carousel>
-        </div>
-      </section>
 
-      <section className="py-24">
+      <section className="reveal-section py-14 md:py-16">
         <div className="container mx-auto">
           <div className="flex items-end justify-between mb-12 flex-wrap gap-6">
             <div>
               <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">La collection</span>
-              <h2 className="font-heading text-4xl md:text-5xl font-bold mt-3 leading-tight">
+              <h2 className="font-heading text-3xl md:text-4xl font-bold mt-3 leading-tight">
                 Nos soins <span className="not-italic text-accent font-medium">du moment</span>
               </h2>
             </div>
@@ -157,7 +144,7 @@ const Index = () => {
               <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          <div className="product-grid">
             {featured.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
@@ -174,7 +161,7 @@ const Index = () => {
           <div className="flex items-center order-1 md:order-2 p-10 md:p-20">
             <div className="max-w-md">
               <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">La marque</span>
-              <h2 className="font-heading text-4xl md:text-5xl font-bold mt-3 mb-6 leading-tight">
+              <h2 className="font-heading text-3xl md:text-4xl font-bold mt-3 mb-6 leading-tight">
                 L'élégance <span className="not-italic text-primary font-medium">au quotidien</span>
               </h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
@@ -183,7 +170,7 @@ const Index = () => {
               <p className="not-italic text-primary font-medium mb-8">
                 « Le meilleur remède pour tous vos bobos capillaires. »
               </p>
-              <Button onClick={openCart} className="bg-foreground text-background hover:bg-foreground/90 rounded-full px-8 py-6 uppercase tracking-wider text-xs font-semibold">
+              <Button onClick={() => openCart()} className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-8 py-6 uppercase tracking-wider text-xs font-semibold">
                 Commander maintenant
               </Button>
             </div>
@@ -192,11 +179,11 @@ const Index = () => {
       </section>
 
       {/* ============ DEUX GAMMES PHARES ============ */}
-      <section className="py-24">
+      <section className="reveal-section py-14 md:py-16">
         <div className="container mx-auto">
           <div className="text-center mb-14">
             <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Nos gammes</span>
-            <h2 className="font-heading text-4xl md:text-5xl font-bold mt-3 leading-tight">
+            <h2 className="font-heading text-3xl md:text-4xl font-bold mt-3 leading-tight">
               Deux rituels, <span className="not-italic text-accent font-medium">une même signature</span>
             </h2>
           </div>
@@ -208,10 +195,10 @@ const Index = () => {
               <Link
                 key={num}
                 to={to}
-                className="group relative overflow-hidden rounded-3xl bg-primary text-primary-foreground aspect-[4/5] md:aspect-[5/6]"
+                className="group relative overflow-hidden rounded-md bg-primary text-primary-foreground aspect-[4/5] md:aspect-[5/6]"
               >
-                <img src={pack.image} alt={pack.name} className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-70 group-hover:scale-105 transition-all duration-700" />
-                <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/60 to-transparent" />
+                <img src={pack.image} alt={pack.name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.02] transition-all duration-200" />
+                <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/15 to-transparent" />
                 <div className="relative h-full flex flex-col justify-between p-8 md:p-10">
                   <div className="flex items-start justify-between">
                     <span className="font-heading text-5xl md:text-6xl font-bold text-accent">{num}</span>
@@ -236,12 +223,12 @@ const Index = () => {
       <BoutiqueBanner images={[slide1, slide4, slide6]} />
 
       {/* ============ À NE PAS MANQUER ============ */}
-      <section className="py-24 bg-secondary">
+      <section className="reveal-section py-14 md:py-16 bg-secondary">
         <div className="container mx-auto">
           <div className="flex items-end justify-between mb-12 flex-wrap gap-6">
             <div>
               <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Sélection</span>
-              <h2 className="font-heading text-4xl md:text-5xl font-bold mt-3 leading-tight">
+              <h2 className="font-heading text-3xl md:text-4xl font-bold mt-3 leading-tight">
                 À ne pas <span className="not-italic text-accent font-medium">manquer</span>
               </h2>
             </div>
@@ -250,7 +237,7 @@ const Index = () => {
               <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          <div className="product-grid">
             {selection.map((p) => (
               <ProductCard key={p.id} product={p} hideBadge />
             ))}
@@ -259,11 +246,11 @@ const Index = () => {
       </section>
 
       {/* ============ NÉE À ABIDJAN ============ */}
-      <section className="py-28 bg-primary text-primary-foreground">
+      <section className="py-16 bg-primary text-primary-foreground">
         <div className="container mx-auto max-w-4xl text-center">
           <span className="font-heading text-7xl md:text-8xl not-italic text-accent block leading-none mb-4">CN</span>
           <span className="text-xs uppercase tracking-[0.3em] text-primary-foreground/60">La marque</span>
-          <h2 className="font-heading text-4xl md:text-6xl font-bold mt-4 mb-8 leading-tight">
+          <h2 className="font-heading text-[32px] md:text-[48px] font-bold mt-4 mb-8 leading-tight">
             Née à Abidjan, <span className="not-italic text-accent font-medium">portée partout.</span>
           </h2>
           <p className="text-primary-foreground/80 text-lg leading-relaxed max-w-2xl mx-auto mb-10">
@@ -271,18 +258,49 @@ const Index = () => {
             capillaires naturels, efficaces et pensés pour elle. Des formules qui célèbrent la beauté
             de nos textures, du cuir chevelu jusqu'aux pointes.
           </p>
-          <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full px-8 py-6 uppercase tracking-wider text-xs font-semibold">
+          <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-8 py-6 uppercase tracking-wider text-xs font-semibold">
             <Link to="/a-propos">Notre histoire</Link>
           </Button>
         </div>
       </section>
 
+      {/* ============ LIFESTYLE SLIDER ============ */}
+      <section className="py-16 md:py-20 bg-background">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-10">
+            <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">L'univers</span>
+            <h2 className="font-heading text-3xl md:text-4xl font-bold mt-3">
+              Notre <span className="not-italic text-accent font-medium">communauté</span>
+            </h2>
+          </div>
+          <Carousel
+            opts={{ loop: true, align: "start" }}
+            plugins={[Autoplay({ delay: 3500, stopOnInteraction: false })]}
+          >
+            <CarouselContent>
+              {lifestyleSlides.map((src, i) => (
+                <CarouselItem key={i} className="basis-2/3 sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
+                  <div className="aspect-[3/4] overflow-hidden rounded-md bg-secondary group">
+                    <img
+                      src={src}
+                      alt={`Cure's Nappy — moment ${i + 1}`}
+                      loading="lazy"
+                      className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-[1.02]"
+                    />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
+        </div>
+      </section>
+
       {/* ============ RETOURS CLIENTS ============ */}
-      <section className="py-24">
+      <section className="reveal-section py-14 md:py-16">
         <div className="container mx-auto">
           <div className="text-center mb-12">
             <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">La Cure’s Nappy Family</span>
-            <h2 className="font-heading text-4xl md:text-5xl font-bold mt-3 leading-tight">
+            <h2 className="font-heading text-3xl md:text-4xl font-bold mt-3 leading-tight">
               Retours <span className="not-italic text-accent font-medium">clients</span>
             </h2>
           </div>
@@ -310,37 +328,28 @@ const Index = () => {
       </section>
 
       {/* ============ BANNIÈRE PROMO ============ */}
-      <section className="bg-accent text-accent-foreground py-20">
+      <section className="bg-secondary text-foreground py-12 border-y border-border">
         <div className="container mx-auto text-center max-w-3xl">
-          <span className="text-xs uppercase tracking-[0.3em] opacity-70">Offre en cours</span>
-          <h2 className="font-heading text-4xl md:text-6xl font-bold mt-3 mb-6 leading-tight">
-            La <span className="not-italic">Gamme Suprême</span> à 61 000 FCFA
+          <span className="text-xs uppercase tracking-[0.3em] opacity-70">Le coffret complet</span>
+          <h2 className="font-heading text-[32px] md:text-[48px] font-bold mt-3 mb-6 leading-tight">
+            La <span className="not-italic">Gamme Suprême</span>
           </h2>
           <p className="text-base md:text-lg opacity-80 mb-8 max-w-xl mx-auto">
             Tout votre rituel capillaire complet. Hydratation, nutrition, croissance et définition réunis.
           </p>
-          <Button onClick={() => { addToCart(packToProduct(heroPack)); openCart(); }} size="lg" className="bg-foreground text-background hover:bg-foreground/90 rounded-full px-10 py-6 uppercase tracking-wider text-xs font-semibold">
+          <p className="text-xl text-primary font-bold mb-6">{heroPack.price.toLocaleString("fr-FR")} FCFA · {heroPack.contains.length} soins inclus</p>
+          <Button onClick={() => { addToCart(packToProduct(heroPack)); openCart(); }} size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-10 py-6 uppercase tracking-wider text-xs font-semibold">
             En profiter
           </Button>
         </div>
       </section>
 
-      {/* ============ GARANTIES ============ */}
-      <section className="py-20 bg-background border-t border-border">
-        <div className="container mx-auto grid grid-cols-2 md:grid-cols-4 gap-10">
-          {[
-            { icon: ShieldCheck, title: "Qualité garantie", desc: "Chaque produit est contrôlé avant expédition." },
-            { icon: Truck, title: "Livraison Abidjan", desc: "1 500 à 2 000 FCFA selon votre zone." },
-            { icon: Sparkles, title: "Commande simple", desc: "Mobile Money, Fineo Pay, WhatsApp." },
-            { icon: RotateCcw, title: "Conseils inclus", desc: "Routines personnalisées pour vos cheveux." },
-          ].map((f, i) => (
-            <div key={i} className="text-center md:text-left">
-              <f.icon className="h-7 w-7 text-accent mb-4 mx-auto md:mx-0" strokeWidth={1.5} />
-              <h3 className="font-heading text-lg font-semibold mb-2">{f.title}</h3>
-              <p className="text-sm text-muted-foreground">{f.desc}</p>
-            </div>
-          ))}
-        </div>
+
+      <section className="container mx-auto py-14 md:py-16 reveal-section">
+        <p className="text-sm text-muted-foreground mb-3">Le journal Cure’s Nappy</p>
+        <h2 className="font-heading font-bold mb-5">Conseils capillaires</h2>
+        <p className="text-muted-foreground max-w-xl mb-6">Massage du cuir chevelu, gestes de soin et routines pour vos cheveux naturels.</p>
+        <Button asChild><Link to="/conseils">Astuces et conseils <ArrowRight /></Link></Button>
       </section>
     </div>
   );
@@ -354,17 +363,17 @@ const BoutiqueBanner = ({ images }: { images: string[] }) => (
           <Link
             key={i}
             to="/boutique"
-            className="relative group overflow-hidden rounded-2xl aspect-[16/9] md:aspect-[4/3] block"
+            className="relative group overflow-hidden rounded-md aspect-[16/9] md:aspect-[4/3] block"
           >
             <img
               src={src}
               alt={`Cure's Nappy — boutique ${i + 1}`}
               loading="lazy"
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-[1.02]"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-primary/85 via-primary/30 to-transparent" />
             <div className="absolute inset-0 flex items-end p-6">
-              <span className="inline-flex items-center gap-2 bg-action text-action-foreground px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider shadow-lg group-hover:gap-3 transition-all">
+              <span className="inline-flex items-center gap-2 bg-action text-action-foreground px-5 py-2.5 rounded-md text-xs font-semibold uppercase tracking-wider shadow-lg group-hover:gap-3 transition-all">
                 Voir la boutique
                 <ArrowRight className="h-4 w-4" />
               </span>
