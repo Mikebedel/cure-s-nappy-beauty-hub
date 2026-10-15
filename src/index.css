@@ -4,31 +4,31 @@
 
 @layer base {
   :root {
-    --background: 40 20% 97%;
-    --foreground: 0 0% 8%;
+    --background: 39 41% 93%;
+    --foreground: 86 11% 12%;
 
-    --card: 40 20% 99%;
-    --card-foreground: 0 0% 8%;
+    --card: 0 0% 100%;
+    --card-foreground: 86 11% 12%;
 
-    --popover: 40 20% 99%;
-    --popover-foreground: 0 0% 8%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 86 11% 12%;
 
     --primary: 82 35% 35%;
-    --primary-foreground: 40 20% 97%;
+    --primary-foreground: 0 0% 100%;
 
     --primary-light: 90 40% 55%;
     --primary-light-foreground: 0 0% 8%;
 
-    --secondary: 40 20% 93%;
-    --secondary-foreground: 0 0% 8%;
+    --secondary: 39 30% 89%;
+    --secondary-foreground: 86 11% 12%;
 
     --muted: 40 15% 92%;
-    --muted-foreground: 0 0% 40%;
+    --muted-foreground: 86 7% 34%;
 
-    --accent: 43 80% 50%;
-    --accent-foreground: 0 0% 8%;
+    --accent: 42 81% 53%;
+    --accent-foreground: 86 11% 12%;
 
-    --action: 25 95% 55%;
+    --action: 82 35% 35%;
     --action-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
@@ -38,7 +38,9 @@
     --input: 40 15% 88%;
     --ring: 82 35% 35%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
+    --shadow-product: 0 8px 24px hsl(var(--foreground) / 0.06);
+    --shadow-cart: 0 16px 48px hsl(var(--foreground) / 0.16);
 
     --sidebar-background: 82 35% 35%;
     --sidebar-foreground: 40 20% 97%;
@@ -61,6 +63,8 @@
 
   body {
     @apply bg-background text-foreground font-body;
+    font-size: 16px;
+    line-height: 1.6;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -82,8 +86,8 @@
 }
 
 @keyframes cart-arrive {
-  from { opacity: 0; transform: translateY(-12px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes page-arrive {
@@ -96,7 +100,30 @@
   to { transform: translateX(-50%); }
 }
 
-.cart-panel { animation: cart-arrive 280ms ease-out both; }
+.cart-panel { animation: cart-arrive 240ms ease-out both; box-shadow: var(--shadow-cart); }
+.cart-panel[data-closing="true"] { animation: cart-leave 200ms ease-in both; }
+@keyframes cart-leave { to { opacity: 0; transform: translateX(24px); } }
+@keyframes first-add { from { opacity: 0; transform: translateY(10px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.first-add-notice { animation: first-add 260ms ease-out both; }
+.product-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
+@media (min-width: 360px) { .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .product-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.product-card { transition: box-shadow 220ms ease, border-color 220ms ease; }
+.product-card:hover { box-shadow: var(--shadow-product); border-color: hsl(var(--primary) / 0.35); }
+.range-content { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 240ms ease; }
+.range-content[data-open="true"] { grid-template-rows: 1fr; }
+.range-content > div { overflow: hidden; }
+.store-page h1 { font-size: 32px; line-height: 1.15; }
+.store-page h2 { font-size: 28px; line-height: 1.2; }
+@media (min-width: 768px) {
+  .store-page h1 { font-size: 48px; }
+  .store-page h2 { font-size: 36px; }
+}
+.reveal-section { opacity: 1; }
+@supports (animation-timeline: view()) {
+  @keyframes section-reveal { from { opacity: 0.4; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .reveal-section { animation: section-reveal linear both; animation-timeline: view(); animation-range: entry 0% entry 20%; }
+}
 .store-page { animation: page-arrive 240ms ease-out both; }
 .reviews-track { animation: reviews-travel 48s linear infinite; }
 .reviews-marquee:hover .reviews-track,
