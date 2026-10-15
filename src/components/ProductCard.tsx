@@ -15,14 +15,14 @@ const ProductCard = ({ product, hideBadge = false }: { product: Product; hideBad
   const { addToCart } = useCart();
 
   return (
-    <div className="group bg-card rounded-lg overflow-hidden border border-border hover:shadow-lg transition-shadow flex flex-col">
+    <div className="product-card group min-w-0 bg-card rounded-md overflow-hidden border border-border flex flex-col h-full">
       <Link to={`/produit/${product.id}`}>
         <div className="aspect-square bg-muted relative overflow-hidden">
           <img
             src={product.image}
             alt={product.name}
             loading="lazy"
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200"
           />
           {!hideBadge && gammeLabels[product.gamme] && (
             <span className="absolute top-3 left-3 bg-primary text-primary-foreground text-xs font-semibold px-2 py-1 rounded-sm">
@@ -33,18 +33,18 @@ const ProductCard = ({ product, hideBadge = false }: { product: Product; hideBad
       </Link>
       <div className="p-4 flex flex-col flex-1">
         <Link to={`/produit/${product.id}`}>
-          <h3 className="font-heading font-semibold text-base mb-1 line-clamp-2 hover:text-primary transition-colors">
+          <h3 className="font-heading font-semibold text-base leading-6 min-h-12 mb-1 hover:text-primary transition-colors">
             {product.name}
           </h3>
         </Link>
-        <p className="text-sm text-muted-foreground mb-2 line-clamp-1">{product.shortDescription}</p>
-        <div className="flex items-center gap-1 mb-3">
+        <p className="text-[15px] leading-6 text-muted-foreground mb-3 line-clamp-2 min-h-12">{product.shortDescription}</p>
+        <div className="hidden">
           <Star className="h-3.5 w-3.5 fill-accent text-accent" />
           <span className="text-xs font-medium">{product.rating}</span>
           <span className="text-xs text-muted-foreground">({product.reviews} avis)</span>
         </div>
-        <div className="flex items-center justify-between mt-auto gap-2">
-          <span className="text-lg font-bold text-primary">{product.price.toLocaleString()} FCFA</span>
+        <div className="flex flex-col items-stretch mt-auto gap-3">
+          <span className="text-lg font-bold text-primary">{product.price.toLocaleString("fr-FR")} FCFA</span>
           <Button
             size="sm"
             className="bg-action text-action-foreground hover:bg-action/90 font-semibold"

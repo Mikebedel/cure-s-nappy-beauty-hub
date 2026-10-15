@@ -1,8 +1,8 @@
-# Modifications demandées
-- [ ] Uniformiser et réduire les soins, retirer les doublons, afficher les gammes sans menu.
-- [ ] Ajouter Nos Duos dans la boutique et la page Nos Gammes.
-- [ ] Rendre le panier compact, flottant et animé, conserver ouverture/fermeture et retour à la page.
-- [ ] Relier les deux boutons d’accueil au panier et à la Gamme Complète Suprême.
-- [ ] Extraire les cinq commentaires fournis et les faire défiler de droite à gauche.
-- [ ] Consulter Facebook pour les conseils, visuels et offres vérifiables.
-- [ ] Vérifier les parcours et l’affichage sur grands et petits écrans.
+# Amélioration progressive Cure’s Nappy
+- [ ] Harmoniser palette, boutons, typographie et cartes sans modifier le catalogue.
+- [ ] Réordonner l’accueil, alléger les fondus et la promotion, ajouter l’accès aux conseils.
+- [ ] Fiabiliser Commander maintenant et le panier accessible; premier ajout animé une seule fois.
+- [ ] Déplier indépendamment les gammes et présenter le duo en carte.
+- [ ] Améliorer les fiches et la clarté des frais, erreurs et paiement de la commande.
+- [ ] Tester quantités, suppression, totaux, filtres et affichage desktop/tablette/mobile.
+- [ ] Vérifier la confirmation réelle de commande sans simuler un paiement.

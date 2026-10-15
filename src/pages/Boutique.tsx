@@ -6,7 +6,7 @@ import { products, gammes, productMatchesCategory } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { GammesSection, DuosSection } from "@/components/CollectionSections";
-import { toast } from "sonner";
+import ProductCard from "@/components/ProductCard";
 
 const Boutique = () => {
   const [searchParams] = useSearchParams();
@@ -34,7 +34,7 @@ const Boutique = () => {
             backgroundSize: "48px 48px",
           }}
         />
-        <div className="container mx-auto relative z-10 grid md:grid-cols-2 gap-10 px-4 pt-28 pb-16 md:pt-32 md:pb-24">
+        <div className="container mx-auto relative z-10 grid md:grid-cols-2 gap-10 items-start px-4 pt-28 pb-16 md:pt-32 md:pb-24">
           {/* Texte */}
           <div className="flex flex-col justify-center">
             <div className="flex items-center gap-3 text-xs tracking-[0.25em] uppercase text-accent mb-6">
@@ -75,14 +75,14 @@ const Boutique = () => {
               <Button
                 size="lg"
                 className="bg-action text-action-foreground hover:bg-action/90 px-7"
-                onClick={() => { addToCart(featured); toast.success(`${featured.name} ajouté au panier`); openCart(); }}
+                onClick={() => { addToCart(featured); openCart(); }}
               >
                 <ShoppingBag className="h-4 w-4" /> Commande dès maintenant !
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="rounded-full px-7 bg-transparent border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                className="rounded-md px-7 bg-transparent border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
                 asChild
               >
                 <Link to="/contact">Nous contacter <ArrowRight className="ml-1 h-4 w-4" /></Link>
@@ -154,20 +154,7 @@ const Boutique = () => {
           ))}
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-5">
-          {filtered.map((p) => (
-            <article key={p.id} data-product-id={p.id} className="group flex flex-col min-w-0 border border-border bg-card rounded-md overflow-hidden">
-              <Link to={`/produit/${p.id}`} className="block overflow-hidden bg-secondary aspect-square shrink-0">
-                <img src={p.image} alt={p.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-              </Link>
-              <div className="p-3 flex flex-col gap-3">
-                <Link to={`/produit/${p.id}`} className="font-heading font-semibold text-sm leading-5 h-10 line-clamp-2 hover:text-primary">{p.name}</Link>
-                <div className="text-primary font-bold text-sm">{p.price.toLocaleString("fr-FR")} FCFA</div>
-                <Button size="sm" onClick={() => { addToCart(p); toast.success(`${p.name} ajouté au panier`); }} className="w-full bg-action text-action-foreground hover:bg-action/90"><ShoppingBag />Ajouter</Button>
-              </div>
-            </article>
-          ))}
-        </div>
+        <div className="product-grid">{filtered.map(product => <div key={product.id} data-product-id={product.id}><ProductCard product={product} hideBadge /></div>)}</div>
       </section>
 
       <GammesSection />
