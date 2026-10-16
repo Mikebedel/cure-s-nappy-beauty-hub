@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { products, gammePacks, packToProduct } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import ProductCard from "@/components/ProductCard";
+import HomeVideo from "@/components/HomeVideo";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import heroImage from "@/assets/hero-image.jpg";
@@ -95,6 +96,8 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      <HomeVideo />
 
       {/* ============ GARANTIES ============ */}
       <section className="py-20 bg-background border-t border-border">

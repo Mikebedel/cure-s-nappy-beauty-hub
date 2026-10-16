@@ -31,6 +31,7 @@ import AdminMarketing from "./pages/admin/AdminMarketing";
 import AdminReviews from "./pages/admin/AdminReviews";
 import AdminReports from "./pages/admin/AdminReports";
 import AdminSupport from "./pages/admin/AdminSupport";
+import AdminVideos from "./pages/admin/AdminVideos";
 
 const queryClient = new QueryClient();
 
@@ -98,6 +99,7 @@ const App = () => (
                 <Route path="avis" element={<AdminReviews />} />
                 <Route path="rapports" element={<AdminReports />} />
                 <Route path="support" element={<AdminSupport />} />
+                <Route path="videos" element={<AdminVideos />} />
               </Route>
 
               {/* Public routes */}
