@@ -1,7 +1,7 @@
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, ShoppingCart, Package, Users, BarChart3,
-  Megaphone, Star, FileText, MessageSquare, LogOut, Menu
+  Megaphone, Star, FileText, MessageSquare, Video, LogOut, Menu
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ const navItems = [
   { label: "Avis", path: "/admin/avis", icon: Star },
   { label: "Rapports", path: "/admin/rapports", icon: FileText },
   { label: "Support", path: "/admin/support", icon: MessageSquare },
+  { label: "Vidéos", path: "/admin/videos", icon: Video },
 ];
 
 const AdminLayout = () => {
