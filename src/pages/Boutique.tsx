@@ -5,7 +5,7 @@ import { ShoppingBag, ArrowRight, Check } from "lucide-react";
 import { products, gammes, productMatchesCategory } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
-import { GammesSection, DuosSection } from "@/components/CollectionSections";
+import { GammesSection, DuosSection, AccessoriesSection } from "@/components/CollectionSections";
 import ProductCard from "@/components/ProductCard";
 
 const Boutique = () => {
@@ -121,7 +121,7 @@ const Boutique = () => {
       </section>
 
       <nav aria-label="Collections" className="container mx-auto flex flex-wrap gap-3 px-4 pt-8">
-        {[{ id: "catalogue", label: "Tous les soins" }, { id: "gammes", label: "Nos Gammes" }, { id: "duos", label: "Nos Duos" }].map(section => <Button key={section.id} asChild variant="outline"><a href={`#${section.id}`}>{section.label}</a></Button>)}
+        {[{ id: "catalogue", label: "Tous les soins" }, { id: "gammes", label: "Nos Gammes" }, { id: "duos", label: "Nos Duos et Trio" }, { id: "accessoires", label: "Accessoires" }].map(section => <Button key={section.id} asChild variant="outline"><a href={`#${section.id}`}>{section.label}</a></Button>)}
       </nav>
 
       {/* CATALOGUE */}
@@ -159,6 +159,7 @@ const Boutique = () => {
 
       <GammesSection />
       <DuosSection />
+      <AccessoriesSection />
     </div>
   );
 };

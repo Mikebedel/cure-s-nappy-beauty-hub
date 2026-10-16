@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, ShoppingBag } from "lucide-react";
 import { products, gammes } from "@/data/products";
@@ -9,6 +10,7 @@ const ProductDetail = () => {
   const { id } = useParams();
   const { addToCart } = useCart();
   const product = products.find((p) => p.id === id);
+  const [imageIndex, setImageIndex] = useState(0);
 
   if (!product) {
     return (
@@ -32,8 +34,19 @@ const ProductDetail = () => {
 
         <div className="grid md:grid-cols-2 gap-8 mb-16">
           {/* Image */}
-          <div className="aspect-square bg-muted rounded-lg overflow-hidden">
-            <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+          <div>
+            <div className="aspect-square bg-muted rounded-lg overflow-hidden">
+              <img src={product.gallery?.[imageIndex] ?? product.image} alt={product.name} className="w-full h-full object-cover" />
+            </div>
+            {product.gallery && product.gallery.length > 1 && (
+              <div className="flex gap-3 mt-3">
+                {product.gallery.map((src, i) => (
+                  <button key={src} type="button" onClick={() => setImageIndex(i)} aria-label={`Photo ${i + 1}`} className={`h-20 w-20 rounded-md overflow-hidden border-2 ${i === imageIndex ? "border-primary" : "border-border"}`}>
+                    <img src={src} alt="" className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Info */}
