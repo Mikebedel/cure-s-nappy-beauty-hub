@@ -13,6 +13,15 @@ import gammeSoinProfond from "@/assets/gamme-soin-profond.jpg";
 import gammeHydratationIntense from "@/assets/gamme-hydratation-intense.jpg";
 import gammeMiniePlus from "@/assets/gamme-minie-plus.jpg";
 import gammeMinie from "@/assets/gamme-minie.jpg";
+import cremeBouclanteAsset from "@/assets/creme-bouclante.png.asset.json";
+import cremeBouclanteOuverteAsset from "@/assets/creme-bouclante-ouverte.png.asset.json";
+import duoExtraPousseAsset from "@/assets/duo-extra-pousse.jpg.asset.json";
+import duoAntiPelliculaireAsset from "@/assets/duo-anti-pelliculaire.jpg.asset.json";
+import trioRamollissantAsset from "@/assets/trio-ramollissant.png.asset.json";
+import accessoiresVertAsset from "@/assets/set-accessoires-vert.png.asset.json";
+import accessoiresBeigeAsset from "@/assets/set-accessoires-beige.png.asset.json";
+
+export const cremeBouclanteImages = [cremeBouclanteAsset.url, cremeBouclanteOuverteAsset.url];
 
 export interface Product {
   id: string;
@@ -29,6 +38,7 @@ export interface Product {
   rating: number;
   reviews: number;
   volume?: string;
+  gallery?: string[];
 }
 
 export interface GammePack {
@@ -136,6 +146,35 @@ export const gammePacks: GammePack[] = [
       "Leave-in conditioner",
       "Magical Spray",
       "Crème hydratante & volume+",
+    ],
+  },
+];
+
+gammePacks.sort((a, b) => a.price - b.price);
+
+const priceOf = (name: string) => products.find(p => p.name === name)?.price ?? 0;
+
+export const duoPacks: GammePack[] = [
+  { id: "duo-extra-pousse", name: "Duo Extra Pousse", description: "Le combo parfait pour avoir des cheveux longs et volumineux en quelques semaines.", image: duoExtraPousseAsset.url, benefits: [], contains: ["Crème Hydratante & Volume+", "Huile Extra Pousse"], price: 0 },
+  { id: "duo-anti-pelliculaire", name: "Duo Anti-pelliculaire", description: "Le combo parfait pour dire adieu aux pellicules et démangeaisons en un seul geste.", image: duoAntiPelliculaireAsset.url, benefits: [], contains: ["Shampoing Doux & Clarifiant", "Huile Extra Pousse"], price: 0 },
+  { id: "trio-ramollissant-anti-chutes", name: "Trio Ramollissant & Anti-chutes", description: "Le trio parfait pour des cheveux souples, faciles à coiffer et sans casse.", image: trioRamollissantAsset.url, benefits: [], contains: ["Huile 2 en 1", "Crème Hydratante & Volume+", "Magical Spray"], price: 0 },
+];
+
+export interface Accessory {
+  id: string;
+  name: string;
+  price: number | null;
+  colors: { name: string; swatch: string; image: string }[];
+}
+
+export const accessories: Accessory[] = [
+  {
+    id: "set-peignes-brosses",
+    name: "Set de peignes & brosses Cure's Nappy",
+    price: null,
+    colors: [
+      { name: "Vert", swatch: "hsl(100 25% 55%)", image: accessoiresVertAsset.url },
+      { name: "Beige", swatch: "hsl(35 15% 70%)", image: accessoiresBeigeAsset.url },
     ],
   },
 ];
@@ -297,7 +336,8 @@ export const products: Product[] = [
     description: "Une crème coiffante qui définit parfaitement les boucles de vos cheveux. Pour des boucles sublimes et bien dessinées.",
     shortDescription: "Définit parfaitement les boucles de vos cheveux",
     price: 8500,
-    image: cremeHydratanteVolume,
+    image: cremeBouclanteAsset.url,
+    gallery: [cremeBouclanteAsset.url, cremeBouclanteOuverteAsset.url],
     gamme: "boucle",
     benefits: ["Définition des boucles", "Tenue longue durée", "Anti-frisottis", "Brillance naturelle"],
     ingredients: ["Beurre de karité", "Huile de coco", "Aloe vera", "Glycérine végétale"],
@@ -309,3 +349,5 @@ export const products: Product[] = [
 
 export const productMatchesCategory = (product: Product, category: string) =>
   product.gamme === category || product.categories?.includes(category) === true;
+
+duoPacks.forEach(pack => { pack.price = pack.contains.reduce((sum, name) => sum + priceOf(name), 0); });
