@@ -345,6 +345,30 @@ export type Database = {
           },
         ]
       }
+      site_videos: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          title: string | null
+          youtube_url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          title?: string | null
+          youtube_url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          title?: string | null
+          youtube_url?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
