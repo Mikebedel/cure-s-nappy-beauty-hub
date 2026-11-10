@@ -1,7 +1,7 @@
 import { useCartNavigation } from "@/hooks/use-cart-navigation";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, ShieldCheck, Truck, Sparkles, MessageCircleHeart, Star, ShoppingBag, ChevronLeft, ChevronRight, Zap } from "lucide-react";
+import { ArrowRight, ShieldCheck, Truck, Sparkles, MessageCircleHeart, Star, ShoppingBag, ChevronLeft, ChevronRight, Zap, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { products, gammePacks, packToProduct } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
@@ -12,7 +12,6 @@ import { flashNews } from "@/data/flashNews";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import heroImage from "@/assets/hero-image.jpg";
-import gammeComplete from "@/assets/gamme-complete.jpg";
 import slide1 from "@/assets/slide-1.jpg";
 import slide2 from "@/assets/slide-2.jpg";
 import slide3 from "@/assets/slide-3.jpg";
@@ -127,6 +126,7 @@ const Index = () => {
   const { addToCart } = useCart();
   const openCart = useCartNavigation();
   const featured = products.slice(0, 4);
+  const curlCream = products.find((p) => p.id === "13");
   // gammePacks est trié par prix : on cible les gammes par identifiant, pas par position.
   const heroPack = gammePacks.find((pack) => pack.id === "gamme-complete-supreme") ?? gammePacks[gammePacks.length - 1];
   const luxePack = gammePacks.find((pack) => pack.id === "gamme-soin-profond") ?? gammePacks[0];
@@ -261,31 +261,45 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ============ LA MARQUE (image + texte) ============ */}
-      <section className="container mx-auto pb-16 md:pb-24 reveal-section">
-        <div className="surface overflow-hidden grid md:grid-cols-2 p-2 md:p-3 gap-2">
-          <div className="relative overflow-hidden rounded-2xl min-h-[320px] md:min-h-[480px]">
-            <img src={gammeComplete} alt="L'art du soin capillaire" loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
-          </div>
-          <div className="flex items-center p-6 md:p-12">
-            <div className="max-w-md">
-              <span className="eyebrow">La marque</span>
-              <h2 className="font-heading font-bold mt-3 mb-5">
-                L'élégance <span className="text-primary">au quotidien</span>
-              </h2>
-              <p className="text-muted-foreground text-lg leading-relaxed mb-5">
-                Des formulations soignées, des actifs naturels sélectionnés avec exigence. Un rituel capillaire qui vous ressemble.
-              </p>
-              <p className="font-heading text-lg font-semibold text-primary mb-8">
-                « Le meilleur remède pour tous vos bobos capillaires. »
-              </p>
-              <Button asChild size="lg">
-                <Link to="/boutique">Commander maintenant <ArrowRight /></Link>
-              </Button>
+      {/* ============ SOIN VEDETTE : CRÈME BOUCLANTE ============ */}
+      {curlCream && (
+        <section className="container mx-auto pb-16 md:pb-24 reveal-section">
+          <div className="surface overflow-hidden grid md:grid-cols-2 p-2 md:p-3 gap-2">
+            <div className="relative overflow-hidden rounded-2xl min-h-[340px] md:min-h-[520px] bg-muted group">
+              <img src={curlCream.gallery?.[0] ?? curlCream.image} alt={curlCream.name} loading="lazy" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
+              <span className="absolute top-4 left-4 rounded-full bg-accent text-accent-foreground px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider shadow-soft">Soin vedette</span>
+              {curlCream.gallery?.[1] && (
+                <img src={curlCream.gallery[1]} alt={`${curlCream.name}, texture`} loading="lazy" className="absolute bottom-4 right-4 w-28 md:w-40 aspect-square object-cover rounded-2xl ring-4 ring-card shadow-lift" />
+              )}
+            </div>
+            <div className="flex items-center p-6 md:p-12">
+              <div className="max-w-md">
+                <span className="eyebrow">Définition de boucle</span>
+                <h2 className="font-heading font-bold mt-3 mb-5">
+                  {curlCream.name} <span className="block text-primary">des boucles qui tiennent</span>
+                </h2>
+                <p className="text-muted-foreground text-lg leading-relaxed mb-6">{curlCream.description}</p>
+                <ul className="grid grid-cols-2 gap-2.5 mb-7">
+                  {curlCream.benefits.map((benefit) => (
+                    <li key={benefit} className="flex items-start gap-2 rounded-2xl bg-secondary/70 px-3.5 py-3 text-sm font-medium">
+                      <Check className="h-4 w-4 mt-0.5 shrink-0 text-primary" />{benefit}
+                    </li>
+                  ))}
+                </ul>
+                <p className="font-heading text-3xl font-bold text-primary mb-6">{curlCream.price.toLocaleString("fr-FR")} FCFA</p>
+                <div className="flex flex-wrap gap-3">
+                  <Button size="lg" onClick={() => { addToCart(curlCream); openCart(); }}>
+                    <ShoppingBag /> Ajouter au panier
+                  </Button>
+                  <Button asChild size="lg" variant="outline">
+                    <Link to={`/produit/${curlCream.id}`}>Voir le soin <ArrowRight /></Link>
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ============ FLASH NEWS : promotion, communiqué ou nouveauté (src/data/flashNews.ts) ============ */}
       {flashNews.active && (
@@ -401,18 +415,21 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ============ NÉE À ABIDJAN + CONSEILS ============ */}
+      {/* ============ NOTRE RAISON D'ÊTRE + CONSEILS ============ */}
       <section className="container mx-auto section reveal-section">
         <div className="grid md:grid-cols-2 gap-5">
           <div className="rounded-[2rem] bg-deep text-deep-foreground p-7 md:p-12 flex flex-col">
-            <span className="eyebrow eyebrow--light">La marque</span>
+            <span className="eyebrow eyebrow--light">Notre raison d'être</span>
             <h2 className="font-heading font-bold mt-3 mb-5 text-3xl md:text-4xl">
-              Née à Abidjan, <span className="text-accent">portée partout.</span>
+              Née d'une mission : <span className="text-accent">réconcilier chaque femme avec ses cheveux naturels.</span>
             </h2>
+            <p className="text-deep-foreground/85 leading-relaxed mb-4">
+              Trop longtemps, les soins vendus chez nous n'étaient pensés ni pour les cheveux crépus, ni pour
+              notre climat. Cure's Nappy est née pour changer ça.
+            </p>
             <p className="text-deep-foreground/85 leading-relaxed mb-8">
-              Cure's Nappy est née d'une conviction simple : chaque femme africaine mérite des soins
-              capillaires naturels, efficaces et pensés pour elle. Des formules qui célèbrent la beauté
-              de nos textures, du cuir chevelu jusqu'aux pointes.
+              Des soins naturels, efficaces et accessibles, pour que chaque femme aime ses cheveux tels qu'ils
+              sont, du cuir chevelu jusqu'aux pointes.
             </p>
             <Button asChild size="lg" className="mt-auto w-fit bg-accent text-accent-foreground hover:bg-accent/90">
               <Link to="/a-propos">Notre histoire <ArrowRight /></Link>
