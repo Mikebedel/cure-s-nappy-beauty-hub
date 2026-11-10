@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Sparkles, Lightbulb, ShieldAlert, AlertTriangle, ShoppingBag } from "lucide-react";
+import { Sparkles, Lightbulb, ShieldAlert, AlertTriangle, ShoppingBag, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,9 +10,10 @@ import {
   DialogTrigger,
   DialogDescription,
 } from "@/components/ui/dialog";
+import PageHero from "@/components/PageHero";
 
 type Item = {
-  icon: any;
+  icon: LucideIcon;
   title: string;
   intro: string;
   body: React.ReactNode;
@@ -135,16 +136,16 @@ const ItemCard = ({ item }: { item: Item }) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button className="text-left bg-card border border-border rounded-2xl p-6 hover:border-primary hover:shadow-lg transition-all group flex flex-col h-full">
-          <Icon className="h-6 w-6 text-primary mb-4" strokeWidth={1.5} />
+        <button className="product-card text-left bg-card border border-border/80 rounded-3xl p-6 md:p-7 group flex flex-col h-full">
+          <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-5"><Icon className="h-6 w-6" strokeWidth={1.6} /></span>
           <h3 className="font-heading text-lg font-bold mb-2 leading-tight">{item.title}</h3>
           <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{item.intro}</p>
-          <span className="mt-auto text-xs uppercase tracking-wider font-semibold text-action">
+          <span className="mt-auto text-sm font-semibold text-primary group-hover:underline">
             Lire l'article →
           </span>
         </button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto rounded-3xl">
         <DialogHeader>
           <div className="flex items-center gap-3 mb-2">
             <Icon className="h-5 w-5 shrink-0 text-primary" strokeWidth={1.5} />
@@ -163,22 +164,11 @@ const ItemCard = ({ item }: { item: Item }) => {
 const Conseils = () => {
   return (
     <div className="min-h-screen bg-background">
-      <section className="bg-primary py-20 text-center">
-        <div className="container mx-auto">
-          <h1 className="font-heading text-4xl md:text-6xl font-bold text-primary-foreground mb-3">
-            Astuces & <span className="not-italic text-accent">Conseils</span>
-          </h1>
-          <p className="text-primary-foreground/70 max-w-md mx-auto not-italic">
-            "Le meilleur remède pour tous vos bobos capillaires."
-          </p>
-        </div>
-      </section>
+      <PageHero eyebrow="Le journal Cure's Nappy" title={<>Astuces & <span className="text-accent">Conseils</span></>} description="« Le meilleur remède pour tous vos bobos capillaires. »" />
 
       {/* ASTUCES */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="mb-8 flex items-center gap-2 text-primary font-semibold text-sm uppercase tracking-wider">
-          <Sparkles className="h-4 w-4" /> Astuces
-        </div>
+      <section className="container mx-auto pt-16 md:pt-20 pb-12">
+        <h2 className="font-heading font-bold mb-8 text-3xl md:text-4xl">Astuces</h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {astuces.map((item, i) => (
             <ItemCard key={i} item={item} />
@@ -187,10 +177,8 @@ const Conseils = () => {
       </section>
 
       {/* CONSEILS */}
-      <section className="container mx-auto px-4 pb-16">
-        <div className="mb-8 flex items-center gap-2 text-primary font-semibold text-sm uppercase tracking-wider">
-          <Lightbulb className="h-4 w-4" /> Conseils
-        </div>
+      <section className="container mx-auto pb-16 md:pb-20">
+        <h2 className="font-heading font-bold mb-8 text-3xl md:text-4xl">Conseils</h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {conseils.map((item, i) => (
             <ItemCard key={i} item={item} />
@@ -198,7 +186,7 @@ const Conseils = () => {
         </div>
 
         <div className="mt-12 max-w-md mx-auto">
-          <Button asChild size="lg" className="w-full bg-action text-action-foreground hover:bg-action/90 rounded-full font-semibold">
+          <Button asChild size="lg" className="w-full h-12">
             <Link to="/boutique">
               <ShoppingBag className="mr-2 h-5 w-5" />
               Voir la boutique

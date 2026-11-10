@@ -2,24 +2,33 @@ import { useEffect, useState } from "react";
 import logo from "@/assets/logo.jpg";
 
 const SplashScreen = () => {
-  const [hidden, setHidden] = useState(false);
+  // Affiché une seule fois par visite, jamais dans l'administration.
+  const [hidden, setHidden] = useState(() => {
+    try {
+      return sessionStorage.getItem("curesnappy-splash-seen") === "true" || location.pathname.startsWith("/admin");
+    } catch { return false; }
+  });
   const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
+    if (hidden) return;
+    try { sessionStorage.setItem("curesnappy-splash-seen", "true"); } catch { /* stockage indisponible */ }
     const t1 = setTimeout(() => setFadeOut(true), 1100);
     const t2 = setTimeout(() => setHidden(true), 1700);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (hidden) return null;
 
   return (
     <div
+      aria-hidden="true"
       className={`fixed inset-0 z-[200] flex items-center justify-center bg-background transition-opacity duration-500 ${
-        fadeOut ? "opacity-0" : "opacity-100"
+        fadeOut ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
     >
       <div className="flex flex-col items-center gap-6">

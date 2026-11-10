@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
-import { Product } from "@/data/products";
+import { Product, findCatalogItem } from "@/data/products";
 import { Check, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
 
@@ -24,14 +24,22 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>(() => {
     try {
       const saved = localStorage.getItem("curesnappy-cart");
-      const parsed = saved ? JSON.parse(saved) : [];
-      return Array.isArray(parsed) ? parsed : [];
+      const parsed: unknown = saved ? JSON.parse(saved) : [];
+      if (!Array.isArray(parsed)) return [];
+      // On ne garde que l'identifiant et la quantité : prix, nom et image
+      // sont toujours relus dans le catalogue actuel.
+      return parsed.flatMap((entry): CartItem[] => {
+        const id = entry?.id ?? entry?.product?.id;
+        const quantity = Math.floor(Number(entry?.quantity));
+        const product = typeof id === "string" ? findCatalogItem(id) : undefined;
+        return product && quantity > 0 ? [{ product, quantity }] : [];
+      });
     } catch { return []; }
   });
   const firstAddShown = useRef(localStorage.getItem("curesnappy-first-add-seen") === "true" || items.length > 0);
 
   useEffect(() => {
-    localStorage.setItem("curesnappy-cart", JSON.stringify(items));
+    localStorage.setItem("curesnappy-cart", JSON.stringify(items.map(({ product, quantity }) => ({ id: product.id, quantity }))));
     if (firstAddShown.current) localStorage.setItem("curesnappy-first-add-seen", "true");
   }, [items]);
 
@@ -40,8 +48,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       firstAddShown.current = true;
       localStorage.setItem("curesnappy-first-add-seen", "true");
       toast.custom(() => (
-        <div role="status" data-testid="first-add-notice" className="first-add-notice flex items-center gap-4 w-full bg-card text-card-foreground border border-primary/30 rounded-md p-4 shadow-sm">
-          <img src={product.image} alt="" className="w-14 h-14 rounded-sm object-cover shrink-0" />
+        <div role="status" data-testid="first-add-notice" className="first-add-notice flex items-center gap-4 w-full bg-card text-card-foreground border border-primary/30 rounded-2xl p-4 shadow-soft">
+          <img src={product.image} alt="" className="w-14 h-14 rounded-xl object-cover shrink-0" />
           <div className="min-w-0"><p className="font-heading font-bold flex items-center gap-2"><Check className="w-4 h-4 text-primary" />Votre premier soin est ajouté</p><p className="text-sm text-muted-foreground">{product.name}</p></div>
           <ShoppingBag className="w-5 h-5 text-primary shrink-0" />
         </div>

@@ -45,10 +45,10 @@ const AdminLogin = () => {
           });
           setMode("login");
         }
-      } catch (err: any) {
+      } catch (err) {
         toast({
           title: "Erreur",
-          description: err.message,
+          description: err instanceof Error ? err.message : "Une erreur est survenue.",
           variant: "destructive",
         });
       }

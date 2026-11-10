@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Phone, Mail, User, CreditCard, Truck } from "lucide-react";
+import { ArrowLeft, MapPin, User, CreditCard, Truck, MessageCircle } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useCartNavigation } from "@/hooks/use-cart-navigation";
 
 const communes = [
   { name: "Cocody", zone: "abidjan" },
@@ -28,17 +29,21 @@ const communes = [
 ];
 
 const paymentMethods = [
-  { id: "wave", name: "Wave", icon: "🌊" },
-  { id: "orange-money", name: "Orange Money", icon: "🟠" },
-  { id: "mtn-momo", name: "MTN MoMo", icon: "🟡" },
-  { id: "moov-money", name: "Moov Money", icon: "🔵" },
-  { id: "djamo", name: "Djamo", icon: "💳" },
+  { id: "wave", name: "Wave" },
+  { id: "orange-money", name: "Orange Money" },
+  { id: "mtn-momo", name: "MTN MoMo" },
+  { id: "moov-money", name: "Moov Money" },
+  { id: "djamo", name: "Djamo" },
 ];
+
+const WHATSAPP_NUMBER = "2250100848479";
 
 const Checkout = () => {
   const { items, totalPrice, clearCart } = useCart();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const openCart = useCartNavigation();
+  const [failed, setFailed] = useState(false);
   const [confirmation, setConfirmation] = useState<{ number: string; total: number } | null>(null);
 
   const [form, setForm] = useState({
@@ -62,15 +67,20 @@ const Checkout = () => {
       return;
     }
     setLoading(true);
+    setFailed(false);
 
     try {
-      const customerName = `${form.firstName} ${form.lastName}`;
+      const customerName = `${form.firstName.trim()} ${form.lastName.trim()}`;
+      // Identifiant et numéro générés ici : une cliente non connectée a le droit
+      // d'enregistrer une commande, pas de la relire ensuite dans la base.
+      const orderId = crypto.randomUUID();
+      const orderNumber = `CN-${Date.now().toString(36).toUpperCase()}`;
 
-      // Create order in database
-      const { data: order, error: orderError } = await supabase
+      const { error: orderError } = await supabase
         .from("orders")
         .insert({
-          order_number: `CN-${Date.now().toString(36).toUpperCase()}`,
+          id: orderId,
+          order_number: orderNumber,
           customer_name: customerName,
           customer_phone: form.phone,
           customer_email: form.email || null,
@@ -81,15 +91,13 @@ const Checkout = () => {
           total: grandTotal,
           payment_method: form.paymentMethod,
           status: "nouvelle",
-        })
-        .select()
-        .single();
+        });
 
       if (orderError) throw orderError;
 
       // Create order items
       const orderItems = items.map(({ product, quantity }) => ({
-        order_id: order.id,
+        order_id: orderId,
         product_name: product.name,
         product_price: product.price,
         quantity,
@@ -114,15 +122,27 @@ const Checkout = () => {
         { onConflict: "phone", ignoreDuplicates: false }
       );
 
-      setConfirmation({ number: order.order_number, total: grandTotal });
+      setConfirmation({ number: orderNumber, total: grandTotal });
       clearCart();
     } catch (error) {
       console.error("Order error:", error);
+      setFailed(true);
       toast({ title: "Erreur", description: "Votre commande n’a pas pu être finalisée. Vos articles sont conservés. Veuillez réessayer ou contacter notre équipe.", variant: "destructive" });
     }
 
     setLoading(false);
   };
+
+  // Secours si l'enregistrement en ligne échoue : la commande part sur WhatsApp.
+  const whatsappOrderUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+    [
+      "Bonjour Cure's Nappy, je souhaite passer cette commande :",
+      ...items.map(({ product, quantity }) => `• ${product.name} × ${quantity} — ${(product.price * quantity).toLocaleString("fr-FR")} FCFA`),
+      `Sous-total : ${totalPrice.toLocaleString("fr-FR")} FCFA`,
+      form.commune ? `Livraison ${form.commune} : ${deliveryFee.toLocaleString("fr-FR")} FCFA` : "",
+      `Total : ${grandTotal.toLocaleString("fr-FR")} FCFA`,
+    ].filter(Boolean).join("\n"),
+  )}`;
 
   if (confirmation) {
     return (
@@ -139,7 +159,7 @@ const Checkout = () => {
   if (items.length === 0) {
     return (
       <div className="container mx-auto pt-32 pb-20 text-center">
-        <h1 className="font-heading text-2xl font-bold mb-3">Aucun produit dans votre panier</h1>
+        <h1 className="font-heading font-bold mb-5">Aucun produit dans votre panier</h1>
         <Button asChild className="bg-action text-action-foreground">
           <Link to="/boutique">Voir la boutique</Link>
         </Button>
@@ -150,11 +170,11 @@ const Checkout = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto pt-28 pb-12 px-4">
-        <Link to="/panier" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-6">
+        <button type="button" onClick={() => openCart()} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-6">
           <ArrowLeft className="h-4 w-4 mr-1" /> Retour au panier
-        </Link>
+        </button>
 
-        <h1 className="font-heading text-2xl md:text-3xl font-bold mb-8">Finaliser la commande</h1>
+        <h1 className="font-heading text-3xl md:text-4xl font-bold mb-8">Finaliser la commande</h1>
 
         <form onSubmit={handleSubmit}>
           <div className="grid lg:grid-cols-3 gap-8">
@@ -207,9 +227,9 @@ const Checkout = () => {
                   </div>
                 </div>
                 {form.commune && (
-                  <div className="mt-4 flex items-center gap-2 text-sm bg-primary/10 text-primary p-3 rounded-md">
+                  <div className="mt-4 flex items-center gap-2 text-sm bg-primary/10 text-primary p-3 rounded-2xl">
                     <Truck className="h-4 w-4" />
-                    <span>Livraison {selectedCommune?.zone === "special" ? "zone spéciale" : "Abidjan"} : <strong>{deliveryFee.toLocaleString()} FCFA</strong></span>
+                    <span>Livraison {selectedCommune?.zone === "special" ? "zone spéciale" : "Abidjan"} : <strong>{deliveryFee.toLocaleString("fr-FR")} FCFA</strong></span>
                   </div>
                 )}
               </div>
@@ -226,7 +246,7 @@ const Checkout = () => {
                       aria-pressed={form.paymentMethod === pm.id}
                       type="button"
                       onClick={() => handleChange("paymentMethod", pm.id)}
-                      className={`h-auto min-h-14 whitespace-normal p-3 rounded-md border text-center transition-colors ${
+                      className={`h-auto min-h-14 whitespace-normal p-3 rounded-2xl border text-center transition-colors ${
                         form.paymentMethod === pm.id
                           ? "border-primary bg-primary/10"
                           : "border-border hover:border-primary/50"
@@ -240,28 +260,28 @@ const Checkout = () => {
               </div>
             </div>
 
-            <div className="bg-card border border-border rounded-md p-6 h-fit lg:sticky lg:top-24">
+            <div className="surface p-6 h-fit lg:sticky lg:top-24">
               <h2 className="font-heading font-semibold text-lg mb-4">Récapitulatif</h2>
               <div className="space-y-3 mb-4">
                 {items.map(({ product, quantity }) => (
                   <div key={product.id} className="flex justify-between gap-4 text-sm">
                     <span className="text-muted-foreground">{product.name} × {quantity}</span>
-                    <span className="shrink-0">{(product.price * quantity).toLocaleString()} FCFA</span>
+                    <span className="shrink-0">{(product.price * quantity).toLocaleString("fr-FR")} FCFA</span>
                   </div>
                 ))}
               </div>
               <div className="border-t border-border pt-3 space-y-2">
                 <div className="flex justify-between gap-4 text-sm">
                   <span className="text-muted-foreground">Sous-total</span>
-                  <span>{totalPrice.toLocaleString()} FCFA</span>
+                  <span>{totalPrice.toLocaleString("fr-FR")} FCFA</span>
                 </div>
                 <div className="flex justify-between gap-4 text-sm">
                   <span className="text-muted-foreground">Livraison</span>
-                  <span>{form.commune ? `${deliveryFee.toLocaleString()} FCFA` : "—"}</span>
+                  <span>{form.commune ? `${deliveryFee.toLocaleString("fr-FR")} FCFA` : "—"}</span>
                 </div>
                 <div className="border-t border-border pt-3 flex justify-between font-bold text-lg">
                   <span>Total</span>
-                  <span className="text-primary">{grandTotal.toLocaleString()} FCFA</span>
+                  <span className="text-primary">{grandTotal.toLocaleString("fr-FR")} FCFA</span>
                 </div>
               </div>
               <Button
@@ -275,6 +295,15 @@ const Checkout = () => {
               <p className="text-sm text-muted-foreground text-center mt-3">
                 Vous serez invité à payer sur Fineo Pay après l’enregistrement. Le paiement sera confirmé séparément.
               </p>
+              {failed && (
+                <div role="alert" className="mt-5 rounded-2xl border border-destructive/40 bg-destructive/5 p-4 text-sm">
+                  <p className="font-semibold mb-1">La commande n’a pas pu être enregistrée.</p>
+                  <p className="text-muted-foreground mb-3">Votre panier est conservé. Vous pouvez réessayer ou nous envoyer la commande directement sur WhatsApp.</p>
+                  <Button asChild variant="outline" className="w-full">
+                    <a href={whatsappOrderUrl} target="_blank" rel="noopener noreferrer"><MessageCircle /> Commander sur WhatsApp</a>
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </form>

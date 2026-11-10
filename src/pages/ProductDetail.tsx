@@ -14,8 +14,9 @@ const ProductDetail = () => {
 
   if (!product) {
     return (
-      <div className="container mx-auto py-20 text-center">
-        <h1 className="font-heading text-2xl font-bold mb-4">Produit non trouvé</h1>
+      <div className="container mx-auto pt-36 pb-24 text-center">
+        <h1 className="font-heading font-bold mb-3">Produit introuvable</h1>
+        <p className="text-muted-foreground mb-6">Ce soin n’existe pas ou n’est plus disponible.</p>
         <Button asChild>
           <Link to="/boutique">Retour à la boutique</Link>
         </Button>
@@ -32,16 +33,16 @@ const ProductDetail = () => {
           <ArrowLeft className="h-4 w-4 mr-1" /> Retour à la boutique
         </Link>
 
-        <div className="grid md:grid-cols-2 gap-8 mb-16">
+        <div className="grid md:grid-cols-2 gap-8 lg:gap-14 mb-16">
           {/* Image */}
           <div>
-            <div className="aspect-square bg-muted rounded-lg overflow-hidden">
+            <div className="aspect-square bg-muted rounded-[2rem] overflow-hidden shadow-soft">
               <img src={product.gallery?.[imageIndex] ?? product.image} alt={product.name} className="w-full h-full object-cover" />
             </div>
             {product.gallery && product.gallery.length > 1 && (
               <div className="flex gap-3 mt-3">
                 {product.gallery.map((src, i) => (
-                  <button key={src} type="button" onClick={() => setImageIndex(i)} aria-label={`Photo ${i + 1}`} className={`h-20 w-20 rounded-md overflow-hidden border-2 ${i === imageIndex ? "border-primary" : "border-border"}`}>
+                  <button key={src} type="button" onClick={() => setImageIndex(i)} aria-label={`Photo ${i + 1}`} className={`h-20 w-20 rounded-2xl overflow-hidden border-2 ${i === imageIndex ? "border-primary" : "border-border"}`}>
                     <img src={src} alt="" className="w-full h-full object-cover" />
                   </button>
                 ))}
@@ -51,18 +52,16 @@ const ProductDetail = () => {
 
           {/* Info */}
           <div>
-            {product.gamme !== "hydratation" && <span className="text-primary text-sm font-semibold uppercase tracking-wider">
-              {gammes.find((g) => g.id === product.gamme)?.icon} {gammes.find((g) => g.id === product.gamme)?.name}
-            </span>}
-            <h1 className="font-heading text-2xl md:text-3xl font-bold mt-2 mb-3">{product.name}</h1>
+            {product.gamme !== "hydratation" && <span className="eyebrow">{gammes.find((g) => g.id === product.gamme)?.name}</span>}
+            <h1 className="font-heading text-3xl md:text-4xl font-bold mt-2 mb-3">{product.name}</h1>
             {product.volume && <p className="text-muted-foreground mb-4">{product.volume}</p>}
 
-            <p className="text-xl font-bold text-primary mb-4">{product.price.toLocaleString("fr-FR")} FCFA</p>
+            <p className="text-2xl font-bold text-primary mb-4">{product.price.toLocaleString("fr-FR")} FCFA</p>
             <p className="text-base leading-7 mb-6">{product.shortDescription}</p>
 
             <Button
               size="lg"
-              className="w-full bg-action text-action-foreground hover:bg-action/90 text-base mb-8"
+              className="w-full h-12 bg-action text-action-foreground hover:bg-action/90 text-base mb-8"
               onClick={() => addToCart(product)}
             >
               <ShoppingBag className="mr-2 h-5 w-5" />
@@ -71,7 +70,7 @@ const ProductDetail = () => {
 
             {/* Benefits */}
             <div className="border-t border-border pt-6 mb-6">
-              <h2 className="font-heading font-semibold mb-3">Le soin en détail</h2>
+              <h2 className="font-heading text-lg font-semibold mb-3">Le soin en détail</h2>
               <p className="text-base text-muted-foreground leading-7 mb-6">{product.description}</p>
               <h3 className="font-heading font-semibold mb-3">Bienfaits indiqués par la marque</h3>
               <ul className="space-y-2 list-disc pl-5">
@@ -98,7 +97,7 @@ const ProductDetail = () => {
         {/* Similar */}
         {similar.length > 0 && (
           <div className="mb-16">
-            <h2 className="font-heading text-2xl font-bold mb-6">Produits similaires</h2>
+            <h2 className="font-heading text-3xl md:text-4xl font-bold mb-8">Produits similaires</h2>
             <div className="product-grid">
               {similar.map((p) => (
                 <ProductCard key={p.id} product={p} />

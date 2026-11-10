@@ -72,8 +72,8 @@ const Navbar = () => {
   }, [hoverIdx, activeIdx, location.pathname]);
 
   return (
-    <nav aria-label="Navigation principale" className={`fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border transition-all duration-200 ${scrolled ? "py-2" : "py-4"}`}>
-      <div className="container mx-auto flex items-center justify-between gap-2">
+    <nav aria-label="Navigation principale" className="fixed top-0 left-0 right-0 z-50 px-3 pt-3">
+      <div className={`mx-auto max-w-[1240px] flex items-center justify-between gap-2 rounded-full border bg-background/85 backdrop-blur-xl pl-4 pr-2 transition-all duration-300 ${scrolled ? "py-1.5 border-border shadow-lift" : "py-2 border-border/60 shadow-soft"}`}>
         <Link
           to="/"
           className="flex items-center gap-2 transition-colors"
@@ -81,20 +81,20 @@ const Navbar = () => {
           <img
             src="/favicon.ico"
             alt=""
-            className="h-9 w-9 object-contain shrink-0"
+            className="h-9 w-9 object-contain shrink-0 rounded-full"
           />
-          <img src={wordmark} alt="Cure's Nappy" className="w-28 sm:w-32 md:w-40 h-auto object-contain" />
+          <img src={wordmark} alt="Cure's Nappy" className="w-28 sm:w-32 md:w-36 h-auto object-contain" />
         </Link>
 
         {/* Desktop pill nav with animated indicator */}
         <div
           ref={listRef}
-          className="hidden lg:flex items-center gap-1 bg-background/90 backdrop-blur-md border border-border rounded-full px-2 py-1.5 shadow-sm relative"
+          className="hidden lg:flex items-center gap-1 relative"
           onMouseLeave={() => setHoverIdx(null)}
         >
           {/* Animated highlight */}
           <span
-            className="absolute top-1.5 bottom-1.5 rounded-full bg-accent shadow-sm transition-all duration-300 ease-out pointer-events-none"
+            className="absolute top-0 bottom-0 rounded-full bg-primary transition-all duration-300 ease-out pointer-events-none"
             style={{
               left: indicator.left,
               width: indicator.width,
@@ -113,9 +113,7 @@ const Navbar = () => {
                 ref={(el) => (itemRefs.current[i] = el)}
                 onMouseEnter={() => setHoverIdx(i)}
                 className={`relative z-10 px-4 py-2 rounded-full text-sm font-medium transition-colors inline-flex items-center gap-1.5 ${
-                  active || hovered
-                    ? "text-accent-foreground"
-                    : "text-foreground/70"
+                  hoverIdx === null ? (active ? "text-primary-foreground" : "text-foreground/75") : hovered ? "text-primary-foreground" : "text-foreground/75"
                 }`}
               >
                 {Icon && <Icon className="h-3.5 w-3.5" />}
@@ -133,11 +131,11 @@ const Navbar = () => {
             aria-label={cartOpen ? "Fermer le panier" : "Ouvrir le panier"}
             title={cartOpen ? "Fermer le panier" : "Ouvrir le panier"}
             aria-expanded={cartOpen}
-            className="relative h-11 w-11 text-foreground hover:text-primary hover:bg-transparent"
+            className="relative h-11 w-11 text-foreground hover:text-primary hover:bg-secondary"
           >
-            <ShoppingBag className="h-4 w-4" />
+            <ShoppingBag className="!size-5" />
             {totalItems > 0 && (
-              <span key={totalItems} className="first-add-notice absolute top-0 right-0 text-action text-xs font-bold" aria-label={`${totalItems} articles dans le panier`}>
+              <span key={totalItems} className="first-add-notice absolute top-0.5 right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-accent text-accent-foreground text-[11px] leading-none font-bold flex items-center justify-center" aria-label={`${totalItems} article${totalItems > 1 ? "s" : ""} dans le panier`}>
                 {totalItems}
               </span>
             )}
@@ -146,28 +144,28 @@ const Navbar = () => {
           <Button
             variant="ghost"
             size="icon"
-            className="lg:hidden h-11 w-11 hover:bg-transparent text-foreground"
+            className="lg:hidden h-11 w-11 hover:bg-secondary hover:text-foreground text-foreground"
             onClick={() => setIsOpen(!isOpen)}
-            aria-label="Menu"
+            aria-label={isOpen ? "Fermer le menu" : "Ouvrir le menu"}
             aria-expanded={isOpen}
           >
-            {isOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+            {isOpen ? <X className="!size-5" /> : <Menu className="!size-5" />}
           </Button>
         </div>
       </div>
 
       {/* Mobile menu */}
       {isOpen && (
-        <div className="lg:hidden container mx-auto mt-3">
-          <div className="bg-background/95 backdrop-blur-md border border-border rounded-2xl p-3 shadow-lg flex flex-col gap-1">
+        <div className="lg:hidden mx-auto max-w-[1240px] mt-2">
+          <div className="bg-background/95 backdrop-blur-xl border border-border rounded-3xl p-3 shadow-lift flex flex-col gap-1">
             {navLinks.map((link) => {
               const active = location.pathname === link.to;
               return (
                 <Link
                   key={link.label}
                   to={link.to}
-                  className={`px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
-                    active ? "bg-accent text-accent-foreground" : "text-foreground/80 hover:bg-secondary"
+                  className={`px-4 py-3 rounded-2xl text-base font-medium transition-colors ${
+                    active ? "bg-primary text-primary-foreground" : "text-foreground/80 hover:bg-secondary"
                   }`}
                   onClick={() => setIsOpen(false)}
                 >

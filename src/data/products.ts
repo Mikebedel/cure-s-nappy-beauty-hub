@@ -351,3 +351,13 @@ export const productMatchesCategory = (product: Product, category: string) =>
   product.gamme === category || product.categories?.includes(category) === true;
 
 duoPacks.forEach(pack => { pack.price = pack.contains.reduce((sum, name) => sum + priceOf(name), 0); });
+
+export const formatPrice = (amount: number) => `${amount.toLocaleString("fr-FR")} FCFA`;
+
+/** Retrouve un article du catalogue (soin, gamme ou duo) à partir de son identifiant panier. */
+export const findCatalogItem = (id: string): Product | undefined => {
+  const product = products.find(p => p.id === id);
+  if (product) return product;
+  const pack = [...gammePacks, ...duoPacks].find(p => `pack-${p.id}` === id);
+  return pack ? packToProduct(pack) : undefined;
+};

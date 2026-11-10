@@ -42,7 +42,7 @@ const Panier = () => {
 
   return (
     <div className="fixed inset-0 z-40 bg-foreground/25 backdrop-blur-sm pt-24 pb-5 px-3 flex items-start justify-end" onClick={close}>
-      <section ref={panelRef} data-closing={closing} role="dialog" aria-modal="true" aria-labelledby="cart-title" className="cart-panel bg-card border border-border rounded-lg w-full max-w-md max-h-[calc(100dvh-7rem)] flex flex-col overflow-hidden" onClick={event => event.stopPropagation()}>
+      <section ref={panelRef} data-closing={closing} role="dialog" aria-modal="true" aria-labelledby="cart-title" className="cart-panel bg-card border border-border rounded-3xl w-full max-w-md max-h-[calc(100dvh-7rem)] flex flex-col overflow-hidden" onClick={event => event.stopPropagation()}>
         <header className="flex items-center justify-between px-5 py-4 border-b border-border">
           <h1 id="cart-title" className="font-heading font-bold text-xl">Votre panier <span className="text-sm text-muted-foreground">({items.length})</span></h1>
           <Button variant="ghost" size="icon" aria-label="Fermer votre panier" onClick={close}><X /></Button>
@@ -58,7 +58,7 @@ const Panier = () => {
             <div className="overflow-y-auto px-5 divide-y divide-border">
               {items.map(({ product, quantity }) => (
                 <div key={product.id} className="flex gap-3 py-4">
-                  <img src={product.image} alt={product.name} className="h-16 w-16 rounded-sm object-cover bg-muted shrink-0" />
+                  <img src={product.image} alt={product.name} className="h-16 w-16 rounded-xl object-cover bg-muted shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-sm leading-5">{product.name}</p>
                     <p className="text-sm text-primary font-bold mt-1">{product.price.toLocaleString("fr-FR")} FCFA</p>
