@@ -226,6 +226,10 @@ const Checkout = () => {
                     <Input id="address" required autoComplete="street-address" value={form.address} onChange={e => handleChange("address", e.target.value)} placeholder="Quartier, rue, repère..." />
                   </div>
                 </div>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  Hors Abidjan ou à l’étranger ? Nous expédions partout en Côte d’Ivoire et à l’international :{" "}
+                  <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer" className="font-semibold text-primary underline underline-offset-2">écrivez-nous sur WhatsApp</a> pour organiser l’envoi.
+                </p>
                 {form.commune && (
                   <div className="mt-4 flex items-center gap-2 text-sm bg-primary/10 text-primary p-3 rounded-2xl">
                     <Truck className="h-4 w-4" />

@@ -1,13 +1,14 @@
 import { useCartNavigation } from "@/hooks/use-cart-navigation";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, ShieldCheck, Truck, Sparkles, MessageCircleHeart, Star, ShoppingBag, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight, ShieldCheck, Truck, Sparkles, MessageCircleHeart, Star, ShoppingBag, ChevronLeft, ChevronRight, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { products, gammePacks, packToProduct } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import ProductCard from "@/components/ProductCard";
 import HomeVideo from "@/components/HomeVideo";
 import SectionHeading from "@/components/SectionHeading";
+import { flashNews } from "@/data/flashNews";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import heroImage from "@/assets/hero-image.jpg";
@@ -33,7 +34,7 @@ const tickerItems = [
 
 const guarantees = [
   { icon: ShieldCheck, title: "Qualité garantie", desc: "Chaque produit est contrôlé avant expédition." },
-  { icon: Truck, title: "Livraison Abidjan", desc: "1 500 à 2 000 FCFA selon votre zone." },
+  { icon: Truck, title: "Livraison partout", desc: "Abidjan, expédition dans tout le pays et à l'international." },
   { icon: Sparkles, title: "Commande simple", desc: "Mobile Money, Fineo Pay, WhatsApp." },
   { icon: MessageCircleHeart, title: "Conseils inclus", desc: "Routines personnalisées pour vos cheveux." },
 ];
@@ -45,6 +46,23 @@ const reviews = [
   { name: "Sophie Koffi", text: "Testez et restez y'a rien même ❤️❤️❤️ Cure's NAPPY_Officiel" },
   { name: "Faithfulness De Jésus", text: "Cure's nappy the best ❤️❤️❤️" },
 ];
+
+const heroWords = ["nature", "beauté", "force", "éclat", "couronne"];
+
+/** Le dernier mot du titre change tout seul. */
+const RotatingWord = () => {
+  const [index, setIndex] = useState(0);
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = setInterval(() => setIndex((current) => (current + 1) % heroWords.length), 2400);
+    return () => clearInterval(timer);
+  }, []);
+  return (
+    <span aria-hidden="true" className="block overflow-hidden pb-[0.12em] text-accent">
+      <span key={index} className="hero-word inline-block">{heroWords[index]}.</span>
+    </span>
+  );
+};
 
 /** Diaporama du haut de page : les photos défilent seules, avec flèches et repères. */
 const HeroSlider = () => {
@@ -109,7 +127,6 @@ const Index = () => {
   const { addToCart } = useCart();
   const openCart = useCartNavigation();
   const featured = products.slice(0, 4);
-  const selection = products.slice(4, 8);
   // gammePacks est trié par prix : on cible les gammes par identifiant, pas par position.
   const heroPack = gammePacks.find((pack) => pack.id === "gamme-complete-supreme") ?? gammePacks[gammePacks.length - 1];
   const luxePack = gammePacks.find((pack) => pack.id === "gamme-soin-profond") ?? gammePacks[0];
@@ -126,9 +143,10 @@ const Index = () => {
       <section className="container mx-auto pt-28 md:pt-32 pb-12 md:pb-16">
         <div className="grid lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] gap-x-16 gap-y-8 lg:gap-y-10">
           <div className="lg:self-end">
-            <span className="eyebrow">Collection 2026</span>
-            <h1 className="font-heading font-extrabold mt-4 mb-6 text-[40px] leading-[1.04] md:text-[64px]">
-              Soins capillaires <span className="text-primary">qui révèlent votre nature.</span>
+            <h1 aria-label="Soins capillaires qui révèlent votre nature." className="font-heading font-extrabold mb-6 text-[40px] leading-[1.04] md:text-[64px]">
+              <span aria-hidden="true" className="block">Soins capillaires</span>
+              <span aria-hidden="true" className="block text-primary">qui révèlent votre</span>
+              <RotatingWord />
             </h1>
             <p className="text-muted-foreground text-lg leading-relaxed max-w-xl mb-8">
               Une gamme pensée pour les cheveux crépus, bouclés et naturels. Le meilleur remède pour tous vos bobos capillaires.
@@ -150,7 +168,7 @@ const Index = () => {
 
           <div className="lg:self-start">
             <dl className="grid grid-cols-3 gap-3 max-w-lg">
-              {[{ value: "10+", label: "Produits" }, { value: "5", label: "Gammes" }, { value: "ABJ", label: "Livraison" }].map((stat) => (
+              {[{ value: "10+", label: "Produits" }, { value: "5", label: "Gammes" }, { value: "Partout", label: "Livraison" }].map((stat) => (
                 <div key={stat.label} className="surface !rounded-2xl px-4 py-4 flex flex-col-reverse">
                   <dt className="text-xs uppercase tracking-wider text-muted-foreground mt-1">{stat.label}</dt>
                   <dd className="font-heading text-2xl md:text-3xl font-bold text-primary">{stat.value}</dd>
@@ -269,17 +287,39 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ============ À NE PAS MANQUER ============ */}
-      <section className="reveal-section section bg-secondary/60">
-        <div className="container mx-auto">
-          <SectionHeading eyebrow="Sélection" title={<>À ne pas <span className="text-primary">manquer</span></>} action={seeAll} />
-          <div className="product-grid">
-            {selection.map((p) => (
-              <ProductCard key={p.id} product={p} hideBadge />
-            ))}
+      {/* ============ FLASH NEWS : promotion, communiqué ou nouveauté (src/data/flashNews.ts) ============ */}
+      {flashNews.active && (
+        <section className="container mx-auto reveal-section">
+          <div className="relative overflow-hidden rounded-[2rem] bg-deep text-deep-foreground grid md:grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] items-center">
+            <div aria-hidden="true" className="absolute -bottom-24 -right-16 h-72 w-72 rounded-full bg-accent/20 blur-3xl" />
+            <div className="relative p-3 md:p-4 md:pr-0">
+              <img src={flashNews.image} alt={flashNews.imageAlt} loading="lazy" className="w-full aspect-square object-cover rounded-[1.5rem]" />
+            </div>
+            <div className="relative p-7 md:p-14">
+              <div className="flex flex-wrap items-center gap-3 mb-5">
+                <span className="inline-flex items-center gap-2 rounded-full bg-accent text-accent-foreground px-4 py-1.5 text-sm font-bold uppercase tracking-wider">
+                  <Zap className="h-4 w-4 fill-current" /> Flash News
+                </span>
+                <span className="inline-flex items-center gap-2 text-sm font-semibold text-accent">
+                  <span className="relative flex h-2.5 w-2.5"><span className="flash-pulse absolute inline-flex h-full w-full rounded-full bg-accent" /><span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-accent" /></span>
+                  {flashNews.badge}
+                </span>
+              </div>
+              <h2 className="font-heading font-bold mb-4">{flashNews.title}</h2>
+              <p className="text-deep-foreground/85 text-lg leading-relaxed max-w-lg mb-6">{flashNews.text}</p>
+              {flashNews.highlight && <p className="font-heading text-2xl md:text-3xl font-bold text-accent mb-7">{flashNews.highlight}</p>}
+              <div className="flex flex-wrap gap-3">
+                <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
+                  <Link to={flashNews.cta.to}>{flashNews.cta.label} <ArrowRight /></Link>
+                </Button>
+                <Button asChild size="lg" variant="outline" className="bg-deep-foreground/10 border-deep-foreground/40 text-deep-foreground hover:bg-deep-foreground hover:text-deep">
+                  <Link to={flashNews.secondaryCta.to}>{flashNews.secondaryCta.label}</Link>
+                </Button>
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ============ COFFRET : GAMME SUPRÊME ============ */}
       <section className="container mx-auto section reveal-section">

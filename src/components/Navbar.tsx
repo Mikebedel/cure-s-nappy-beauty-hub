@@ -124,6 +124,7 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-2">
+          <span className="relative inline-flex">
           <Button
             variant="ghost"
             size="icon"
@@ -134,12 +135,13 @@ const Navbar = () => {
             className="relative h-11 w-11 text-foreground hover:text-primary hover:bg-secondary"
           >
             <ShoppingBag className="!size-5" />
+          </Button>
             {totalItems > 0 && (
-              <span key={totalItems} className="first-add-notice absolute top-0.5 right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-accent text-accent-foreground text-[11px] leading-none font-bold flex items-center justify-center" aria-label={`${totalItems} article${totalItems > 1 ? "s" : ""} dans le panier`}>
+              <span key={totalItems} className="first-add-notice pointer-events-none absolute -top-0.5 -right-0.5 min-w-5 h-5 px-1 rounded-full bg-accent text-accent-foreground text-[11px] leading-none font-bold flex items-center justify-center ring-2 ring-background" aria-label={`${totalItems} article${totalItems > 1 ? "s" : ""} dans le panier`}>
                 {totalItems}
               </span>
             )}
-          </Button>
+          </span>
 
           <Button
             variant="ghost"
