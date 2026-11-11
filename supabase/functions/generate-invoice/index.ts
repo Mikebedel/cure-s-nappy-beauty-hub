@@ -10,6 +10,23 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Réservé aux admins : la facture contient le nom, le téléphone et l'adresse du client.
+    const token = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "");
+    const { data: auth } = token ? await supabase.auth.getUser(token) : { data: { user: null } };
+    const { data: isAdmin } = auth?.user
+      ? await supabase.rpc("has_role", { _user_id: auth.user.id, _role: "admin" })
+      : { data: false };
+    if (!isAdmin) {
+      return new Response(JSON.stringify({ error: "Accès refusé" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { order_id } = await req.json();
     if (!order_id) {
       return new Response(JSON.stringify({ error: "order_id is required" }), {
@@ -17,10 +34,6 @@ Deno.serve(async (req: Request) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Fetch order
     const { data: order, error: orderError } = await supabase
@@ -44,12 +57,15 @@ Deno.serve(async (req: Request) => {
 
     const orderItems = items || [];
 
+    // Tout texte saisi par un client est échappé : sinon un nom piégé pourrait injecter du code dans la facture.
+    const esc = (value: unknown) => String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
+
     // Generate HTML invoice
     const itemRows = orderItems
       .map(
         (item: any) => `
       <tr>
-        <td style="padding:8px;border-bottom:1px solid #eee;">${item.product_name}</td>
+        <td style="padding:8px;border-bottom:1px solid #eee;">${esc(item.product_name)}</td>
         <td style="padding:8px;border-bottom:1px solid #eee;text-align:center;">${item.quantity}</td>
         <td style="padding:8px;border-bottom:1px solid #eee;text-align:right;">${item.product_price.toLocaleString()} FCFA</td>
         <td style="padding:8px;border-bottom:1px solid #eee;text-align:right;">${(item.product_price * item.quantity).toLocaleString()} FCFA</td>
@@ -87,7 +103,7 @@ Deno.serve(async (req: Request) => {
     </div>
     <div style="text-align:right;">
       <div class="invoice-title">FACTURE</div>
-      <div style="font-size:14px;color:#666;">${order.order_number}</div>
+      <div style="font-size:14px;color:#666;">${esc(order.order_number)}</div>
       <div style="font-size:12px;color:#888;">${new Date(order.created_at).toLocaleDateString("fr-FR", { year: "numeric", month: "long", day: "numeric" })}</div>
     </div>
   </div>
@@ -95,14 +111,14 @@ Deno.serve(async (req: Request) => {
   <div class="info-grid">
     <div class="info-box">
       <h3>Client</h3>
-      <p style="margin:0;font-weight:bold;">${order.customer_name}</p>
-      <p style="margin:2px 0;">${order.customer_phone}</p>
-      ${order.customer_email ? `<p style="margin:2px 0;">${order.customer_email}</p>` : ""}
+      <p style="margin:0;font-weight:bold;">${esc(order.customer_name)}</p>
+      <p style="margin:2px 0;">${esc(order.customer_phone)}</p>
+      ${order.customer_email ? `<p style="margin:2px 0;">${esc(order.customer_email)}</p>` : ""}
     </div>
     <div class="info-box">
       <h3>Livraison</h3>
-      <p style="margin:0;">${order.delivery_commune}</p>
-      <p style="margin:2px 0;">${order.delivery_address}</p>
+      <p style="margin:0;">${esc(order.delivery_commune)}</p>
+      <p style="margin:2px 0;">${esc(order.delivery_address)}</p>
     </div>
   </div>
 
@@ -128,7 +144,7 @@ Deno.serve(async (req: Request) => {
   </div>
 
   <div style="margin-top:30px;padding:15px;background:#f8f8f8;border-radius:8px;font-size:13px;">
-    <strong>Mode de paiement:</strong> ${order.payment_method || "—"}<br>
+    <strong>Mode de paiement:</strong> ${esc(order.payment_method || "—")}<br>
     <strong>Statut:</strong> ${order.payment_status === "payee" ? "Payée" : "En attente"}
   </div>
 
@@ -145,7 +161,8 @@ Deno.serve(async (req: Request) => {
       status: 200,
     });
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    console.error("generate-invoice", error);
+    return new Response(JSON.stringify({ error: "Facture indisponible" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

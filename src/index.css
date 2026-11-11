@@ -184,3 +184,14 @@ html { scroll-behavior: smooth; }
 .btn-gold:hover::after { transform: translateX(120%); }
 .btn-gold:active { background-color: hsl(var(--gold)) !important; color: hsl(var(--gold-foreground)) !important; transform: scale(0.97); box-shadow: 0 0 24px hsl(var(--gold) / 0.9); }
 @media (prefers-reduced-motion: reduce) { .btn-gold::after { display: none; } .btn-gold:hover { transform: none; } }
+
+/* Impression du reçu (/commande/…) : seule la carte du reçu sort sur papier ou en PDF. */
+@media print {
+  @page { margin: 12mm; }
+  body { background: #fff !important; }
+  nav, footer, .no-print, [data-sonner-toaster] { display: none !important; }
+  .receipt footer { display: block !important; }
+  .receipt-page { padding: 0 !important; max-width: none !important; }
+  .receipt { border: none !important; box-shadow: none !important; padding: 0 !important; }
+  .store-page { animation: none !important; }
+}

@@ -10,3 +10,5 @@
 - All editable site content lives in src/content (types.ts, defaults.ts) and is read through useContent/useCatalog; never hardcode page text, prices, contact details or images in pages. Add a field to SiteContent + defaults + its dashboard screen (src/pages/admin/site) together.
 - Images in content are references: "asset:<file name>" for files in src/assets, or a full URL for uploads; always render them through resolveImage.
 - Dashboard saves to the Supabase table site_content (migration 20261111090000); when the database is unreachable on a dev machine, it saves to localStorage as a local preview only.
+- Orders are only created by the create-order edge function, which re-prices everything with supabase/functions/_shared/pricing.ts; the browser sends ids and quantities only. An order becomes paid only through confirmPayment (signed Paystack webhook or verify API, amount and currency checked).
+- supabase/functions/_shared/default-content.json mirrors catalog and delivery from src/content/defaults.ts; regenerate with UPDATE_SERVER_DEFAULTS=1 npx vitest run after changing them.

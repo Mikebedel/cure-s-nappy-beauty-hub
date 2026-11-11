@@ -1,1 +1,5 @@
 project_id = "xfhcknatemyzgpkqpjhw"
+
+# Paystack appelle cette fonction directement : elle est authentifiée par la signature Paystack, pas par un compte.
+[functions.paystack-webhook]
+verify_jwt = false

@@ -16,6 +16,10 @@ const SiteDelivery = () => {
           <NumberField label="Zone standard (FCFA)" value={delivery.standardFee} onChange={(v) => update((d) => { d.delivery.standardFee = v ?? 0; })} />
           <NumberField label="Zone spéciale (FCFA)" value={delivery.specialFee} onChange={(v) => update((d) => { d.delivery.specialFee = v ?? 0; })} />
         </Grid>
+        <Grid>
+          <TextField label="Délai annoncé, zone standard" value={delivery.standardDelay} onChange={(v) => update((d) => { d.delivery.standardDelay = v; })} hint="Affiché après « Livrée … » : ex. sous 24 à 48 h" />
+          <TextField label="Délai annoncé, zone spéciale" value={delivery.specialDelay} onChange={(v) => update((d) => { d.delivery.specialDelay = v; })} />
+        </Grid>
         <TextField label="Texte pour les envois hors Abidjan et à l'étranger" multiline value={delivery.outsideNote} onChange={(v) => update((d) => { d.delivery.outsideNote = v; })} />
       </Panel>
 
@@ -31,11 +35,11 @@ const SiteDelivery = () => {
       </Panel>
 
       <Panel title="Paiement">
-        <LinesField label="Moyens de paiement proposés" value={delivery.paymentMethods} onChange={(v) => update((d) => { d.delivery.paymentMethods = v; })} />
-        <Grid>
-          <TextField label="Lien de paiement en ligne" value={delivery.paymentUrl} onChange={(v) => update((d) => { d.delivery.paymentUrl = v.trim(); })} hint="Proposé après l'enregistrement de la commande." />
-          <TextField label="Texte du bouton de paiement" value={delivery.paymentLabel} onChange={(v) => update((d) => { d.delivery.paymentLabel = v; })} />
-        </Grid>
+        <ToggleField label="Proposer le paiement en ligne (Paystack)" checked={delivery.onlinePayment} onChange={(v) => update((d) => { d.delivery.onlinePayment = v; })}
+          hint="Wave, Orange Money, MTN et carte bancaire. Il faut aussi que la clé secrète Paystack soit configurée sur le serveur." />
+        <ToggleField label="Proposer « Payer plus tard »" checked={delivery.payLater} onChange={(v) => update((d) => { d.delivery.payLater = v; })}
+          hint="La commande est enregistrée et l'équipe recontacte le client sur WhatsApp pour le paiement." />
+        <LinesField label="Moyens de paiement affichés" value={delivery.paymentMethods} onChange={(v) => update((d) => { d.delivery.paymentMethods = v; })} hint="Texte affiché sous « Payer maintenant ». Un moyen par ligne." />
       </Panel>
     </div>
   );

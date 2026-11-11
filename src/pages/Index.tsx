@@ -18,6 +18,9 @@ import RichText from "@/content/RichText";
 
 const HERO_DELAY = 5000;
 
+/** Les liens saisis dans le dashboard restent des pages du site (pas de « javascript: » ni de site externe). */
+const safeLink = (link: string) => (/^\/(?!\/)/.test(link.trim()) ? link.trim() : "/boutique");
+
 /** Le dernier mot du titre change tout seul. */
 const RotatingWord = ({ words }: { words: string[] }) => {
   const [index, setIndex] = useState(0);
@@ -321,12 +324,12 @@ const Index = () => {
               <div className="flex flex-wrap gap-3">
                 {flash.ctaLabel && (
                   <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
-                    <Link to={flash.ctaLink || "/boutique"}>{flash.ctaLabel} <ArrowRight /></Link>
+                    <Link to={safeLink(flash.ctaLink)}>{flash.ctaLabel} <ArrowRight /></Link>
                   </Button>
                 )}
                 {flash.secondaryLabel && (
                   <Button asChild size="lg" variant="outline" className="bg-deep-foreground/10 border-deep-foreground/40 text-deep-foreground hover:bg-deep-foreground hover:text-deep">
-                    <Link to={flash.secondaryLink || "/boutique"}>{flash.secondaryLabel}</Link>
+                    <Link to={safeLink(flash.secondaryLink)}>{flash.secondaryLabel}</Link>
                   </Button>
                 )}
               </div>

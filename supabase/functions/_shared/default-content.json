@@ -1,0 +1,566 @@
+{
+  "catalog": {
+    "categories": [
+      {
+        "id": "hydratation",
+        "name": "Hydratation & Nutrition"
+      },
+      {
+        "id": "volume",
+        "name": "Volume et Longueur"
+      },
+      {
+        "id": "fortifiant",
+        "name": "Fortifiant & Anti Chute"
+      },
+      {
+        "id": "soin",
+        "name": "Soin Nettoyant & Anti-pelliculaire"
+      },
+      {
+        "id": "boucle",
+        "name": "Définition de boucle"
+      }
+    ],
+    "products": [
+      {
+        "id": "1",
+        "name": "Bain d'Huile",
+        "visible": true,
+        "description": "Un bain d'huile nourrissant qui pénètre en profondeur pour revitaliser les cheveux secs et abîmés. Adapté à tous types de cheveux : naturels, bouclés et défrisés.",
+        "shortDescription": "Nourrit en profondeur - Renforce l'hydratation - Protège des agressions extérieures",
+        "price": 5500,
+        "image": "asset:bain-dhuile",
+        "gallery": [],
+        "category": "hydratation",
+        "extraCategories": [],
+        "volume": "100ml",
+        "benefits": [
+          "Nourrit en profondeur",
+          "Renforce l'hydratation",
+          "Protège des agressions",
+          "Douceur soyeuse"
+        ],
+        "ingredients": [
+          "Huile de coco",
+          "Huile d'olive",
+          "Huile de jojoba",
+          "Vitamine E"
+        ],
+        "usage": "Appliquer généreusement sur les longueurs et pointes. Laisser poser 1h minimum ou toute la nuit. Laver ensuite."
+      },
+      {
+        "id": "2",
+        "name": "Shampoing Doux & Clarifiant",
+        "visible": true,
+        "description": "Un shampooing nettoyant ultra-doux qui clarifie le cuir chevelu tout en respectant la fibre capillaire. Adapté à tous types de cheveux : naturels, bouclés et défrisés.",
+        "shortDescription": "Nettoie efficacement - Apaise - Élimine les pellicules",
+        "price": 6000,
+        "image": "asset:shampoing-doux-clarifiant",
+        "gallery": [],
+        "category": "hydratation",
+        "extraCategories": [
+          "soin"
+        ],
+        "volume": "250ml",
+        "benefits": [
+          "Nettoie efficacement",
+          "Apaise le cuir chevelu",
+          "Élimine les pellicules",
+          "Préserve l'hydratation"
+        ],
+        "ingredients": [
+          "Extrait de moringa",
+          "Hibiscus",
+          "Protéine de soie",
+          "Eau de rose"
+        ],
+        "usage": "Appliquer sur cheveux mouillés, masser le cuir chevelu délicatement. Rincer abondamment."
+      },
+      {
+        "id": "3",
+        "name": "Leave-in Conditionner",
+        "visible": true,
+        "description": "Après-shampooing sans rinçage qui démêle, hydrate et protège les cheveux au quotidien. Adapté à tous types de cheveux : naturels, bouclés et défrisés.",
+        "shortDescription": "Hydrate (effet durable) - Protège - Répare - Révitalise - Coiffe",
+        "price": 5000,
+        "image": "asset:leave-in-conditionner",
+        "gallery": [],
+        "category": "hydratation",
+        "extraCategories": [],
+        "volume": "100ml",
+        "benefits": [
+          "Hydratation durable",
+          "Protège & Répare",
+          "Révitalise",
+          "Coiffe facilement"
+        ],
+        "ingredients": [
+          "Eau de coco",
+          "Aloe vera",
+          "Provitamine B5",
+          "Extrait de bambou"
+        ],
+        "usage": "Appliquer sur cheveux humides après le shampooing. Ne pas rincer."
+      },
+      {
+        "id": "4",
+        "name": "Huile 2 en 1",
+        "visible": true,
+        "description": "Une huile fortifiante & scellante qui fortifie la fibre capillaire et prévient la casse. Adaptée à tous types de cheveux.",
+        "shortDescription": "Fortifie - Scelle l'hydratation - Anti-casse",
+        "price": 5000,
+        "image": "asset:huile-fortifiante",
+        "gallery": [],
+        "category": "hydratation",
+        "extraCategories": [
+          "fortifiant"
+        ],
+        "volume": "100ml",
+        "benefits": [
+          "Fortifie la fibre",
+          "Anti-casse",
+          "Scelle l'hydratation",
+          "Brillance naturelle"
+        ],
+        "ingredients": [
+          "Huile de baobab",
+          "Huile de moringa",
+          "Kératine végétale",
+          "Vitamine E"
+        ],
+        "usage": "Appliquer quelques gouttes sur les longueurs et pointes. Utiliser comme scellant après la crème."
+      },
+      {
+        "id": "5",
+        "name": "Magical Spray",
+        "visible": true,
+        "description": "Un spray multi-usage qui hydrate, démêle et apporte brillance instantanée. Parfait pour rafraîchir votre coiffure au quotidien.",
+        "shortDescription": "Hydrate instantanément les cheveux au quotidien",
+        "price": 5000,
+        "image": "asset:magical-spray",
+        "gallery": [],
+        "category": "hydratation",
+        "extraCategories": [],
+        "volume": "250ml",
+        "benefits": [
+          "Hydratation instantanée",
+          "Démêlage rapide",
+          "Brillance",
+          "Rafraîchit la coiffure"
+        ],
+        "ingredients": [
+          "Eau de rose",
+          "Aloe vera",
+          "Glycérine végétale",
+          "Huile d'argan"
+        ],
+        "usage": "Vaporiser sur cheveux secs ou humides. Peut être réappliqué dans la journée."
+      },
+      {
+        "id": "7",
+        "name": "Masque Hydratant & Protéiné",
+        "visible": true,
+        "description": "Un masque profond qui combine hydratation et protéines pour restaurer les cheveux abîmés. Résultats visibles dès la première utilisation.",
+        "shortDescription": "Hydrate - Nourrit 2x plus - Sublime les cheveux",
+        "price": 6000,
+        "image": "asset:masque-hydratant-proteine",
+        "gallery": [],
+        "category": "hydratation",
+        "extraCategories": [],
+        "volume": "",
+        "benefits": [
+          "Hydrate en profondeur",
+          "Nourrit 2x plus",
+          "Sublime les cheveux",
+          "Douceur extrême"
+        ],
+        "ingredients": [
+          "Protéine de soie",
+          "Beurre de karité",
+          "Huile d'avocat",
+          "Kératine végétale"
+        ],
+        "usage": "Appliquer généreusement sur cheveux lavés. Laisser poser 30 minutes sous un bonnet. Rincer."
+      },
+      {
+        "id": "8",
+        "name": "Huile Extra Pousse",
+        "visible": true,
+        "description": "Une huile concentrée qui stimule la croissance capillaire et renforce les racines. Formulée avec des ingrédients naturels.",
+        "shortDescription": "Active la pousse rapide - Lutte contre les alopécies - Tonifie les racines",
+        "price": 6500,
+        "image": "asset:huile-extra-pousse",
+        "gallery": [],
+        "category": "volume",
+        "extraCategories": [],
+        "volume": "100ml",
+        "benefits": [
+          "Active la pousse rapide",
+          "Lutte contre les alopécies",
+          "Tonifie les racines",
+          "Prévient la chute"
+        ],
+        "ingredients": [
+          "Huile de ricin",
+          "Huile de romarin",
+          "Biotine",
+          "Huile de menthe poivrée"
+        ],
+        "usage": "Appliquer directement sur le cuir chevelu. Masser 5 minutes. Utiliser 3 fois par semaine."
+      },
+      {
+        "id": "9",
+        "name": "Crème Hydratante & Volume+",
+        "visible": true,
+        "description": "Une crème riche qui hydrate en profondeur tout en apportant du volume aux cheveux.",
+        "shortDescription": "Scelle l'hydratation - Ramollit - Donne du volume",
+        "price": 6000,
+        "image": "asset:creme-hydratante-volume",
+        "gallery": [],
+        "category": "volume",
+        "extraCategories": [
+          "hydratation"
+        ],
+        "volume": "",
+        "benefits": [
+          "Scelle l'hydratation",
+          "Ramollit les cheveux",
+          "Donne du volume",
+          "Protection"
+        ],
+        "ingredients": [
+          "Beurre de karité",
+          "Huile de coco",
+          "Aloe vera",
+          "Vitamine E"
+        ],
+        "usage": "Appliquer sur cheveux humides, mèche par mèche. Sceller avec une huile légère."
+      },
+      {
+        "id": "10",
+        "name": "Masque Fortifiant",
+        "visible": true,
+        "description": "Un masque 100% naturel à base de poudres africaines qui fortifie et épaissit les cheveux.",
+        "shortDescription": "Fortifie - Anti-chutes - Donne du volume & l'éclat",
+        "price": 5000,
+        "image": "asset:masque-fortifiant",
+        "gallery": [],
+        "category": "fortifiant",
+        "extraCategories": [],
+        "volume": "",
+        "benefits": [
+          "Fortifie intensément",
+          "Anti-chutes",
+          "Donne du volume",
+          "Redonne l'éclat"
+        ],
+        "ingredients": [
+          "Henné neutre",
+          "Poudre de fenugrec",
+          "Argile",
+          "Beurre de karité"
+        ],
+        "usage": "Mélanger la poudre avec de l'eau tiède. Appliquer sur cheveux humides. Laisser poser 45 minutes. Rincer."
+      },
+      {
+        "id": "13",
+        "name": "Crème Bouclante",
+        "visible": true,
+        "description": "Une crème coiffante qui définit parfaitement les boucles de vos cheveux. Pour des boucles sublimes et bien dessinées.",
+        "shortDescription": "Définit parfaitement les boucles de vos cheveux",
+        "price": 8500,
+        "image": "asset:creme-bouclante",
+        "gallery": [
+          "asset:creme-bouclante",
+          "asset:creme-bouclante-ouverte"
+        ],
+        "category": "boucle",
+        "extraCategories": [],
+        "volume": "",
+        "benefits": [
+          "Définition des boucles",
+          "Tenue longue durée",
+          "Anti-frisottis",
+          "Brillance naturelle"
+        ],
+        "ingredients": [
+          "Beurre de karité",
+          "Huile de coco",
+          "Aloe vera",
+          "Glycérine végétale"
+        ],
+        "usage": "Appliquer sur cheveux humides, mèche par mèche, en froissant les boucles vers le haut."
+      }
+    ],
+    "ranges": [
+      {
+        "id": "gamme-minie",
+        "name": "Gamme Minie",
+        "price": 22000,
+        "image": "asset:gamme-minie",
+        "description": "Conçue pour une routine capillaire de base, simple et efficace, facilitant le coiffage au quotidien.",
+        "note": "Idéale pour débuter une routine capillaire et corriger les problèmes de base.",
+        "benefits": [
+          "Routine simple",
+          "Coiffage facile",
+          "Pour débuter"
+        ],
+        "contains": [
+          "Shampoing doux & clarifiant",
+          "Leave-in conditioner",
+          "Magical Spray",
+          "Crème hydratante & volume+"
+        ]
+      },
+      {
+        "id": "gamme-soin-profond",
+        "name": "Gamme Soin Profond & Réparateur",
+        "price": 27000,
+        "image": "asset:gamme-soin-profond",
+        "description": "Répare & traite efficacement les cheveux très fragiles, ternes, rêches, abîmés et très cassants. Redonne vie et éclat à vos cheveux.",
+        "note": "",
+        "benefits": [
+          "Répare en profondeur",
+          "Anti-casse",
+          "Redonne éclat"
+        ],
+        "contains": [
+          "Shampoing doux & clarifiant",
+          "Masque hydratant & protéiné",
+          "Masque fortifiant",
+          "Leave-in conditioner",
+          "Huile 2 en 1"
+        ]
+      },
+      {
+        "id": "gamme-minie-plus",
+        "name": "Gamme Minie+",
+        "price": 33500,
+        "image": "asset:gamme-minie-plus",
+        "description": "Complète et renforce l'action de la Gamme Minie en stimulant la croissance rapide, stoppant la casse, les irritations du cuir chevelu et facilitant la circulation sanguine.",
+        "note": "Idéale pour celles qui veulent un plus au soin de base.",
+        "benefits": [
+          "Croissance rapide",
+          "Anti-casse",
+          "Anti-irritations"
+        ],
+        "contains": [
+          "Shampoing doux & clarifiant",
+          "Leave-in conditioner",
+          "Magical Spray",
+          "Crème hydratante & volume+",
+          "Huile Extra Pousse",
+          "Huile 2 en 1"
+        ]
+      },
+      {
+        "id": "gamme-hydratation-intense",
+        "name": "Gamme Hydratation Intense",
+        "price": 38500,
+        "image": "asset:gamme-hydratation-intense",
+        "description": "Hydrate profondément et durablement pour des cheveux très souples, faciles à démêler et brillants.",
+        "note": "Parfaite pour cheveux très secs, abîmés et difficiles à peigner.",
+        "benefits": [
+          "Hydratation intense",
+          "Démêlage facile",
+          "Brillance"
+        ],
+        "contains": [
+          "Bain d'huile",
+          "Shampoing doux",
+          "Masque hydratant",
+          "Leave-in",
+          "Spray",
+          "Crème hydratante",
+          "Huile 2 en 1"
+        ]
+      },
+      {
+        "id": "gamme-complete-supreme",
+        "name": "Gamme Complète Suprême",
+        "price": 61000,
+        "image": "asset:gamme-complete",
+        "description": "Permet d'atteindre tous vos objectifs capillaires & met fin à tous vos problèmes de cheveux.",
+        "note": "",
+        "benefits": [
+          "Tous les produits inclus",
+          "Solution complète",
+          "Tous problèmes capillaires"
+        ],
+        "contains": [
+          "Bain d'huile",
+          "Shampoing doux & clarifiant",
+          "Masque hydratant & protéiné",
+          "Masque fortifiant",
+          "Leave-in conditioner",
+          "Magical Spray",
+          "Crème hydratante & volume +",
+          "Crème bouclante",
+          "Huile Extra Pousse",
+          "Huile 2 en 1"
+        ]
+      }
+    ],
+    "duos": [
+      {
+        "id": "duo-extra-pousse",
+        "name": "Duo Extra Pousse",
+        "image": "asset:duo-extra-pousse",
+        "productIds": [
+          "9",
+          "8"
+        ],
+        "description": "Le combo parfait pour avoir des cheveux longs et volumineux en quelques semaines."
+      },
+      {
+        "id": "duo-anti-pelliculaire",
+        "name": "Duo Anti-pelliculaire",
+        "image": "asset:duo-anti-pelliculaire",
+        "productIds": [
+          "2",
+          "8"
+        ],
+        "description": "Le combo parfait pour dire adieu aux pellicules et démangeaisons en un seul geste."
+      },
+      {
+        "id": "trio-ramollissant-anti-chutes",
+        "name": "Trio Ramollissant & Anti-chutes",
+        "image": "asset:trio-ramollissant",
+        "productIds": [
+          "4",
+          "9",
+          "5"
+        ],
+        "description": "Le trio parfait pour des cheveux souples, faciles à coiffer et sans casse."
+      }
+    ],
+    "accessories": [
+      {
+        "id": "set-peignes-brosses",
+        "name": "Set de peignes & brosses Cure's Nappy",
+        "price": null,
+        "intro": "Le set d'accessoires qui change tout dans ta routine capillaire : une brosse à shampoing en silicone, une brosse en paille de blé et un peigne à dents larges, réunis dans un sac Cure's Nappy personnalisé.",
+        "hook": "Tu prends soin de tes cheveux avec de bons produits, mais utilises-tu aussi les bons outils ? Une belle routine ne s'arrête pas aux soins.",
+        "colors": [
+          {
+            "name": "Vert",
+            "swatch": "hsl(100 25% 55%)",
+            "image": "asset:set-accessoires-vert"
+          },
+          {
+            "name": "Beige",
+            "swatch": "hsl(35 15% 70%)",
+            "image": "asset:set-accessoires-beige"
+          }
+        ],
+        "tools": [
+          {
+            "title": "Brosse à shampoing en silicone",
+            "points": [
+              "Masse délicatement le cuir chevelu",
+              "Aide à décoller les résidus et impuretés",
+              "Stimule la microcirculation grâce au massage",
+              "Transforme le shampoing en moment de détente, sans abîmer tes ongles"
+            ]
+          },
+          {
+            "title": "Brosse en paille de blé",
+            "points": [
+              "Facilite le coiffage",
+              "Répartit uniformément les soins et produits hydratants",
+              "Convient aux cheveux naturels, bouclés, crépus ou défrisés",
+              "Coiffage doux, sans tirer sur les cheveux"
+            ]
+          },
+          {
+            "title": "Peigne à dents larges",
+            "points": [
+              "Démêle en douceur les cheveux épais et texturés",
+              "Respecte la forme naturelle des boucles",
+              "Limite les tiraillements et la casse",
+              "Parfait sur cheveux humides ou pendant un masque"
+            ]
+          }
+        ],
+        "why": "Ce set réunit les essentiels pour laver, démêler, coiffer et entretenir tes cheveux. Le petit plus : un joli sac Cure's Nappy pour les ranger, les protéger et les emporter partout."
+      }
+    ]
+  },
+  "delivery": {
+    "standardFee": 1500,
+    "specialFee": 2000,
+    "communes": [
+      {
+        "name": "Cocody",
+        "special": false
+      },
+      {
+        "name": "Plateau",
+        "special": false
+      },
+      {
+        "name": "Marcory",
+        "special": false
+      },
+      {
+        "name": "Treichville",
+        "special": false
+      },
+      {
+        "name": "Koumassi",
+        "special": false
+      },
+      {
+        "name": "Adjamé",
+        "special": false
+      },
+      {
+        "name": "Abobo",
+        "special": false
+      },
+      {
+        "name": "Yopougon",
+        "special": false
+      },
+      {
+        "name": "Riviera",
+        "special": false
+      },
+      {
+        "name": "Bingerville",
+        "special": false
+      },
+      {
+        "name": "Songon",
+        "special": false
+      },
+      {
+        "name": "Port-Bouët",
+        "special": true
+      },
+      {
+        "name": "Grand-Bassam",
+        "special": true
+      },
+      {
+        "name": "Anyama",
+        "special": true
+      },
+      {
+        "name": "Gonzagueville",
+        "special": true
+      }
+    ],
+    "outsideNote": "Hors Abidjan ou à l’étranger ? Nous expédions partout en Côte d’Ivoire et à l’international : écrivez-nous sur WhatsApp pour organiser l’envoi.",
+    "paymentMethods": [
+      "Wave",
+      "Orange Money",
+      "MTN MoMo"
+    ],
+    "standardDelay": "sous 24 à 48 h",
+    "specialDelay": "sous 48 à 72 h",
+    "onlinePayment": true,
+    "payLater": true
+  }
+}

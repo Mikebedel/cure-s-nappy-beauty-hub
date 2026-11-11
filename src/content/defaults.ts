@@ -42,9 +42,11 @@ export const defaultContent: SiteContent = {
       { name: "Gonzagueville", special: true },
     ],
     outsideNote: "Hors Abidjan ou à l’étranger ? Nous expédions partout en Côte d’Ivoire et à l’international : écrivez-nous sur WhatsApp pour organiser l’envoi.",
-    paymentMethods: ["Wave", "Orange Money", "MTN MoMo", "Moov Money", "Djamo"],
-    paymentUrl: "https://app.fineopay.com/cures_nappy/marie_marcelle/checkout",
-    paymentLabel: "Payer sur Fineo Pay",
+    paymentMethods: ["Wave", "Orange Money", "MTN MoMo"],
+    standardDelay: "sous 24 à 48 h",
+    specialDelay: "sous 48 à 72 h",
+    onlinePayment: true,
+    payLater: true,
   },
 
   catalog: {

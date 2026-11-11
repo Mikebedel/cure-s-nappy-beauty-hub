@@ -20,6 +20,7 @@ import Contact from "./pages/Contact";
 import ProductDetail from "./pages/ProductDetail";
 import Panier from "./pages/Panier";
 import Checkout from "./pages/Checkout";
+import OrderReceipt from "./pages/OrderReceipt";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminLayout from "./layouts/AdminLayout";
@@ -73,6 +74,7 @@ const PublicStore = () => {
           <Route path="/contact" element={<Contact />} />
           <Route path="/produit/:id" element={<ProductDetail />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/commande/:token" element={<OrderReceipt />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Footer />

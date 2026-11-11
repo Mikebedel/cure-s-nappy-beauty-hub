@@ -109,7 +109,7 @@ const SiteHome = () => {
         <ImageField label="Image" value={home.flashNews.image} onChange={(v) => update((d) => { d.home.flashNews.image = v; })} />
         <Grid>
           <TextField label="Bouton principal" value={home.flashNews.ctaLabel} onChange={(v) => update((d) => { d.home.flashNews.ctaLabel = v; })} />
-          <TextField label="Lien du bouton principal" value={home.flashNews.ctaLink} onChange={(v) => update((d) => { d.home.flashNews.ctaLink = v; })} hint="Ex. /boutique, /boutique#accessoires, /produit/13" />
+          <TextField label="Lien du bouton principal" value={home.flashNews.ctaLink} onChange={(v) => update((d) => { d.home.flashNews.ctaLink = v; })} hint="Une page du site, qui commence par / : ex. /boutique, /boutique#accessoires, /produit/13" />
           <TextField label="Bouton secondaire" value={home.flashNews.secondaryLabel} onChange={(v) => update((d) => { d.home.flashNews.secondaryLabel = v; })} hint="Laissez vide pour le masquer." />
           <TextField label="Lien du bouton secondaire" value={home.flashNews.secondaryLink} onChange={(v) => update((d) => { d.home.flashNews.secondaryLink = v; })} />
         </Grid>

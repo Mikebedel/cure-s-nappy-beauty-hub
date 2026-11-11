@@ -87,8 +87,13 @@ export interface SiteContent {
     communes: { name: string; special: boolean }[];
     outsideNote: string;
     paymentMethods: string[];
-    paymentUrl: string;
-    paymentLabel: string;
+    /** Délai de livraison annoncé après la commande, par zone. */
+    standardDelay: string;
+    specialDelay: string;
+    /** Paiement en ligne (Paystack) proposé à la commande. */
+    onlinePayment: boolean;
+    /** Commande sans paiement en ligne : l'équipe recontacte le client sur WhatsApp. */
+    payLater: boolean;
   };
   catalog: {
     categories: { id: string; name: string }[];

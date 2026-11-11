@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, User, CreditCard, Truck, MessageCircle } from "lucide-react";
+import { ArrowLeft, MapPin, User, CreditCard, Truck, MessageCircle, ShieldCheck, Clock, Loader2 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,109 +11,76 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCartNavigation } from "@/hooks/use-cart-navigation";
 import { useContent } from "@/content/ContentProvider";
 
+type PaymentChoice = "online" | "later";
 
+/** Lit le message d'erreur renvoyé par une fonction serveur. */
+const serverMessage = async (error: unknown): Promise<string | null> => {
+  const context = (error as { context?: Response })?.context;
+  if (context && typeof context.json === "function") {
+    const body = await context.json().catch(() => null);
+    if (body?.error) return body.error as string;
+  }
+  return null;
+};
 
 const Checkout = () => {
   const { items, totalPrice, clearCart } = useCart();
   const { delivery, contact } = useContent().content;
-  const WHATSAPP_NUMBER = contact.whatsapp;
-  const communes = delivery.communes.map((c) => ({ name: c.name, zone: c.special ? "special" : "abidjan" }));
-  const paymentMethods = delivery.paymentMethods.map((name) => ({ id: name.toLowerCase().replace(/\s+/g, "-"), name }));
   const { toast } = useToast();
   const navigate = useNavigate();
   const openCart = useCartNavigation();
-  const [failed, setFailed] = useState(false);
-  const [confirmation, setConfirmation] = useState<{ number: string; total: number } | null>(null);
 
-  const [form, setForm] = useState({
-    firstName: "", lastName: "", phone: "", email: "",
-    commune: "", address: "", paymentMethod: "",
-  });
+  const choices: PaymentChoice[] = [...(delivery.onlinePayment ? ["online" as const] : []), ...(delivery.payLater ? ["later" as const] : [])];
+  const [payment, setPayment] = useState<PaymentChoice>(choices[0] ?? "later");
+  const [form, setForm] = useState({ firstName: "", lastName: "", phone: "", email: "", commune: "", address: "" });
   const [loading, setLoading] = useState(false);
+  const [failed, setFailed] = useState<string | null>(null);
 
-  const selectedCommune = communes.find(c => c.name === form.commune);
-  const deliveryFee = selectedCommune ? (selectedCommune.zone === "special" ? delivery.specialFee : delivery.standardFee) : 0;
+  const selectedCommune = delivery.communes.find((c) => c.name === form.commune);
+  const deliveryFee = selectedCommune ? (selectedCommune.special ? delivery.specialFee : delivery.standardFee) : 0;
+  const deliveryDelay = selectedCommune ? (selectedCommune.special ? delivery.specialDelay : delivery.standardDelay) : "";
   const grandTotal = totalPrice + deliveryFee;
+  const online = payment === "online";
 
-  const handleChange = (field: string, value: string) => {
-    setForm(prev => ({ ...prev, [field]: value }));
-  };
+  const handleChange = (field: keyof typeof form, value: string) => setForm((prev) => ({ ...prev, [field]: value }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.firstName || !form.lastName || !form.phone || !form.commune || !form.address || !form.paymentMethod) {
-      toast({ title: "Champs manquants", description: "Veuillez remplir tous les champs obligatoires.", variant: "destructive" });
+    if (!form.firstName || !form.lastName || !form.phone || !form.commune || !form.address || (online && !form.email)) {
+      toast({ title: "Champs manquants", description: online ? "Remplissez tous les champs, e-mail compris : il sert à recevoir votre reçu." : "Veuillez remplir tous les champs obligatoires.", variant: "destructive" });
       return;
     }
     setLoading(true);
-    setFailed(false);
+    setFailed(null);
 
-    try {
-      const customerName = `${form.firstName.trim()} ${form.lastName.trim()}`;
-      // Identifiant et numéro générés ici : une cliente non connectée a le droit
-      // d'enregistrer une commande, pas de la relire ensuite dans la base.
-      const orderId = crypto.randomUUID();
-      const orderNumber = `CN-${Date.now().toString(36).toUpperCase()}`;
+    // Le site n'envoie que les articles et les quantités : le serveur recalcule les prix et le total.
+    const { data, error } = await supabase.functions.invoke("create-order", {
+      body: {
+        payment: online ? "online" : "later",
+        items: items.map(({ product, quantity }) => ({ id: product.id, quantity })),
+        customer: form,
+      },
+    });
 
-      const { error: orderError } = await supabase
-        .from("orders")
-        .insert({
-          id: orderId,
-          order_number: orderNumber,
-          customer_name: customerName,
-          customer_phone: form.phone,
-          customer_email: form.email || null,
-          delivery_commune: form.commune,
-          delivery_address: form.address,
-          delivery_fee: deliveryFee,
-          subtotal: totalPrice,
-          total: grandTotal,
-          payment_method: form.paymentMethod,
-          status: "nouvelle",
-        });
-
-      if (orderError) throw orderError;
-
-      // Create order items
-      const orderItems = items.map(({ product, quantity }) => ({
-        order_id: orderId,
-        product_name: product.name,
-        product_price: product.price,
-        quantity,
-      }));
-
-      const { error: itemsError } = await supabase
-        .from("order_items")
-        .insert(orderItems);
-
-      if (itemsError) throw itemsError;
-
-      // Upsert customer
-      await supabase.from("customers").upsert(
-        {
-          name: customerName,
-          phone: form.phone,
-          email: form.email || null,
-          total_spent: grandTotal,
-          orders_count: 1,
-          last_order_at: new Date().toISOString(),
-        },
-        { onConflict: "phone", ignoreDuplicates: false }
-      );
-
-      setConfirmation({ number: orderNumber, total: grandTotal });
-      clearCart();
-    } catch (error) {
-      console.error("Order error:", error);
-      setFailed(true);
-      toast({ title: "Erreur", description: "Votre commande n’a pas pu être finalisée. Vos articles sont conservés. Veuillez réessayer ou contacter notre équipe.", variant: "destructive" });
+    if (error || !data?.receiptToken) {
+      const message = (await serverMessage(error)) ?? "Votre commande n’a pas pu être enregistrée. Votre panier est conservé.";
+      setFailed(message);
+      toast({ title: "Commande non enregistrée", description: message, variant: "destructive" });
+      setLoading(false);
+      return;
     }
 
-    setLoading(false);
+    clearCart();
+    if (data.paymentUrl) {
+      // Page de paiement sécurisée de Paystack ; elle renvoie ensuite vers le reçu.
+      window.location.assign(data.paymentUrl);
+      return;
+    }
+    navigate(`/commande/${data.receiptToken}`);
   };
 
-  // Secours si l'enregistrement en ligne échoue : la commande part sur WhatsApp.
-  const whatsappOrderUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+  // Secours si l'enregistrement échoue : la commande part sur WhatsApp.
+  const whatsappOrderUrl = `https://wa.me/${contact.whatsapp}?text=${encodeURIComponent(
     [
       "Bonjour Cure's Nappy, je souhaite passer cette commande :",
       ...items.map(({ product, quantity }) => `• ${product.name} × ${quantity} — ${(product.price * quantity).toLocaleString("fr-FR")} FCFA`),
@@ -122,18 +89,6 @@ const Checkout = () => {
       `Total : ${grandTotal.toLocaleString("fr-FR")} FCFA`,
     ].filter(Boolean).join("\n"),
   )}`;
-
-  if (confirmation) {
-    return (
-      <div className="container mx-auto pt-32 pb-16 max-w-2xl">
-        <h1 className="font-heading font-bold mb-5">Commande reçue</h1>
-        <p className="mb-4">Votre commande {confirmation.number} a été enregistrée pour un montant de <strong>{confirmation.total.toLocaleString("fr-FR")} FCFA</strong>, livraison incluse.</p>
-        <p className="text-muted-foreground mb-6">Le paiement n’est pas encore confirmé. Poursuivez avec le paiement en ligne pour régler votre commande. Notre équipe vous contactera pour finaliser la livraison.</p>
-        <Button asChild className="mb-4"><a href={delivery.paymentUrl} target="_blank" rel="noopener noreferrer">{delivery.paymentLabel} <CreditCard /></a></Button>
-        <Button variant="ghost" className="block" onClick={() => navigate("/")}>Retour à l’accueil</Button>
-      </div>
-    );
-  }
 
   if (items.length === 0) {
     return (
@@ -145,6 +100,19 @@ const Checkout = () => {
       </div>
     );
   }
+
+  const choiceCard = (value: PaymentChoice, title: string, text: string, Icon: typeof CreditCard) => (
+    <button
+      key={value}
+      type="button"
+      aria-pressed={payment === value}
+      onClick={() => setPayment(value)}
+      className={`text-left rounded-2xl border p-4 transition-colors ${payment === value ? "border-primary bg-primary/10 ring-1 ring-primary" : "border-border hover:border-primary/50 bg-card"}`}
+    >
+      <span className="flex items-center gap-2 font-semibold"><Icon className="h-5 w-5 text-primary" />{title}</span>
+      <span className="block text-sm text-muted-foreground mt-1">{text}</span>
+    </button>
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -165,19 +133,20 @@ const Checkout = () => {
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="firstName">Prénom *</Label>
-                    <Input id="firstName" required autoComplete="given-name" value={form.firstName} onChange={e => handleChange("firstName", e.target.value)} placeholder="Votre prénom" />
+                    <Input id="firstName" required maxLength={60} autoComplete="given-name" value={form.firstName} onChange={(e) => handleChange("firstName", e.target.value)} placeholder="Votre prénom" />
                   </div>
                   <div>
                     <Label htmlFor="lastName">Nom *</Label>
-                    <Input id="lastName" required autoComplete="family-name" value={form.lastName} onChange={e => handleChange("lastName", e.target.value)} placeholder="Votre nom" />
+                    <Input id="lastName" required maxLength={60} autoComplete="family-name" value={form.lastName} onChange={(e) => handleChange("lastName", e.target.value)} placeholder="Votre nom" />
                   </div>
                   <div>
-                    <Label htmlFor="phone">Téléphone *</Label>
-                    <Input id="phone" required autoComplete="tel" type="tel" value={form.phone} onChange={e => handleChange("phone", e.target.value)} placeholder="+225 07 00 00 00" />
+                    <Label htmlFor="phone">Téléphone (WhatsApp) *</Label>
+                    <Input id="phone" required maxLength={20} autoComplete="tel" type="tel" value={form.phone} onChange={(e) => handleChange("phone", e.target.value)} placeholder="+225 07 00 00 00 00" />
                   </div>
                   <div>
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" autoComplete="email" type="email" value={form.email} onChange={e => handleChange("email", e.target.value)} placeholder="votre@email.com" />
+                    <Label htmlFor="email">E-mail{online ? " *" : ""}</Label>
+                    <Input id="email" required={online} maxLength={120} autoComplete="email" type="email" value={form.email} onChange={(e) => handleChange("email", e.target.value)} placeholder="votre@email.com" />
+                    {online && <p className="text-xs text-muted-foreground mt-1">Pour recevoir votre reçu.</p>}
                   </div>
                 </div>
               </div>
@@ -189,12 +158,12 @@ const Checkout = () => {
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="commune">Commune *</Label>
-                    <Select value={form.commune} onValueChange={v => handleChange("commune", v)}>
+                    <Select value={form.commune} onValueChange={(v) => handleChange("commune", v)}>
                       <SelectTrigger id="commune" aria-required="true"><SelectValue placeholder="Choisir une commune" /></SelectTrigger>
                       <SelectContent>
-                        {communes.map(c => (
+                        {delivery.communes.map((c) => (
                           <SelectItem key={c.name} value={c.name}>
-                            {c.name} {c.zone === "special" ? "(zone spéciale)" : ""}
+                            {c.name} {c.special ? "(zone spéciale)" : ""}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -202,45 +171,32 @@ const Checkout = () => {
                   </div>
                   <div>
                     <Label htmlFor="address">Adresse précise *</Label>
-                    <Input id="address" required autoComplete="street-address" value={form.address} onChange={e => handleChange("address", e.target.value)} placeholder="Quartier, rue, repère..." />
+                    <Input id="address" required maxLength={200} autoComplete="street-address" value={form.address} onChange={(e) => handleChange("address", e.target.value)} placeholder="Quartier, rue, repère..." />
                   </div>
                 </div>
                 <p className="mt-3 text-sm text-muted-foreground">
                   {delivery.outsideNote}{" "}
-                  <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer" className="font-semibold text-primary underline underline-offset-2">Écrire sur WhatsApp</a>
+                  <a href={`https://wa.me/${contact.whatsapp}`} target="_blank" rel="noopener noreferrer" className="font-semibold text-primary underline underline-offset-2">Écrire sur WhatsApp</a>
                 </p>
-                {form.commune && (
-                  <div className="mt-4 flex items-center gap-2 text-sm bg-primary/10 text-primary p-3 rounded-2xl">
-                    <Truck className="h-4 w-4" />
-                    <span>Livraison {selectedCommune?.zone === "special" ? "zone spéciale" : "Abidjan"} : <strong>{deliveryFee.toLocaleString("fr-FR")} FCFA</strong></span>
+                {selectedCommune && (
+                  <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm bg-primary/10 text-primary p-3 rounded-2xl">
+                    <span className="inline-flex items-center gap-2"><Truck className="h-4 w-4" />Livraison {selectedCommune.special ? "zone spéciale" : "Abidjan"} : <strong>{deliveryFee.toLocaleString("fr-FR")} FCFA</strong></span>
+                    {deliveryDelay && <span className="inline-flex items-center gap-2"><Clock className="h-4 w-4" />Livrée {deliveryDelay}</span>}
                   </div>
                 )}
               </div>
 
-              <div className="border-b border-border pb-6">
-                <h2 className="font-heading font-semibold text-lg mb-4 flex items-center gap-2">
-                  <CreditCard className="h-5 w-5 text-primary" /> Mode de paiement
-                </h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {paymentMethods.map(pm => (
-                    <Button
-                      key={pm.id}
-                      variant="outline"
-                      aria-pressed={form.paymentMethod === pm.id}
-                      type="button"
-                      onClick={() => handleChange("paymentMethod", pm.id)}
-                      className={`h-auto min-h-14 whitespace-normal p-3 rounded-2xl border text-center transition-colors ${
-                        form.paymentMethod === pm.id
-                          ? "border-primary bg-primary/10"
-                          : "border-border hover:border-primary/50"
-                      }`}
-                    >
-                      <CreditCard aria-hidden="true" className="text-primary" />
-                      <span className="text-sm font-medium">{pm.name}</span>
-                    </Button>
-                  ))}
+              {choices.length > 0 && (
+                <div className="border-b border-border pb-6">
+                  <h2 className="font-heading font-semibold text-lg mb-4 flex items-center gap-2">
+                    <CreditCard className="h-5 w-5 text-primary" /> Paiement
+                  </h2>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    {delivery.onlinePayment && choiceCard("online", "Payer maintenant", `${delivery.paymentMethods.join(", ")} ou carte bancaire, sur la page sécurisée de Paystack.`, ShieldCheck)}
+                    {delivery.payLater && choiceCard("later", "Payer plus tard", "Votre commande est enregistrée et notre équipe vous contacte sur WhatsApp pour le paiement.", MessageCircle)}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             <div className="surface p-6 h-fit lg:sticky lg:top-24">
@@ -267,21 +223,18 @@ const Checkout = () => {
                   <span className="text-primary">{grandTotal.toLocaleString("fr-FR")} FCFA</span>
                 </div>
               </div>
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full mt-6 bg-action text-action-foreground hover:bg-action/90 text-base"
-                size="lg"
-              >
-                {loading ? "Traitement..." : "Valider la commande"}
+              <Button type="submit" disabled={loading} className="w-full mt-6 bg-action text-action-foreground hover:bg-action/90 text-base" size="lg">
+                {loading ? <><Loader2 className="animate-spin" />Traitement...</> : online ? <><ShieldCheck />Payer {grandTotal.toLocaleString("fr-FR")} FCFA</> : "Valider la commande"}
               </Button>
               <p className="text-sm text-muted-foreground text-center mt-3">
-                Vous serez invité à payer en ligne après l’enregistrement. Le paiement sera confirmé séparément.
+                {online
+                  ? "Vous allez être redirigé vers Paystack. Cure's Nappy ne voit ni ne conserve vos données de carte ou de Mobile Money."
+                  : "Vous recevrez un reçu tout de suite ; le paiement se fait ensuite avec notre équipe."}
               </p>
               {failed && (
                 <div role="alert" className="mt-5 rounded-2xl border border-destructive/40 bg-destructive/5 p-4 text-sm">
-                  <p className="font-semibold mb-1">La commande n’a pas pu être enregistrée.</p>
-                  <p className="text-muted-foreground mb-3">Votre panier est conservé. Vous pouvez réessayer ou nous envoyer la commande directement sur WhatsApp.</p>
+                  <p className="font-semibold mb-1">{failed}</p>
+                  <p className="text-muted-foreground mb-3">Vous pouvez réessayer ou nous envoyer la commande directement sur WhatsApp.</p>
                   <Button asChild variant="outline" className="w-full">
                     <a href={whatsappOrderUrl} target="_blank" rel="noopener noreferrer"><MessageCircle /> Commander sur WhatsApp</a>
                   </Button>
