@@ -24,8 +24,8 @@ export async function sendReceiptEmail(db: SupabaseClient, order: Record<string,
     <p>Bonjour ${escapeHtml(order.customer_name)}, nous avons bien reçu votre commande <strong>${escapeHtml(order.order_number)}</strong>.
     ${order.delivery_estimate ? `Livraison prévue ${escapeHtml(order.delivery_estimate)} à ${escapeHtml(order.delivery_commune)}.` : ""}</p>
     <table style="width:100%;border-collapse:collapse;border-top:1px solid #ddd;border-bottom:1px solid #ddd">${rows}
-      <tr><td style="padding:6px 0">Livraison</td><td style="padding:6px 0;text-align:right">${fcfa(order.delivery_fee)}</td></tr>
-      <tr><td style="padding:8px 0;font-weight:bold">Total ${paid ? "payé" : "à régler"}</td><td style="padding:8px 0;text-align:right;font-weight:bold">${fcfa(order.total)}</td></tr>
+      <tr><td style="padding:6px 0">Livraison</td><td style="padding:6px 0;text-align:right">${order.delivery_fee_confirmed === false ? "à confirmer" : fcfa(order.delivery_fee)}</td></tr>
+      <tr><td style="padding:8px 0;font-weight:bold">Total ${paid ? "payé" : "à régler"}${order.delivery_fee_confirmed === false ? " (hors expédition)" : ""}</td><td style="padding:8px 0;text-align:right;font-weight:bold">${fcfa(order.total)}</td></tr>
     </table>
     ${link ? `<p><a href="${escapeHtml(link)}" style="display:inline-block;background:#66793a;color:#fff;padding:10px 18px;border-radius:999px;text-decoration:none">Voir et imprimer mon reçu</a></p>` : ""}
     <p style="color:#6a6f60;font-size:13px">Une question ? Répondez à cet e-mail ou écrivez-nous sur WhatsApp.</p>

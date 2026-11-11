@@ -10,6 +10,8 @@ ALTER TABLE public.orders
   ADD COLUMN IF NOT EXISTS receipt_token UUID NOT NULL DEFAULT gen_random_uuid() UNIQUE,
   ADD COLUMN IF NOT EXISTS delivery_zone TEXT,
   ADD COLUMN IF NOT EXISTS delivery_estimate TEXT,
+  -- Faux quand les frais d'expédition restent à confirmer par l'équipe (ville ou pays sans tarif).
+  ADD COLUMN IF NOT EXISTS delivery_fee_confirmed BOOLEAN NOT NULL DEFAULT true,
   ADD COLUMN IF NOT EXISTS receipt_emailed_at TIMESTAMPTZ;
 
 -- Plus aucune écriture directe depuis le navigateur sur les commandes et leurs articles.

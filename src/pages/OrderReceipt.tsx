@@ -14,7 +14,9 @@ interface Receipt {
   customerName: string;
   customerPhone: string;
   customerEmail: string | null;
-  commune: string;
+  place: string;
+  zone: string | null;
+  deliveryFeeConfirmed: boolean;
   address: string;
   deliveryEstimate: string | null;
   items: { name: string; unitPrice: number; quantity: number }[];
@@ -86,7 +88,7 @@ const OrderReceipt = () => {
             <h1 className="font-heading font-bold !text-3xl md:!text-4xl mb-2">Paiement reçu, merci {receipt.customerName.split(" ")[0]} !</h1>
             <p className="text-primary-foreground/90 text-lg">
               Nous avons bien reçu votre commande <strong>{receipt.orderNumber}</strong>.
-              {receipt.deliveryEstimate && <> Elle sera livrée <strong>{receipt.deliveryEstimate}</strong> à {receipt.commune}.</>} Nous vous contacterons sur WhatsApp avant la livraison.
+              {receipt.deliveryEstimate && <> Elle sera {receipt.zone === "abidjan" ? "livrée" : "expédiée"} <strong>{receipt.deliveryEstimate}</strong> {receipt.zone === "abidjan" ? "à" : "vers"} {receipt.place}.</>} Nous vous contacterons sur WhatsApp avant la livraison.
             </p>
           </>
         ) : waiting ? (
@@ -112,7 +114,7 @@ const OrderReceipt = () => {
             <CheckCircle2 className="h-10 w-10 mb-3 text-primary" />
             <h1 className="font-heading font-bold !text-3xl md:!text-4xl mb-2">Commande enregistrée, merci !</h1>
             <p className="text-muted-foreground text-lg">
-              Votre commande <strong className="text-foreground">{receipt.orderNumber}</strong> est bien reçue. Notre équipe vous contacte sur WhatsApp pour le paiement
+              Votre commande <strong className="text-foreground">{receipt.orderNumber}</strong> est bien reçue. Notre équipe vous contacte sur WhatsApp pour {receipt.deliveryFeeConfirmed ? "le paiement" : "vous confirmer les frais d'expédition et le paiement"}
               {receipt.deliveryEstimate && <>, puis la livraison <strong className="text-foreground">{receipt.deliveryEstimate}</strong></>}.
             </p>
           </>
@@ -149,8 +151,8 @@ const OrderReceipt = () => {
             {receipt.customerEmail && <p>{receipt.customerEmail}</p>}
           </div>
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">Livraison</p>
-            <p className="font-semibold">{receipt.commune}</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">{receipt.zone === "abidjan" || !receipt.zone ? "Livraison" : receipt.zone === "national" ? "Expédition Côte d'Ivoire" : "Expédition internationale"}</p>
+            <p className="font-semibold">{receipt.place}</p>
             <p>{receipt.address}</p>
             {receipt.deliveryEstimate && <p className="text-muted-foreground">Prévue {receipt.deliveryEstimate}</p>}
           </div>
@@ -179,8 +181,8 @@ const OrderReceipt = () => {
 
         <div className="ml-auto max-w-xs space-y-1.5 text-sm">
           <div className="flex justify-between"><span className="text-muted-foreground">Sous-total</span><span>{fcfa(receipt.subtotal)}</span></div>
-          <div className="flex justify-between"><span className="text-muted-foreground">Livraison</span><span>{fcfa(receipt.deliveryFee)}</span></div>
-          <div className="flex justify-between border-t border-border pt-2 font-bold text-lg"><span>Total</span><span className="text-primary">{fcfa(receipt.total)}</span></div>
+          <div className="flex justify-between"><span className="text-muted-foreground">Livraison</span><span>{receipt.deliveryFeeConfirmed ? fcfa(receipt.deliveryFee) : "À confirmer"}</span></div>
+          <div className="flex justify-between border-t border-border pt-2 font-bold text-lg"><span>Total{!receipt.deliveryFeeConfirmed && <span className="block text-xs font-normal text-muted-foreground">hors expédition</span>}</span><span className="text-primary">{fcfa(receipt.total)}</span></div>
         </div>
 
         <div className="mt-6 rounded-2xl bg-secondary/70 p-4 text-sm">

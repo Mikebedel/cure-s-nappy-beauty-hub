@@ -488,78 +488,288 @@
     ]
   },
   "delivery": {
-    "standardFee": 1500,
-    "specialFee": 2000,
-    "communes": [
-      {
-        "name": "Cocody",
-        "special": false
-      },
-      {
-        "name": "Plateau",
-        "special": false
-      },
-      {
-        "name": "Marcory",
-        "special": false
-      },
-      {
-        "name": "Treichville",
-        "special": false
-      },
-      {
-        "name": "Koumassi",
-        "special": false
-      },
-      {
-        "name": "Adjamé",
-        "special": false
-      },
-      {
-        "name": "Abobo",
-        "special": false
-      },
-      {
-        "name": "Yopougon",
-        "special": false
-      },
-      {
-        "name": "Riviera",
-        "special": false
-      },
-      {
-        "name": "Bingerville",
-        "special": false
-      },
-      {
-        "name": "Songon",
-        "special": false
-      },
-      {
-        "name": "Port-Bouët",
-        "special": true
-      },
-      {
-        "name": "Grand-Bassam",
-        "special": true
-      },
-      {
-        "name": "Anyama",
-        "special": true
-      },
-      {
-        "name": "Gonzagueville",
-        "special": true
-      }
-    ],
-    "outsideNote": "Hors Abidjan ou à l’étranger ? Nous expédions partout en Côte d’Ivoire et à l’international : écrivez-nous sur WhatsApp pour organiser l’envoi.",
+    "abidjan": {
+      "delay": "sous 24 à 48 h",
+      "communes": [
+        {
+          "name": "Cocody",
+          "fee": 1500
+        },
+        {
+          "name": "Plateau",
+          "fee": 1500
+        },
+        {
+          "name": "Marcory",
+          "fee": 1500
+        },
+        {
+          "name": "Treichville",
+          "fee": 1500
+        },
+        {
+          "name": "Koumassi",
+          "fee": 1500
+        },
+        {
+          "name": "Adjamé",
+          "fee": 1500
+        },
+        {
+          "name": "Abobo",
+          "fee": 1500
+        },
+        {
+          "name": "Yopougon",
+          "fee": 1500
+        },
+        {
+          "name": "Riviera",
+          "fee": 1500
+        },
+        {
+          "name": "Bingerville",
+          "fee": 2000
+        },
+        {
+          "name": "Songon",
+          "fee": 2000
+        },
+        {
+          "name": "Port-Bouët",
+          "fee": 2000
+        },
+        {
+          "name": "Grand-Bassam",
+          "fee": 3000
+        },
+        {
+          "name": "Anyama",
+          "fee": 2000
+        },
+        {
+          "name": "Gonzagueville",
+          "fee": 2000
+        }
+      ]
+    },
+    "national": {
+      "enabled": true,
+      "delay": "",
+      "allowOther": true,
+      "cities": [
+        {
+          "name": "Yamoussoukro",
+          "fee": null
+        },
+        {
+          "name": "Bouaké",
+          "fee": null
+        },
+        {
+          "name": "Daloa",
+          "fee": null
+        },
+        {
+          "name": "San-Pédro",
+          "fee": null
+        },
+        {
+          "name": "Korhogo",
+          "fee": null
+        },
+        {
+          "name": "Man",
+          "fee": null
+        },
+        {
+          "name": "Gagnoa",
+          "fee": null
+        },
+        {
+          "name": "Divo",
+          "fee": null
+        },
+        {
+          "name": "Abengourou",
+          "fee": null
+        },
+        {
+          "name": "Soubré",
+          "fee": null
+        },
+        {
+          "name": "Agboville",
+          "fee": null
+        },
+        {
+          "name": "Dabou",
+          "fee": null
+        },
+        {
+          "name": "Bondoukou",
+          "fee": null
+        },
+        {
+          "name": "Odienné",
+          "fee": null
+        },
+        {
+          "name": "Séguéla",
+          "fee": null
+        },
+        {
+          "name": "Ferkessédougou",
+          "fee": null
+        },
+        {
+          "name": "Dimbokro",
+          "fee": null
+        },
+        {
+          "name": "Sassandra",
+          "fee": null
+        },
+        {
+          "name": "Aboisso",
+          "fee": null
+        },
+        {
+          "name": "Adzopé",
+          "fee": null
+        },
+        {
+          "name": "Bouaflé",
+          "fee": null
+        },
+        {
+          "name": "Issia",
+          "fee": null
+        },
+        {
+          "name": "Duékoué",
+          "fee": null
+        },
+        {
+          "name": "Katiola",
+          "fee": null
+        },
+        {
+          "name": "Toumodi",
+          "fee": null
+        }
+      ]
+    },
+    "international": {
+      "enabled": true,
+      "allowOther": true,
+      "zones": [
+        {
+          "name": "Afrique de l'Ouest",
+          "fee": null,
+          "delay": "",
+          "countries": [
+            "Bénin",
+            "Burkina Faso",
+            "Cap-Vert",
+            "Gambie",
+            "Ghana",
+            "Guinée",
+            "Guinée-Bissau",
+            "Liberia",
+            "Mali",
+            "Mauritanie",
+            "Niger",
+            "Nigeria",
+            "Sénégal",
+            "Sierra Leone",
+            "Togo"
+          ]
+        },
+        {
+          "name": "Reste de l'Afrique",
+          "fee": null,
+          "delay": "",
+          "countries": [
+            "Afrique du Sud",
+            "Algérie",
+            "Angola",
+            "Cameroun",
+            "Congo",
+            "République démocratique du Congo",
+            "Égypte",
+            "Éthiopie",
+            "Gabon",
+            "Guinée équatoriale",
+            "Kenya",
+            "Madagascar",
+            "Maroc",
+            "Ouganda",
+            "République centrafricaine",
+            "Rwanda",
+            "Tanzanie",
+            "Tchad",
+            "Tunisie"
+          ]
+        },
+        {
+          "name": "Europe",
+          "fee": null,
+          "delay": "",
+          "countries": [
+            "Allemagne",
+            "Autriche",
+            "Belgique",
+            "Danemark",
+            "Espagne",
+            "France",
+            "Grèce",
+            "Irlande",
+            "Italie",
+            "Luxembourg",
+            "Norvège",
+            "Pays-Bas",
+            "Pologne",
+            "Portugal",
+            "Royaume-Uni",
+            "Suède",
+            "Suisse"
+          ]
+        },
+        {
+          "name": "Amérique du Nord",
+          "fee": null,
+          "delay": "",
+          "countries": [
+            "Canada",
+            "États-Unis"
+          ]
+        },
+        {
+          "name": "Reste du monde",
+          "fee": null,
+          "delay": "",
+          "countries": [
+            "Arabie saoudite",
+            "Australie",
+            "Brésil",
+            "Chine",
+            "Émirats arabes unis",
+            "Haïti",
+            "Inde",
+            "Japon",
+            "Liban",
+            "Qatar",
+            "Turquie"
+          ]
+        }
+      ]
+    },
     "paymentMethods": [
       "Wave",
       "Orange Money",
       "MTN MoMo"
     ],
-    "standardDelay": "sous 24 à 48 h",
-    "specialDelay": "sous 48 à 72 h",
     "onlinePayment": true,
     "payLater": true
   }

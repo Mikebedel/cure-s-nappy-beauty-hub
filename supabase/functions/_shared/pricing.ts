@@ -11,11 +11,64 @@ export interface PricingCatalog {
 }
 
 export interface PricingDelivery {
-  standardFee: number;
-  specialFee: number;
-  communes: { name: string; special: boolean }[];
-  standardDelay: string;
-  specialDelay: string;
+  abidjan: { delay: string; communes: { name: string; fee: number }[] };
+  national: { enabled: boolean; delay: string; cities: { name: string; fee: number | null }[]; allowOther: boolean };
+  international: { enabled: boolean; zones: { name: string; fee: number | null; delay: string; countries: string[] }[]; allowOther: boolean };
+}
+
+/** Valeur des listes « Autre ville » / « Autre pays ». */
+export const OTHER = "__autre";
+
+/** Ce que le client choisit à la commande. */
+export type Destination =
+  | { mode: "abidjan"; commune: string }
+  | { mode: "national"; city: string; otherCity?: string }
+  | { mode: "international"; country: string; otherCountry?: string; city: string };
+
+export interface ResolvedDestination {
+  zone: "abidjan" | "national" | "international";
+  /** Lieu affiché sur la commande et le reçu (commune, ville ou « ville, pays »). */
+  place: string;
+  /** Frais de livraison ; null = à confirmer par l'équipe. */
+  fee: number | null;
+  estimate: string;
+}
+
+const cleanText = (v: unknown, max = 60) => (typeof v === "string" ? v.trim().replace(/\s+/g, " ") : "").slice(0, max);
+
+/** Vérifie la destination choisie et donne ses frais et son délai. Même calcul sur le site et sur le serveur. */
+export function resolveDestination(delivery: PricingDelivery, raw: unknown): ResolvedDestination | { error: string } {
+  const d = (raw ?? {}) as Record<string, unknown>;
+  if (d.mode === "abidjan") {
+    const commune = delivery.abidjan.communes.find((c) => c.name === d.commune);
+    if (!commune) return { error: "Choisissez votre commune." };
+    return { zone: "abidjan", place: commune.name, fee: commune.fee, estimate: delivery.abidjan.delay };
+  }
+  if (d.mode === "national") {
+    if (!delivery.national.enabled) return { error: "L'expédition en Côte d'Ivoire n'est pas disponible pour le moment." };
+    if (d.city === OTHER && delivery.national.allowOther) {
+      const name = cleanText(d.otherCity);
+      if (name.length < 2) return { error: "Indiquez votre ville." };
+      return { zone: "national", place: name, fee: null, estimate: delivery.national.delay };
+    }
+    const city = delivery.national.cities.find((c) => c.name === d.city);
+    if (!city) return { error: "Choisissez votre ville." };
+    return { zone: "national", place: city.name, fee: city.fee, estimate: delivery.national.delay };
+  }
+  if (d.mode === "international") {
+    if (!delivery.international.enabled) return { error: "L'expédition à l'étranger n'est pas disponible pour le moment." };
+    const city = cleanText(d.city);
+    if (city.length < 2) return { error: "Indiquez votre ville." };
+    if (d.country === OTHER && delivery.international.allowOther) {
+      const country = cleanText(d.otherCountry);
+      if (country.length < 2) return { error: "Indiquez votre pays." };
+      return { zone: "international", place: `${city}, ${country}`, fee: null, estimate: "" };
+    }
+    const zone = delivery.international.zones.find((z) => z.countries.includes(String(d.country)));
+    if (!zone) return { error: "Choisissez votre pays." };
+    return { zone: "international", place: `${city}, ${d.country}`, fee: zone.fee, estimate: zone.delay };
+  }
+  return { error: "Choisissez un mode de livraison." };
 }
 
 export interface CartLine { id: string; quantity: number }
@@ -23,7 +76,7 @@ export interface CartLine { id: string; quantity: number }
 export interface PricedLine { id: string; name: string; unitPrice: number; quantity: number; lineTotal: number }
 
 export type PricingResult =
-  | { ok: true; lines: PricedLine[]; subtotal: number; deliveryFee: number; total: number; zone: "standard" | "special"; estimate: string }
+  | { ok: true; lines: PricedLine[]; subtotal: number; deliveryFee: number; feeConfirmed: boolean; total: number; destination: ResolvedDestination }
   | { ok: false; error: string };
 
 export const MAX_LINES = 30;
@@ -31,7 +84,7 @@ export const MAX_QUANTITY = 20;
 
 const isWholePositive = (n: unknown): n is number => typeof n === "number" && Number.isInteger(n) && n > 0;
 
-export function priceOrder(catalog: PricingCatalog, delivery: PricingDelivery, rawLines: unknown, communeName: unknown): PricingResult {
+export function priceOrder(catalog: PricingCatalog, delivery: PricingDelivery, rawLines: unknown, rawDestination: unknown): PricingResult {
   if (!Array.isArray(rawLines) || rawLines.length === 0) return { ok: false, error: "Le panier est vide." };
   if (rawLines.length > MAX_LINES) return { ok: false, error: "Trop d'articles différents dans le panier." };
 
@@ -70,20 +123,11 @@ export function priceOrder(catalog: PricingCatalog, delivery: PricingDelivery, r
     lines.push({ id, name, unitPrice, quantity, lineTotal: unitPrice * quantity });
   }
 
-  const commune = delivery.communes.find((c) => c.name === communeName);
-  if (!commune) return { ok: false, error: "Commune de livraison inconnue." };
-  const zone = commune.special ? "special" : "standard";
-  const deliveryFee = commune.special ? delivery.specialFee : delivery.standardFee;
+  const destination = resolveDestination(delivery, rawDestination);
+  if ("error" in destination) return { ok: false, error: destination.error };
   const subtotal = lines.reduce((sum, l) => sum + l.lineTotal, 0);
-  return {
-    ok: true,
-    lines,
-    subtotal,
-    deliveryFee,
-    total: subtotal + deliveryFee,
-    zone,
-    estimate: commune.special ? delivery.specialDelay : delivery.standardDelay,
-  };
+  const deliveryFee = destination.fee ?? 0;
+  return { ok: true, lines, subtotal, deliveryFee, feeConfirmed: destination.fee !== null, total: subtotal + deliveryFee, destination };
 }
 
 /** Contrôle des coordonnées saisies par le client. Renvoie un message d'erreur, ou null si tout est correct. */

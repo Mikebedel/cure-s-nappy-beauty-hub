@@ -29,8 +29,12 @@ Deno.serve(async (req) => {
     const customerError = checkCustomer(customer, online);
     if (customerError) return json(req, { error: customerError }, 400);
 
-    const priced = priceOrder(settings.catalog, settings.delivery, body.items, customer.commune);
+    const priced = priceOrder(settings.catalog, settings.delivery, body.items, body.destination);
     if (!priced.ok) return json(req, { error: priced.error }, 400);
+    // Sans tarif connu pour la destination, le total final n'existe pas encore : pas de paiement en ligne.
+    if (online && !priced.feeConfirmed) {
+      return json(req, { error: "Les frais d'expédition vers cette destination sont confirmés par notre équipe : choisissez « Payer plus tard »." }, 400);
+    }
 
     const phone = String(customer.phone).replace(/[\s.\-()]/g, "");
     // Frein simple aux abus : pas plus de 5 commandes par numéro en 15 minutes.
@@ -47,11 +51,12 @@ Deno.serve(async (req) => {
       customer_name: customerName,
       customer_phone: phone,
       customer_email: email,
-      delivery_commune: String(customer.commune),
+      delivery_commune: priced.destination.place,
       delivery_address: String(customer.address).trim(),
-      delivery_zone: priced.zone,
-      delivery_estimate: priced.estimate,
+      delivery_zone: priced.destination.zone,
+      delivery_estimate: priced.destination.estimate || null,
       delivery_fee: priced.deliveryFee,
+      delivery_fee_confirmed: priced.feeConfirmed,
       subtotal: priced.subtotal,
       total: priced.total,
       payment_method: online ? "paystack" : "a_regler",

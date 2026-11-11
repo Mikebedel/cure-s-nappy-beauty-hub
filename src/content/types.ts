@@ -82,14 +82,13 @@ export interface SiteContent {
   };
   footer: { tagline: string; quote: string };
   delivery: {
-    standardFee: number;
-    specialFee: number;
-    communes: { name: string; special: boolean }[];
-    outsideNote: string;
+    /** Livraison dans le Grand Abidjan : un prix par commune. */
+    abidjan: { delay: string; communes: { name: string; fee: number }[] };
+    /** Expédition dans les autres villes de Côte d'Ivoire. Frais vides = à confirmer par l'équipe. */
+    national: { enabled: boolean; delay: string; cities: { name: string; fee: number | null }[]; allowOther: boolean };
+    /** Expédition à l'étranger, par zone de pays. Frais vides = à confirmer par l'équipe. */
+    international: { enabled: boolean; zones: { name: string; fee: number | null; delay: string; countries: string[] }[]; allowOther: boolean };
     paymentMethods: string[];
-    /** Délai de livraison annoncé après la commande, par zone. */
-    standardDelay: string;
-    specialDelay: string;
     /** Paiement en ligne (Paystack) proposé à la commande. */
     onlinePayment: boolean;
     /** Commande sans paiement en ligne : l'équipe recontacte le client sur WhatsApp. */

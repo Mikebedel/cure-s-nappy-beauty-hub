@@ -7,37 +7,74 @@ import { defaultContent } from "@/content/defaults";
 const catalog = defaultContent.catalog;
 const delivery = defaultContent.delivery;
 
+const abidjan = (commune: string) => ({ mode: "abidjan", commune });
+
 describe("priceOrder", () => {
   it("recalcule le total à partir du catalogue, pas de ce qu'envoie le navigateur", () => {
-    const result = priceOrder(catalog, delivery, [{ id: "8", quantity: 2, price: 1 }, { id: "pack-gamme-minie", quantity: 1 }], "Cocody");
-    expect(result).toMatchObject({ ok: true, subtotal: 6500 * 2 + 22000, deliveryFee: 1500, total: 6500 * 2 + 22000 + 1500, zone: "standard" });
+    const result = priceOrder(catalog, delivery, [{ id: "8", quantity: 2, price: 1 }, { id: "pack-gamme-minie", quantity: 1 }], abidjan("Cocody"));
+    expect(result).toMatchObject({ ok: true, subtotal: 6500 * 2 + 22000, deliveryFee: 1500, feeConfirmed: true, total: 6500 * 2 + 22000 + 1500 });
+  });
+
+  it("applique le prix de chaque commune d'Abidjan", () => {
+    const fee = (commune: string) => {
+      const r = priceOrder(catalog, delivery, [{ id: "1", quantity: 1 }], abidjan(commune));
+      return r.ok ? r.deliveryFee : null;
+    };
+    expect([fee("Cocody"), fee("Bingerville"), fee("Songon"), fee("Port-Bouët"), fee("Grand-Bassam"), fee("Anyama"), fee("Gonzagueville")])
+      .toEqual([1500, 2000, 2000, 2000, 3000, 2000, 2000]);
   });
 
   it("calcule le prix d'un duo comme la somme de ses produits", () => {
-    const result = priceOrder(catalog, delivery, [{ id: "pack-duo-extra-pousse", quantity: 1 }], "Grand-Bassam");
-    expect(result).toMatchObject({ ok: true, subtotal: 6000 + 6500, deliveryFee: 2000, zone: "special", estimate: delivery.specialDelay });
+    const result = priceOrder(catalog, delivery, [{ id: "pack-duo-extra-pousse", quantity: 1 }], abidjan("Grand-Bassam"));
+    expect(result).toMatchObject({ ok: true, subtotal: 6000 + 6500, deliveryFee: 3000 });
   });
 
   it("regroupe les lignes d'un même article", () => {
-    const result = priceOrder(catalog, delivery, [{ id: "1", quantity: 1 }, { id: "1", quantity: 2 }], "Plateau");
+    const result = priceOrder(catalog, delivery, [{ id: "1", quantity: 1 }, { id: "1", quantity: 2 }], abidjan("Plateau"));
     expect(result.ok && result.lines).toEqual([{ id: "1", name: "Bain d'Huile", unitPrice: 5500, quantity: 3, lineTotal: 16500 }]);
   });
 
+  it("expédition vers une ville sans tarif : frais à confirmer, total hors expédition", () => {
+    const result = priceOrder(catalog, delivery, [{ id: "1", quantity: 1 }], { mode: "national", city: "Bouaké" });
+    expect(result).toMatchObject({ ok: true, deliveryFee: 0, feeConfirmed: false, total: 5500, destination: { zone: "national", place: "Bouaké" } });
+  });
+
+  it("expédition vers une ville avec tarif renseigné dans le dashboard", () => {
+    const priced = { ...delivery, national: { ...delivery.national, cities: [{ name: "Bouaké", fee: 4000 }] } };
+    expect(priceOrder(catalog, priced, [{ id: "1", quantity: 1 }], { mode: "national", city: "Bouaké" })).toMatchObject({ ok: true, deliveryFee: 4000, feeConfirmed: true, total: 9500 });
+  });
+
+  it("autre ville et pays étranger : lieu écrit par le client, frais à confirmer", () => {
+    expect(priceOrder(catalog, delivery, [{ id: "1", quantity: 1 }], { mode: "national", city: "__autre", otherCity: "Tabou" }))
+      .toMatchObject({ ok: true, feeConfirmed: false, destination: { place: "Tabou" } });
+    expect(priceOrder(catalog, delivery, [{ id: "1", quantity: 1 }], { mode: "international", country: "France", city: "Lyon" }))
+      .toMatchObject({ ok: true, feeConfirmed: false, destination: { zone: "international", place: "Lyon, France" } });
+  });
+
   it.each([
-    ["panier vide", [], "Cocody"],
-    ["article inconnu", [{ id: "inconnu", quantity: 1 }], "Cocody"],
-    ["quantité négative", [{ id: "1", quantity: -2 }], "Cocody"],
-    ["quantité décimale", [{ id: "1", quantity: 1.5 }], "Cocody"],
-    ["quantité excessive", [{ id: "1", quantity: 21 }], "Cocody"],
-    ["commune inventée", [{ id: "1", quantity: 1 }], "Paris"],
-    ["panier qui n'est pas une liste", "1", "Cocody"],
-  ])("refuse : %s", (_label, lines, commune) => {
-    expect(priceOrder(catalog, delivery, lines, commune).ok).toBe(false);
+    ["panier vide", [], abidjan("Cocody")],
+    ["article inconnu", [{ id: "inconnu", quantity: 1 }], abidjan("Cocody")],
+    ["quantité négative", [{ id: "1", quantity: -2 }], abidjan("Cocody")],
+    ["quantité décimale", [{ id: "1", quantity: 1.5 }], abidjan("Cocody")],
+    ["quantité excessive", [{ id: "1", quantity: 21 }], abidjan("Cocody")],
+    ["commune inventée", [{ id: "1", quantity: 1 }], abidjan("Paris")],
+    ["ville inventée", [{ id: "1", quantity: 1 }], { mode: "national", city: "Atlantis" }],
+    ["pays inventé", [{ id: "1", quantity: 1 }], { mode: "international", country: "Wakanda", city: "Birnin" }],
+    ["pays sans ville", [{ id: "1", quantity: 1 }], { mode: "international", country: "France", city: "" }],
+    ["mode de livraison absent", [{ id: "1", quantity: 1 }], {}],
+    ["panier qui n'est pas une liste", "1", abidjan("Cocody")],
+  ])("refuse : %s", (_label, lines, destination) => {
+    expect(priceOrder(catalog, delivery, lines, destination).ok).toBe(false);
   });
 
   it("refuse un produit masqué dans le dashboard", () => {
     const hidden = { ...catalog, products: catalog.products.map((p) => (p.id === "1" ? { ...p, visible: false } : p)) };
-    expect(priceOrder(hidden, delivery, [{ id: "1", quantity: 1 }], "Cocody").ok).toBe(false);
+    expect(priceOrder(hidden, delivery, [{ id: "1", quantity: 1 }], abidjan("Cocody")).ok).toBe(false);
+  });
+
+  it("refuse l'expédition quand elle est désactivée dans le dashboard", () => {
+    const off = { ...delivery, national: { ...delivery.national, enabled: false } };
+    expect(priceOrder(catalog, off, [{ id: "1", quantity: 1 }], { mode: "national", city: "Bouaké" }).ok).toBe(false);
   });
 });
 
