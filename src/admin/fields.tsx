@@ -33,7 +33,7 @@ export const Panel = ({ title, description, children, defaultOpen = false, aside
   return (
     <section className="bg-card border border-border rounded-2xl shadow-soft overflow-hidden">
       <div className="flex items-center gap-3 px-5 py-4">
-        <button type="button" aria-expanded={open} aria-controls={id} onClick={() => setOpen((v) => !v)} className="flex-1 flex items-center justify-between gap-3 text-left">
+        <button type="button" aria-expanded={open} aria-controls={id} onClick={() => setOpen((v) => !v)} className="min-h-11 flex-1 flex items-center justify-between gap-3 text-left">
           <span>
             <span className="block font-heading font-semibold text-lg">{title}</span>
             {description && <span className="block text-sm text-muted-foreground">{description}</span>}
@@ -267,15 +267,15 @@ export const ImagesField = ({ label, value, onChange, hint }: { label: string; v
     <FieldShell label={label} hint={hint}>
       <div className="rounded-xl border border-input p-3 space-y-3">
         {value.length === 0 && <p className="text-sm text-muted-foreground">Aucune image.</p>}
-        <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-6 gap-3">
           {value.map((ref, i) => (
             <div key={`${ref}-${i}`} className="relative group">
               <img src={resolveImage(ref)} alt="" className="aspect-square w-full rounded-lg object-cover bg-muted" />
               <span className="absolute top-1 left-1 rounded-full bg-background/90 px-1.5 text-[11px] font-bold">{i + 1}</span>
               <div className="mt-1 flex justify-center gap-1">
-                <button type="button" aria-label="Déplacer avant" onClick={() => move(i, i - 1)} className="h-7 w-7 inline-flex items-center justify-center rounded-md hover:bg-secondary"><ArrowUp className="h-3.5 w-3.5 -rotate-90" /></button>
-                <button type="button" aria-label="Déplacer après" onClick={() => move(i, i + 1)} className="h-7 w-7 inline-flex items-center justify-center rounded-md hover:bg-secondary"><ArrowDown className="h-3.5 w-3.5 -rotate-90" /></button>
-                <button type="button" aria-label="Retirer l'image" onClick={() => onChange(value.filter((_, j) => j !== i))} className="h-7 w-7 inline-flex items-center justify-center rounded-md text-destructive hover:bg-destructive/10"><Trash2 className="h-3.5 w-3.5" /></button>
+                <button type="button" aria-label="Déplacer avant" onClick={() => move(i, i - 1)} className="h-9 w-9 inline-flex items-center justify-center rounded-lg hover:bg-secondary"><ArrowUp className="h-3.5 w-3.5 -rotate-90" /></button>
+                <button type="button" aria-label="Déplacer après" onClick={() => move(i, i + 1)} className="h-9 w-9 inline-flex items-center justify-center rounded-lg hover:bg-secondary"><ArrowDown className="h-3.5 w-3.5 -rotate-90" /></button>
+                <button type="button" aria-label="Retirer l'image" onClick={() => onChange(value.filter((_, j) => j !== i))} className="h-9 w-9 inline-flex items-center justify-center rounded-lg text-destructive hover:bg-destructive/10"><Trash2 className="h-3.5 w-3.5" /></button>
               </div>
             </div>
           ))}

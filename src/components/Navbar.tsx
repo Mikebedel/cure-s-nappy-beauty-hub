@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ShoppingBag, Menu, X, Home } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import wordmark from "@/assets/brand-wordmark.png";
+import logo from "@/assets/logo.jpg";
 import { Button } from "@/components/ui/button";
 
 const Navbar = () => {
@@ -79,7 +80,7 @@ const Navbar = () => {
           className="flex items-center gap-2 transition-colors"
         >
           <img
-            src="/favicon.ico"
+            src={logo}
             alt=""
             className="h-9 w-9 object-contain shrink-0 rounded-full"
           />

@@ -31,7 +31,7 @@ const Contact = () => {
       <div className="container mx-auto section">
         <div className="grid md:grid-cols-2 gap-5 max-w-5xl mx-auto">
           {/* Infos */}
-          <div className="surface p-6 md:p-9">
+          <div className="surface p-5 sm:p-6 md:p-9 min-w-0">
             <h2 className="font-heading text-2xl md:text-3xl font-bold mb-6">{page.infoTitle}</h2>
             <div className="space-y-6">
               {[
@@ -44,14 +44,14 @@ const Contact = () => {
                   <div>
                     <p className="font-semibold text-sm">{item.label}</p>
                     {item.href
-                      ? <a href={item.href} className="text-muted-foreground text-sm hover:text-primary transition-colors">{item.value}</a>
+                      ? <a href={item.href} className="text-muted-foreground text-sm hover:text-primary transition-colors break-all">{item.value}</a>
                       : <p className="text-muted-foreground text-sm">{item.value}</p>}
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="mt-8 p-6 bg-secondary/70 rounded-2xl">
+            <div className="mt-8 p-5 sm:p-6 bg-secondary/70 rounded-2xl">
               <div className="flex items-center gap-3 mb-3">
                 <MessageCircle className="h-5 w-5 text-primary" />
                 <h3 className="font-heading font-semibold">WhatsApp</h3>
@@ -68,7 +68,7 @@ const Contact = () => {
           </div>
 
           {/* Form */}
-          <div className="surface p-6 md:p-9">
+          <div className="surface p-5 sm:p-6 md:p-9 min-w-0">
             <h2 className="font-heading text-2xl md:text-3xl font-bold mb-6">{page.formTitle}</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>

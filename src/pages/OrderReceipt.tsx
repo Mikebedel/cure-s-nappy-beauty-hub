@@ -130,13 +130,13 @@ const OrderReceipt = () => {
       </div>
 
       {/* Le reçu (c'est la seule partie imprimée) */}
-      <article className="receipt bg-card border border-border rounded-3xl p-6 md:p-10" aria-label="Reçu de commande">
+      <article className="receipt bg-card border border-border rounded-3xl p-5 sm:p-6 md:p-10 overflow-hidden" aria-label="Reçu de commande">
         <header className="flex flex-wrap items-start justify-between gap-4 border-b border-border pb-5 mb-5">
           <div>
             <img src={wordmark} alt="Cure's Nappy" className="w-40 mb-2" />
             <p className="text-sm text-muted-foreground">{contact.address} · {contact.phoneDisplay}</p>
           </div>
-          <div className="text-right">
+          <div className="sm:text-right">
             <p className="font-heading text-xl font-bold">{paid ? "REÇU DE PAIEMENT" : "BON DE COMMANDE"}</p>
             <p className="text-sm font-semibold">{receipt.orderNumber}</p>
             <p className="text-sm text-muted-foreground">{date(receipt.createdAt)}</p>
@@ -148,7 +148,7 @@ const OrderReceipt = () => {
             <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">Client</p>
             <p className="font-semibold">{receipt.customerName}</p>
             <p>{receipt.customerPhone}</p>
-            {receipt.customerEmail && <p>{receipt.customerEmail}</p>}
+            {receipt.customerEmail && <p className="break-all">{receipt.customerEmail}</p>}
           </div>
           <div>
             <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">{receipt.zone === "abidjan" || !receipt.zone ? "Livraison" : receipt.zone === "national" ? "Expédition Côte d'Ivoire" : "Expédition internationale"}</p>
@@ -162,17 +162,17 @@ const OrderReceipt = () => {
           <thead>
             <tr className="border-b border-border text-left text-xs uppercase tracking-wider text-muted-foreground">
               <th className="py-2 font-bold">Article</th>
-              <th className="py-2 font-bold text-center">Qté</th>
-              <th className="py-2 font-bold text-right">Prix</th>
+              <th className="py-2 px-2 font-bold text-center">Qté</th>
+              <th className="py-2 font-bold text-right hidden sm:table-cell">Prix</th>
               <th className="py-2 font-bold text-right">Total</th>
             </tr>
           </thead>
           <tbody>
             {receipt.items.map((item, i) => (
               <tr key={`${item.name}-${i}`} className="border-b border-border/60">
-                <td className="py-2.5 pr-2">{item.name}</td>
-                <td className="py-2.5 text-center">{item.quantity}</td>
-                <td className="py-2.5 text-right whitespace-nowrap">{fcfa(item.unitPrice)}</td>
+                <td className="py-2.5 pr-2">{item.name}<span className="block text-xs text-muted-foreground sm:hidden">{fcfa(item.unitPrice)} l’unité</span></td>
+                <td className="py-2.5 px-2 text-center">{item.quantity}</td>
+                <td className="py-2.5 text-right whitespace-nowrap hidden sm:table-cell">{fcfa(item.unitPrice)}</td>
                 <td className="py-2.5 text-right whitespace-nowrap">{fcfa(item.unitPrice * item.quantity)}</td>
               </tr>
             ))}

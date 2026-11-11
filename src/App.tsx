@@ -79,7 +79,7 @@ const PublicStore = () => {
         </Routes>
         <Footer />
       </div>
-      {!isCart && <WhatsAppButton />}
+      {!isCart && location.pathname !== "/checkout" && !location.pathname.startsWith("/commande/") && <WhatsAppButton />}
       {isCart && <Panier />}
     </>
   );

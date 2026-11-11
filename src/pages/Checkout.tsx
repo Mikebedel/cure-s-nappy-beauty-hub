@@ -145,7 +145,7 @@ const Checkout = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto pt-28 pb-12 px-4">
-        <button type="button" onClick={() => openCart()} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-6">
+        <button type="button" onClick={() => openCart()} className="inline-flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary mb-4">
           <ArrowLeft className="h-4 w-4 mr-1" /> Retour au panier
         </button>
 

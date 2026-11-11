@@ -155,9 +155,9 @@ const Index = () => {
             <div className="lg:self-start">
               <dl className="grid grid-cols-3 gap-3 max-w-lg">
                 {home.hero.stats.map((stat) => (
-                  <div key={stat.label} className="surface !rounded-2xl px-4 py-4 flex flex-col-reverse">
-                    <dt className="text-xs uppercase tracking-wider text-muted-foreground mt-1">{stat.label}</dt>
-                    <dd className="font-heading text-2xl md:text-3xl font-bold text-primary">{stat.value}</dd>
+                  <div key={stat.label} className="surface !rounded-2xl px-3 sm:px-4 py-4 flex flex-col-reverse min-w-0">
+                    <dt className="text-[11px] sm:text-xs uppercase tracking-wider text-muted-foreground mt-1">{stat.label}</dt>
+                    <dd className="font-heading text-xl sm:text-2xl md:text-3xl font-bold text-primary break-words">{stat.value}</dd>
                   </div>
                 ))}
               </dl>
