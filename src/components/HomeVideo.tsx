@@ -4,6 +4,8 @@ import { ArrowRight, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getYoutubeId } from "@/lib/youtube";
 import { Button } from "@/components/ui/button";
+import { useContent } from "@/content/ContentProvider";
+import Highlight from "@/content/Highlight";
 
 type Video = { id: string; title: string | null; youtube_url: string };
 
@@ -29,6 +31,7 @@ const VideoFrame = ({ video }: { video: Video }) => {
 const HomeVideo = () => {
   // La vidéo par défaut s'affiche tout de suite ; celles de l'admin la remplacent si elles existent.
   const [videos, setVideos] = useState<Video[]>([FALLBACK]);
+  const text = useContent().content.home.video;
 
   useEffect(() => {
     supabase
@@ -54,15 +57,13 @@ const HomeVideo = () => {
 
           {/* Texte à droite */}
           <div>
-            <span className="eyebrow">En vidéo</span>
+            <span className="eyebrow">{text.eyebrow}</span>
             <h2 className="font-heading font-bold mt-3">
-              Découvrez <span className="text-primary">Cure's Nappy</span>
+              <Highlight title={text.title} highlight={text.highlight} />
             </h2>
-            <p className="mt-5 text-base md:text-lg text-muted-foreground leading-relaxed max-w-xl">
-              Nos soins en action : les textures, les bons gestes et les résultats sur cheveux crépus, bouclés et naturels.
-            </p>
+            <p className="mt-5 text-base md:text-lg text-muted-foreground leading-relaxed max-w-xl">{text.text}</p>
             <ul className="mt-6 space-y-3">
-              {["Les bons gestes pour appliquer chaque soin", "Des routines simples à refaire chez vous", "Le massage du cuir chevelu, étape clé de la pousse"].map((point) => (
+              {text.points.map((point) => (
                 <li key={point} className="flex items-start gap-3">
                   <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground"><Check className="h-3.5 w-3.5" strokeWidth={3} /></span>
                   <span className="text-foreground/90">{point}</span>

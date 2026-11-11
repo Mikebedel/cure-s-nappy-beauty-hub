@@ -7,3 +7,6 @@
 - Centralize add-to-cart feedback in CartProvider and persist the first-add flag separately from cart contents; removing items must not replay onboarding.
 - Use the shared product-grid and ProductCard for catalog layouts; consistent tracks keep small categories compact without stretching items.
 - Keep each range expansion in its own card with start-aligned grid tracks; expanding one range must not stretch sibling cards.
+- All editable site content lives in src/content (types.ts, defaults.ts) and is read through useContent/useCatalog; never hardcode page text, prices, contact details or images in pages. Add a field to SiteContent + defaults + its dashboard screen (src/pages/admin/site) together.
+- Images in content are references: "asset:<file name>" for files in src/assets, or a full URL for uploads; always render them through resolveImage.
+- Dashboard saves to the Supabase table site_content (migration 20261111090000); when the database is unreachable on a dev machine, it saves to localStorage as a local preview only.

@@ -1,7 +1,9 @@
 import { useCartNavigation } from "@/hooks/use-cart-navigation";
 import { useState } from "react";
 import { ShoppingBag, ChevronDown, Check, MessageCircle } from "lucide-react";
-import { gammePacks, duoPacks, accessories, packToProduct, GammePack, Accessory } from "@/data/products";
+import { packToProduct, GammePack, Accessory } from "@/data/products";
+import { useCatalog, useContent } from "@/content/ContentProvider";
+import Highlight from "@/content/Highlight";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import SectionHeading from "@/components/SectionHeading";
@@ -29,53 +31,50 @@ const RangeCard = ({ pack }: { pack: GammePack }) => {
   );
 };
 
-export const GammesSection = () => (
-  <section id="gammes" className="section scroll-mt-24 reveal-section">
-    <div className="container mx-auto">
-      <SectionHeading eyebrow="Routines complètes" title={<>Nos <span className="text-primary">Gammes</span></>} description="Chaque gamme réunit les soins qui vont ensemble pour un objectif capillaire précis." />
-      <div className="product-grid items-start">{gammePacks.map(pack => <RangeCard key={pack.id} pack={pack} />)}</div>
-    </div>
-  </section>
-);
-
-export const DuosSection = () => (
-  <section id="duos" className="section bg-secondary/60 scroll-mt-24">
-    <div className="container mx-auto">
-      <SectionHeading eyebrow="Les combos" title={<>Nos Duos <span className="text-primary">et Trio</span></>} description="Des associations de soins pensées pour agir ensemble." />
-      <div className="product-grid product-grid--3">
-        {duoPacks.map(pack => <RangeCard key={pack.id} pack={pack} />)}
+export const GammesSection = () => {
+  const { ranges } = useCatalog();
+  const heading = useContent().content.shop.rangesHeading;
+  if (!ranges.length) return null;
+  return (
+    <section id="gammes" className="section scroll-mt-24 reveal-section">
+      <div className="container mx-auto">
+        <SectionHeading eyebrow={heading.eyebrow} title={<Highlight title={heading.title} highlight={heading.highlight} />} description={heading.text} />
+        <div className="product-grid items-start">{ranges.map(pack => <RangeCard key={pack.id} pack={pack} />)}</div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
-const setTools = [
-  {
-    title: "Brosse à shampoing en silicone",
-    points: ["Masse délicatement le cuir chevelu", "Aide à décoller les résidus et impuretés", "Stimule la microcirculation grâce au massage", "Transforme le shampoing en moment de détente, sans abîmer tes ongles"],
-  },
-  {
-    title: "Brosse en paille de blé",
-    points: ["Facilite le coiffage", "Répartit uniformément les soins et produits hydratants", "Convient aux cheveux naturels, bouclés, crépus ou défrisés", "Coiffage doux, sans tirer sur les cheveux"],
-  },
-  {
-    title: "Peigne à dents larges",
-    points: ["Démêle en douceur les cheveux épais et texturés", "Respecte la forme naturelle des boucles", "Limite les tiraillements et la casse", "Parfait sur cheveux humides ou pendant un masque"],
-  },
-];
+export const DuosSection = () => {
+  const { duos } = useCatalog();
+  const heading = useContent().content.shop.duosHeading;
+  if (!duos.length) return null;
+  return (
+    <section id="duos" className="section bg-secondary/60 scroll-mt-24">
+      <div className="container mx-auto">
+        <SectionHeading eyebrow={heading.eyebrow} title={<Highlight title={heading.title} highlight={heading.highlight} />} description={heading.text} />
+        <div className="product-grid product-grid--3">
+          {duos.map(pack => <RangeCard key={pack.id} pack={pack} />)}
+        </div>
+      </div>
+    </section>
+  );
+};
 
 const AccessoryCard = ({ item }: { item: Accessory }) => {
   const [color, setColor] = useState(0);
-  const current = item.colors[color];
+  const whatsapp = useContent().content.contact.whatsapp;
+  const current = item.colors[Math.min(color, item.colors.length - 1)] ?? { name: "", swatch: "", image: "" };
+  const colorLabel = current.name ? ` (couleur ${current.name})` : "";
   return (
     <article className="surface overflow-hidden p-2 md:p-3">
       <div className="grid md:grid-cols-2 gap-2 md:gap-8 items-center">
-        <div className="aspect-square overflow-hidden bg-muted rounded-2xl"><img key={current.image} src={current.image} alt={`${item.name} — ${current.name}`} className="w-full h-full object-cover animate-fade-in" /></div>
+        <div className="aspect-square overflow-hidden bg-muted rounded-2xl"><img key={current.image} src={current.image} alt={current.name ? `${item.name} — ${current.name}` : item.name} className="w-full h-full object-cover animate-fade-in" /></div>
         <div className="p-4 md:p-6 md:pl-0 flex flex-col gap-5">
           <h3 className="font-heading font-bold text-2xl md:text-3xl leading-tight">{item.name}</h3>
-          <p className="text-muted-foreground leading-7">Le set d'accessoires qui change tout dans ta routine capillaire : une brosse à shampoing en silicone, une brosse en paille de blé et un peigne à dents larges, réunis dans un sac Cure's Nappy personnalisé.</p>
-          <p className="text-muted-foreground leading-7">Tu prends soin de tes cheveux avec de bons produits, mais utilises-tu aussi les bons outils ? Une belle routine ne s'arrête pas aux soins.</p>
-          <div>
+          {item.intro && <p className="text-muted-foreground leading-7">{item.intro}</p>}
+          {item.hook && <p className="text-muted-foreground leading-7">{item.hook}</p>}
+          {item.colors.length > 1 && <div>
             <p className="text-sm font-semibold mb-2">Couleur : {current.name}</p>
             <div className="flex gap-3">
               {item.colors.map((c, i) => (
@@ -84,17 +83,17 @@ const AccessoryCard = ({ item }: { item: Accessory }) => {
                   style={{ background: c.swatch }} />
               ))}
             </div>
-          </div>
+          </div>}
           {item.price !== null && <p className="font-heading font-bold text-xl text-primary">{item.price.toLocaleString("fr-FR")} FCFA</p>}
-          <Button asChild size="lg" className="w-full sm:w-fit"><a href={`https://wa.me/2250100848479?text=${encodeURIComponent(`Bonjour, je souhaite commander le ${item.name} (couleur ${current.name}).`)}`} target="_blank" rel="noopener noreferrer"><MessageCircle />Commander sur WhatsApp</a></Button>
+          <Button asChild size="lg" className="w-full sm:w-fit"><a href={`https://wa.me/${whatsapp}?text=${encodeURIComponent(`Bonjour, je souhaite commander le ${item.name}${colorLabel}.`)}`} target="_blank" rel="noopener noreferrer"><MessageCircle />Commander sur WhatsApp</a></Button>
         </div>
       </div>
 
       {/* Détail du set : toujours visible, un outil par colonne */}
-      <div className="p-4 md:p-6 pt-8 md:pt-10">
-        <h4 className="font-heading font-semibold text-lg mb-5">Ce que contient le set</h4>
+      {(item.tools.length > 0 || item.why) && <div className="p-4 md:p-6 pt-8 md:pt-10">
+        {item.tools.length > 0 && <h4 className="font-heading font-semibold text-lg mb-5">Ce que contient le set</h4>}
         <div className="grid md:grid-cols-3 gap-4">
-          {setTools.map((tool, index) => (
+          {item.tools.map((tool, index) => (
             <div key={tool.title} className="rounded-2xl bg-secondary/70 p-5">
               <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground font-heading font-bold mb-3">{index + 1}</span>
               <p className="font-heading font-semibold text-foreground mb-3">{tool.title}</p>
@@ -104,17 +103,22 @@ const AccessoryCard = ({ item }: { item: Accessory }) => {
             </div>
           ))}
         </div>
-        <p className="mt-5 rounded-2xl border border-primary/20 bg-primary/5 p-5 text-muted-foreground leading-7"><span className="font-semibold text-foreground">Pourquoi on l'adore ?</span> Ce set réunit les essentiels pour laver, démêler, coiffer et entretenir tes cheveux. Le petit plus : un joli sac Cure's Nappy pour les ranger, les protéger et les emporter partout.</p>
-      </div>
+        {item.why && <p className="mt-5 rounded-2xl border border-primary/20 bg-primary/5 p-5 text-muted-foreground leading-7"><span className="font-semibold text-foreground">Pourquoi on l'adore ?</span> {item.why}</p>}
+      </div>}
     </article>
   );
 };
 
-export const AccessoriesSection = () => (
-  <section id="accessoires" className="section scroll-mt-24">
-    <div className="container mx-auto">
-      <SectionHeading eyebrow="Les bons outils" title="Accessoires" />
-      <div className="grid gap-6">{accessories.map(item => <AccessoryCard key={item.id} item={item} />)}</div>
-    </div>
-  </section>
-);
+export const AccessoriesSection = () => {
+  const { accessories } = useCatalog();
+  const heading = useContent().content.shop.accessoriesHeading;
+  if (!accessories.length) return null;
+  return (
+    <section id="accessoires" className="section scroll-mt-24">
+      <div className="container mx-auto">
+        <SectionHeading eyebrow={heading.eyebrow} title={<Highlight title={heading.title} highlight={heading.highlight} />} />
+        <div className="grid gap-6">{accessories.map(item => <AccessoryCard key={item.id} item={item} />)}</div>
+      </div>
+    </section>
+  );
+};

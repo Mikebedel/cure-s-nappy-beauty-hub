@@ -1,9 +1,11 @@
 import { MessageCircle } from "lucide-react";
+import { useContent } from "@/content/ContentProvider";
 
 const WhatsAppButton = () => {
+  const { contact } = useContent().content;
   return (
     <a
-      href="https://wa.me/c/2250100848479"
+      href={contact.whatsappCatalogUrl}
       target="_blank"
       rel="noopener noreferrer"
       className="fixed bottom-5 right-5 z-40 h-14 w-14 flex items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg ring-2 ring-background hover:bg-primary/90 hover:scale-105 transition-all duration-200"

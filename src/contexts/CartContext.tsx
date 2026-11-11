@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
-import { Product, findCatalogItem } from "@/data/products";
+import { createContext, useContext, useState, useEffect, useMemo, useRef, ReactNode } from "react";
+import { Product } from "@/data/products";
+import { useCatalog } from "@/content/ContentProvider";
 import { Check, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
 
@@ -21,27 +22,34 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [items, setItems] = useState<CartItem[]>(() => {
+  const { findItem } = useCatalog();
+  // On ne garde que l'identifiant et la quantité ; nom, prix et image sont toujours relus
+  // dans le catalogue actuel, pour qu'une modification du dashboard s'applique aussi au panier.
+  const [stored, setStored] = useState<{ id: string; quantity: number }[]>(() => {
     try {
       const saved = localStorage.getItem("curesnappy-cart");
       const parsed: unknown = saved ? JSON.parse(saved) : [];
       if (!Array.isArray(parsed)) return [];
-      // On ne garde que l'identifiant et la quantité : prix, nom et image
-      // sont toujours relus dans le catalogue actuel.
-      return parsed.flatMap((entry): CartItem[] => {
+      return parsed.flatMap((entry) => {
         const id = entry?.id ?? entry?.product?.id;
         const quantity = Math.floor(Number(entry?.quantity));
-        const product = typeof id === "string" ? findCatalogItem(id) : undefined;
-        return product && quantity > 0 ? [{ product, quantity }] : [];
+        return typeof id === "string" && quantity > 0 ? [{ id, quantity }] : [];
       });
     } catch { return []; }
   });
+  const items = useMemo<CartItem[]>(
+    () => stored.flatMap(({ id, quantity }) => {
+      const product = findItem(id);
+      return product ? [{ product, quantity }] : [];
+    }),
+    [stored, findItem],
+  );
   const firstAddShown = useRef(localStorage.getItem("curesnappy-first-add-seen") === "true" || items.length > 0);
 
   useEffect(() => {
-    localStorage.setItem("curesnappy-cart", JSON.stringify(items.map(({ product, quantity }) => ({ id: product.id, quantity }))));
+    localStorage.setItem("curesnappy-cart", JSON.stringify(stored));
     if (firstAddShown.current) localStorage.setItem("curesnappy-first-add-seen", "true");
-  }, [items]);
+  }, [stored]);
 
   const addToCart = (product: Product) => {
     if (!firstAddShown.current) {
@@ -57,19 +65,13 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     } else {
       toast.success(`${product.name} ajouté au panier`, { duration: 2400 });
     }
-    setItems((prev) => {
-      const existing = prev.find((i) => i.product.id === product.id);
-      if (existing) {
-        return prev.map((i) =>
-          i.product.id === product.id ? { ...i, quantity: i.quantity + 1 } : i
-        );
-      }
-      return [...prev, { product, quantity: 1 }];
-    });
+    setStored((prev) => prev.some((i) => i.id === product.id)
+      ? prev.map((i) => (i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i))
+      : [...prev, { id: product.id, quantity: 1 }]);
   };
 
   const removeFromCart = (productId: string) => {
-    setItems((prev) => prev.filter((i) => i.product.id !== productId));
+    setStored((prev) => prev.filter((i) => i.id !== productId));
   };
 
   const updateQuantity = (productId: string, quantity: number) => {
@@ -77,12 +79,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       removeFromCart(productId);
       return;
     }
-    setItems((prev) =>
-      prev.map((i) => (i.product.id === productId ? { ...i, quantity } : i))
-    );
+    setStored((prev) => prev.map((i) => (i.id === productId ? { ...i, quantity } : i)));
   };
 
-  const clearCart = () => setItems([]);
+  const clearCart = () => setStored([]);
 
   const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
   const totalPrice = items.reduce((sum, i) => sum + i.product.price * i.quantity, 0);

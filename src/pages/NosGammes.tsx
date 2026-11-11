@@ -1,15 +1,19 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import { gammes, products, productMatchesCategory } from "@/data/products";
+import { productMatchesCategory } from "@/data/products";
+import { useCatalog, useContent } from "@/content/ContentProvider";
+import Highlight from "@/content/Highlight";
 import ProductCard from "@/components/ProductCard";
 import PageHero from "@/components/PageHero";
 import SectionHeading from "@/components/SectionHeading";
 import { GammesSection, DuosSection } from "@/components/CollectionSections";
 
 const NosGammes = () => {
+  const { products, categories: gammes } = useCatalog();
+  const page = useContent().content.rangesPage;
   return (
     <div className="min-h-screen bg-background">
-      <PageHero eyebrow="Cure's Nappy" title="Nos Gammes" description="Chaque gamme rassemble les soins essentiels pour atteindre un objectif capillaire précis. Économisez en commandant la routine complète." />
+      <PageHero eyebrow={page.eyebrow} title={page.title} description={page.description} />
 
       <GammesSection />
       <DuosSection />
@@ -17,7 +21,7 @@ const NosGammes = () => {
       {/* THEMATIC PRODUCT SECTIONS (ascending price) */}
       <section className="section">
         <div className="container mx-auto space-y-14">
-          <SectionHeading align="center" eyebrow="Thématiques" title={<>Soins par <span className="text-primary">objectif capillaire</span></>} className="!mb-0" />
+          <SectionHeading align="center" eyebrow={page.themesHeading.eyebrow} title={<Highlight title={page.themesHeading.title} highlight={page.themesHeading.highlight} />} className="!mb-0" />
 
           {gammes.map((g) => {
             const gProducts = products

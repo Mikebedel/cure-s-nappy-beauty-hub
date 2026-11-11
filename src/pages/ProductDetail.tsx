@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, ShoppingBag } from "lucide-react";
-import { products, gammes } from "@/data/products";
+import { useCatalog } from "@/content/ContentProvider";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/ProductCard";
@@ -9,6 +9,7 @@ import ProductCard from "@/components/ProductCard";
 const ProductDetail = () => {
   const { id } = useParams();
   const { addToCart } = useCart();
+  const { products, categories: gammes } = useCatalog();
   const product = products.find((p) => p.id === id);
   const [imageIndex, setImageIndex] = useState(0);
 
@@ -52,7 +53,7 @@ const ProductDetail = () => {
 
           {/* Info */}
           <div>
-            {product.gamme !== "hydratation" && <span className="eyebrow">{gammes.find((g) => g.id === product.gamme)?.name}</span>}
+            {gammes.find((g) => g.id === product.gamme) && <span className="eyebrow">{gammes.find((g) => g.id === product.gamme)?.name}</span>}
             <h1 className="font-heading text-3xl md:text-4xl font-bold mt-2 mb-3">{product.name}</h1>
             {product.volume && <p className="text-muted-foreground mb-4">{product.volume}</p>}
 
@@ -72,25 +73,27 @@ const ProductDetail = () => {
             <div className="border-t border-border pt-6 mb-6">
               <h2 className="font-heading text-lg font-semibold mb-3">Le soin en détail</h2>
               <p className="text-base text-muted-foreground leading-7 mb-6">{product.description}</p>
-              <h3 className="font-heading font-semibold mb-3">Bienfaits indiqués par la marque</h3>
-              <ul className="space-y-2 list-disc pl-5">
-                {product.benefits.map((b) => (
-                  <li key={b} className="text-base text-muted-foreground">{b}</li>
-                ))}
-              </ul>
+              {product.benefits.length > 0 && <>
+                <h3 className="font-heading font-semibold mb-3">Bienfaits indiqués par la marque</h3>
+                <ul className="space-y-2 list-disc pl-5">
+                  {product.benefits.map((b) => (
+                    <li key={b} className="text-base text-muted-foreground">{b}</li>
+                  ))}
+                </ul>
+              </>}
             </div>
 
             {/* Usage */}
-            <div className="border-t border-border pt-6 mb-6">
+            {product.usage && <div className="border-t border-border pt-6 mb-6">
               <h3 className="font-heading font-semibold mb-2">Conseils d'utilisation</h3>
               <p className="text-base leading-7 text-muted-foreground">{product.usage}</p>
-            </div>
+            </div>}
 
             {/* Ingredients */}
-            <div className="border-t border-border pt-6">
+            {product.ingredients.length > 0 && <div className="border-t border-border pt-6">
               <h3 className="font-heading font-semibold mb-2">Ingrédients</h3>
               <p className="text-base leading-7 text-muted-foreground">{product.ingredients.join(" · ")}</p>
-            </div>
+            </div>}
           </div>
         </div>
 

@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { products, gammes, productMatchesCategory } from "@/data/products";
+import { productMatchesCategory } from "@/data/products";
+import { useCatalog, useContent } from "@/content/ContentProvider";
+import Highlight from "@/content/Highlight";
 import { Button } from "@/components/ui/button";
 import { GammesSection, DuosSection, AccessoriesSection } from "@/components/CollectionSections";
 import ProductCard from "@/components/ProductCard";
@@ -8,6 +10,8 @@ import SectionHeading from "@/components/SectionHeading";
 import BoutiqueSpotlight from "@/components/BoutiqueSpotlight";
 
 const Boutique = () => {
+  const { products, categories: gammes } = useCatalog();
+  const heading = useContent().content.shop.catalogHeading;
   const [searchParams] = useSearchParams();
   const requestedGamme = searchParams.get("gamme");
   const linkedGamme = gammes.some((g) => g.id === requestedGamme) ? requestedGamme : null;
@@ -25,7 +29,7 @@ const Boutique = () => {
 
   const filtered = useMemo(
     () => (activeFilter === "all" ? products : products.filter((p) => productMatchesCategory(p, activeFilter))),
-    [activeFilter],
+    [activeFilter, products],
   );
 
   return (
@@ -39,7 +43,7 @@ const Boutique = () => {
 
       {/* CATALOGUE */}
       <section id="catalogue" className="container mx-auto pt-12 pb-16 md:pb-24 scroll-mt-24">
-        <SectionHeading eyebrow="La collection" title={<>Tous les <span className="text-primary">soins</span></>} className="!mb-8"
+        <SectionHeading eyebrow={heading.eyebrow} title={<Highlight title={heading.title} highlight={heading.highlight} />} className="!mb-8"
           action={<div className="text-sm text-muted-foreground" aria-live="polite">{filtered.length} soin{filtered.length > 1 ? "s" : ""}</div>} />
 
         {/* Filtres */}

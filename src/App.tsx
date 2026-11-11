@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { CartProvider } from "@/contexts/CartContext";
+import { ContentProvider, useContent } from "@/content/ContentProvider";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -24,7 +25,15 @@ import AdminLogin from "./pages/admin/AdminLogin";
 import AdminLayout from "./layouts/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminOrders from "./pages/admin/AdminOrders";
-import AdminProducts from "./pages/admin/AdminProducts";
+import SiteHome from "./pages/admin/site/SiteHome";
+import SiteShop from "./pages/admin/site/SiteShop";
+import SiteProducts from "./pages/admin/site/SiteProducts";
+import SiteRanges from "./pages/admin/site/SiteRanges";
+import SiteAccessories from "./pages/admin/site/SiteAccessories";
+import SiteAdvice from "./pages/admin/site/SiteAdvice";
+import SiteAbout from "./pages/admin/site/SiteAbout";
+import SiteContact from "./pages/admin/site/SiteContact";
+import SiteDelivery from "./pages/admin/site/SiteDelivery";
 import AdminClients from "./pages/admin/AdminClients";
 import AdminAnalytics from "./pages/admin/AdminAnalytics";
 import AdminMarketing from "./pages/admin/AdminMarketing";
@@ -37,6 +46,10 @@ const queryClient = new QueryClient();
 
 const ProtectedAdmin = ({ children }: { children: React.ReactNode }) => {
   const { user, isAdmin, loading } = useAuth();
+  const { status, localPreview } = useContent();
+  if (status === "checking") return <div className="min-h-screen flex items-center justify-center">Chargement...</div>;
+  // Sur l'ordinateur de développement, base coupée : on ouvre le dashboard en aperçu local.
+  if (localPreview) return <>{children}</>;
   if (loading) return <div className="min-h-screen flex items-center justify-center">Chargement...</div>;
   if (!user) return <Navigate to="/admin/login" replace />;
   if (!isAdmin) return <Navigate to="/" replace />;
@@ -74,6 +87,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <AuthProvider>
+        <ContentProvider>
         <CartProvider>
           <Toaster />
           <Sonner />
@@ -92,7 +106,15 @@ const App = () => (
               }>
                 <Route index element={<AdminDashboard />} />
                 <Route path="commandes" element={<AdminOrders />} />
-                <Route path="produits" element={<AdminProducts />} />
+                <Route path="produits" element={<SiteProducts />} />
+                <Route path="site/accueil" element={<SiteHome />} />
+                <Route path="site/boutique" element={<SiteShop />} />
+                <Route path="site/gammes" element={<SiteRanges />} />
+                <Route path="site/accessoires" element={<SiteAccessories />} />
+                <Route path="site/conseils" element={<SiteAdvice />} />
+                <Route path="site/a-propos" element={<SiteAbout />} />
+                <Route path="site/contact" element={<SiteContact />} />
+                <Route path="site/livraison" element={<SiteDelivery />} />
                 <Route path="clients" element={<AdminClients />} />
                 <Route path="analytics" element={<AdminAnalytics />} />
                 <Route path="marketing" element={<AdminMarketing />} />
@@ -107,6 +129,7 @@ const App = () => (
             </Routes>
           </BrowserRouter>
         </CartProvider>
+        </ContentProvider>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>

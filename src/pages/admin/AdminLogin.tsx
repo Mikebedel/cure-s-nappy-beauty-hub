@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Lock, Mail, UserPlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useContent } from "@/content/ContentProvider";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
@@ -16,6 +17,7 @@ const AdminLogin = () => {
   const { signIn } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { localPreview } = useContent();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,6 +81,12 @@ const AdminLogin = () => {
           </p>
         </CardHeader>
         <CardContent>
+          {localPreview && (
+            <div className="mb-6 rounded-2xl border border-accent/50 bg-accent/10 p-4 text-sm space-y-3">
+              <p><strong>La base de données est coupée.</strong> Sur cet ordinateur, vous pouvez quand même ouvrir le dashboard en aperçu local : vos modifications resteront dans ce navigateur.</p>
+              <Button type="button" className="w-full" onClick={() => navigate("/admin/site/accueil")}>Ouvrir l'aperçu local</Button>
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="email">Email</Label>

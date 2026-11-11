@@ -9,37 +9,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useCartNavigation } from "@/hooks/use-cart-navigation";
+import { useContent } from "@/content/ContentProvider";
 
-const communes = [
-  { name: "Cocody", zone: "abidjan" },
-  { name: "Plateau", zone: "abidjan" },
-  { name: "Marcory", zone: "abidjan" },
-  { name: "Treichville", zone: "abidjan" },
-  { name: "Koumassi", zone: "abidjan" },
-  { name: "Adjamé", zone: "abidjan" },
-  { name: "Abobo", zone: "abidjan" },
-  { name: "Yopougon", zone: "abidjan" },
-  { name: "Riviera", zone: "abidjan" },
-  { name: "Bingerville", zone: "abidjan" },
-  { name: "Songon", zone: "abidjan" },
-  { name: "Port-Bouët", zone: "special" },
-  { name: "Grand-Bassam", zone: "special" },
-  { name: "Anyama", zone: "special" },
-  { name: "Gonzagueville", zone: "special" },
-];
 
-const paymentMethods = [
-  { id: "wave", name: "Wave" },
-  { id: "orange-money", name: "Orange Money" },
-  { id: "mtn-momo", name: "MTN MoMo" },
-  { id: "moov-money", name: "Moov Money" },
-  { id: "djamo", name: "Djamo" },
-];
-
-const WHATSAPP_NUMBER = "2250100848479";
 
 const Checkout = () => {
   const { items, totalPrice, clearCart } = useCart();
+  const { delivery, contact } = useContent().content;
+  const WHATSAPP_NUMBER = contact.whatsapp;
+  const communes = delivery.communes.map((c) => ({ name: c.name, zone: c.special ? "special" : "abidjan" }));
+  const paymentMethods = delivery.paymentMethods.map((name) => ({ id: name.toLowerCase().replace(/\s+/g, "-"), name }));
   const { toast } = useToast();
   const navigate = useNavigate();
   const openCart = useCartNavigation();
@@ -53,7 +32,7 @@ const Checkout = () => {
   const [loading, setLoading] = useState(false);
 
   const selectedCommune = communes.find(c => c.name === form.commune);
-  const deliveryFee = selectedCommune ? (selectedCommune.zone === "special" ? 2000 : 1500) : 0;
+  const deliveryFee = selectedCommune ? (selectedCommune.zone === "special" ? delivery.specialFee : delivery.standardFee) : 0;
   const grandTotal = totalPrice + deliveryFee;
 
   const handleChange = (field: string, value: string) => {
@@ -149,8 +128,8 @@ const Checkout = () => {
       <div className="container mx-auto pt-32 pb-16 max-w-2xl">
         <h1 className="font-heading font-bold mb-5">Commande reçue</h1>
         <p className="mb-4">Votre commande {confirmation.number} a été enregistrée pour un montant de <strong>{confirmation.total.toLocaleString("fr-FR")} FCFA</strong>, livraison incluse.</p>
-        <p className="text-muted-foreground mb-6">Le paiement n’est pas encore confirmé. Poursuivez sur Fineo Pay pour régler votre commande. Notre équipe vous contactera pour finaliser la livraison.</p>
-        <Button asChild className="mb-4"><a href="https://app.fineopay.com/cures_nappy/marie_marcelle/checkout" target="_blank" rel="noopener noreferrer">Payer sur Fineo Pay <CreditCard /></a></Button>
+        <p className="text-muted-foreground mb-6">Le paiement n’est pas encore confirmé. Poursuivez avec le paiement en ligne pour régler votre commande. Notre équipe vous contactera pour finaliser la livraison.</p>
+        <Button asChild className="mb-4"><a href={delivery.paymentUrl} target="_blank" rel="noopener noreferrer">{delivery.paymentLabel} <CreditCard /></a></Button>
         <Button variant="ghost" className="block" onClick={() => navigate("/")}>Retour à l’accueil</Button>
       </div>
     );
@@ -227,8 +206,8 @@ const Checkout = () => {
                   </div>
                 </div>
                 <p className="mt-3 text-sm text-muted-foreground">
-                  Hors Abidjan ou à l’étranger ? Nous expédions partout en Côte d’Ivoire et à l’international :{" "}
-                  <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer" className="font-semibold text-primary underline underline-offset-2">écrivez-nous sur WhatsApp</a> pour organiser l’envoi.
+                  {delivery.outsideNote}{" "}
+                  <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer" className="font-semibold text-primary underline underline-offset-2">Écrire sur WhatsApp</a>
                 </p>
                 {form.commune && (
                   <div className="mt-4 flex items-center gap-2 text-sm bg-primary/10 text-primary p-3 rounded-2xl">
@@ -297,7 +276,7 @@ const Checkout = () => {
                 {loading ? "Traitement..." : "Valider la commande"}
               </Button>
               <p className="text-sm text-muted-foreground text-center mt-3">
-                Vous serez invité à payer sur Fineo Pay après l’enregistrement. Le paiement sera confirmé séparément.
+                Vous serez invité à payer en ligne après l’enregistrement. Le paiement sera confirmé séparément.
               </p>
               {failed && (
                 <div role="alert" className="mt-5 rounded-2xl border border-destructive/40 bg-destructive/5 p-4 text-sm">
