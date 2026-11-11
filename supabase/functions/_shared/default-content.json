@@ -765,10 +765,12 @@
         }
       ]
     },
-    "paymentMethods": [
-      "Wave",
-      "Orange Money",
-      "MTN MoMo"
+    "onlineMethods": [
+      "wave",
+      "orange",
+      "mtn",
+      "moov",
+      "djamo"
     ],
     "onlinePayment": true,
     "payLater": true

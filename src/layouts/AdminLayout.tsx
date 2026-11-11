@@ -3,7 +3,9 @@ import {
   LayoutDashboard, ShoppingCart, Package, Users, BarChart3, Megaphone, Star, FileText, MessageSquare, Video,
   LogOut, Menu, Home, Store, Layers, Sparkles, BookOpen, Info, Phone, Truck, ExternalLink, Save, Undo2, Loader2, AlertTriangle, CloudOff, Cloud,
 } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { toast } from "sonner";
+import { useIdleSignOut, useNoIndex } from "@/admin/useAdminGuards";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useContent } from "@/content/ContentProvider";
@@ -90,6 +92,15 @@ const AdminShell = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { signOut, user } = useAuth();
   const { dirty } = useDraft();
+  useNoIndex();
+
+  // Session réelle (hors aperçu local) : déconnexion après 30 minutes d'inactivité.
+  const onIdle = useCallback(async () => {
+    await signOut();
+    toast.info("Déconnecté après 30 minutes d'inactivité.");
+    navigate("/admin/login");
+  }, [signOut, navigate]);
+  useIdleSignOut(!!user, onIdle);
 
   const handleSignOut = async () => {
     await signOut();

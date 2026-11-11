@@ -18,9 +18,9 @@ Points vérifiés et sans problème : le fichier `.env` ne contient que la clé 
 ## À faire dans la console Supabase (quand la base sera activée)
 
 1. **Supprimer la fonction `create-admin` déjà en ligne.** Console Supabase → Edge Functions → `create-admin` → Delete. Tant qu'elle existe en ligne, la faille critique reste ouverte. Par précaution, le dossier `supabase/functions/create-admin` contient maintenant une version désactivée (elle répond toujours « fonction désactivée ») : si les fonctions sont redéployées depuis ce code avant la suppression, elle remplace l'ancienne. Une fois la fonction supprimée dans Supabase, supprimez aussi ce dossier.
-2. **Appliquer les migrations** du dossier `supabase/migrations` (Lovable le fait d'habitude en recevant le code) : `20261111090000_site_content.sql` et `20261111120000_orders_hardening.sql`.
+2. **Appliquer toutes les migrations** du dossier `supabase/migrations`, dans l'ordre (Lovable le fait d'habitude en recevant le code).
 3. **Fermer les inscriptions publiques** : Authentication → Sign In / Providers → Email → désactiver « Allow new users to sign up ».
-4. **Créer votre compte admin** :
+4. **Créer votre compte admin** (la double authentification sera demandée à la première connexion) :
    - Authentication → Users → Add user → votre e-mail et un mot de passe long (au moins 14 caractères), cocher « Auto confirm ».
    - SQL Editor, puis exécuter (avec votre e-mail) :
      ```sql
@@ -34,30 +34,51 @@ Points vérifiés et sans problème : le fichier `.env` ne contient que la clé 
    Supprimez toute ligne que vous ne reconnaissez pas, puis changez votre mot de passe.
 6. Activer la protection contre les mots de passe divulgués (Authentication → Policies) si elle est proposée.
 
-## Paiement en ligne Paystack : mise en service
+## Paiement en ligne Jèko : mise en service
 
-Le code est prêt ; il reste à le relier à votre compte Paystack. Tout se fait d'abord en **mode test** (clés `sk_test_…`, aucun argent réel), puis en mode réel avec les clés `sk_live_…`.
+Jèko encaisse Wave, Orange Money, MTN, Moov et Djamo (1,5 % TTC par paiement, argent disponible tout de suite). **Jèko n'a pas de mode test** : on teste avec de vrais petits montants (100 FCFA) sur une boutique Jèko dédiée aux essais.
 
-1. **Migrations** : appliquer aussi `20261112090000_online_payment.sql` (colonnes de paiement, journal des notifications ; elle retire toute écriture directe des commandes depuis le navigateur).
-2. **Secrets des fonctions** (Supabase → Edge Functions → Secrets). Ils ne doivent **jamais** être mis dans le code ni dans `.env` :
+1. **Compte Jèko Business** (application ou https://business.jeko.africa) : compléter « Création du compte » dans « Augmenter votre plafond », sinon l'API répond « business_not_enabled_for_api_access ».
+2. **Clés** : Paramètres → API & Webhooks → « Créer une clé API ». Noter la clé, son identifiant et l'identifiant du magasin.
+3. **Webhook** : même écran, créer un webhook vers
+   `https://<identifiant-du-projet>.supabase.co/functions/v1/jeko-webhook`
+   et **copier le secret affiché une seule fois**.
+4. **Secrets des fonctions** (Supabase → Edge Functions → Secrets). Ils ne doivent **jamais** être mis dans le code ni dans `.env` :
    | Nom | Valeur |
    |---|---|
-   | `PAYSTACK_SECRET_KEY` | clé secrète Paystack (Settings → API Keys & Webhooks) |
-   | `SITE_URL` | adresse du site, ex. `https://curesnappy.ci` (retour après paiement) |
+   | `JEKO_API_KEY` | clé API Jèko |
+   | `JEKO_API_KEY_ID` | identifiant de la clé |
+   | `JEKO_STORE_ID` | identifiant du magasin |
+   | `JEKO_WEBHOOK_SECRET` | secret du webhook |
+   | `SITE_URL` | adresse du site en **https**, ex. `https://curesnappy.ci` (retour après paiement) |
    | `ALLOWED_ORIGINS` | adresses autorisées à appeler les fonctions, séparées par des virgules |
    | `RESEND_API_KEY` | facultatif : clé Resend pour envoyer le reçu par e-mail |
-   | `RECEIPT_FROM_EMAIL` | facultatif : expéditeur, ex. `Cure's Nappy <commandes@curesnappy.ci>` (domaine vérifié chez Resend) |
-3. **Déployer les fonctions** `create-order`, `order-receipt`, `paystack-webhook` et `generate-invoice`. `paystack-webhook` est déployée sans vérification de compte (réglé dans `supabase/config.toml`) : c'est la signature Paystack qui l'authentifie.
-4. **Dans Paystack** (Settings → API Keys & Webhooks), renseigner l'adresse de notification :
-   `https://<identifiant-du-projet>.supabase.co/functions/v1/paystack-webhook`
-5. **Tester** une commande en mode test (Paystack fournit des numéros et cartes de test), vérifier qu'elle passe « payée » dans le dashboard et que le reçu s'affiche. Puis remplacer la clé de test par la clé réelle et faire un vrai paiement de faible montant.
+   | `RECEIPT_FROM_EMAIL` | facultatif : expéditeur, ex. `Cure's Nappy <commandes@curesnappy.ci>` |
+5. **Déployer les fonctions** `create-order`, `order-receipt`, `jeko-webhook`, `generate-invoice` et `create-admin` (version désactivée). `jeko-webhook` est déployée sans vérification de compte (réglé dans `supabase/config.toml`) : c'est la signature Jèko qui l'authentifie.
+6. **Option recommandée** : dans Jèko → Restriction par adresse IP, rien à faire tant que les fonctions tournent chez Supabase (adresses variables).
+7. **Tester** une commande de 100 FCFA avec chaque moyen de paiement, vérifier qu'elle passe « payée » dans le dashboard et que le reçu s'affiche.
 
 Ce qui protège les paiements :
-- le navigateur n'envoie que les articles et les quantités ; **le serveur recalcule prix, livraison et total** à partir du catalogue publié ;
-- une commande n'est marquée « payée » que si **Paystack le confirme** : notification signée (HMAC SHA-512 vérifiée), puis vérification directe auprès de Paystack, **montant et devise contrôlés**, traitement une seule fois ;
-- les données de carte et de Mobile Money restent chez Paystack ; le site ne les voit jamais ;
+- le navigateur n'envoie que les articles, les quantités, la destination et le moyen de paiement ; **le serveur recalcule prix, livraison et total** ;
+- une commande n'est marquée « payée » que si **Jèko le confirme** : notification signée (HMAC SHA-256 vérifiée en temps constant), puis **état redemandé directement à Jèko**, référence, devise et montant contrôlés, traitement une seule fois ;
+- un paiement en échec est enregistré comme tel, jamais comme payé ;
+- les données de paiement restent chez Jèko et l'opérateur ; le site ne les voit jamais ;
 - le reçu n'est accessible qu'avec son lien secret (identifiant aléatoire) ;
 - au plus 5 commandes par numéro de téléphone toutes les 15 minutes.
+
+## Administration : double authentification et protections
+
+- **Double authentification obligatoire** : après le mot de passe, l'administration demande un code à 6 chiffres d'une application (Google Authenticator, Microsoft Authenticator, Authy). À la première connexion, l'écran affiche un QR code à scanner.
+- **Vérifiée aussi par la base** (migration `20261112130000_admin_mfa.sql`) : sans le code, le rôle admin ne donne accès à rien, même avec le bon mot de passe. Un mot de passe volé ne suffit donc pas.
+- Blocage de 60 secondes après 5 mots de passe ou 5 codes faux ; message d'erreur qui ne dit pas si c'est l'e-mail ou le mot de passe.
+- Déconnexion automatique après 30 minutes sans activité.
+- Pages d'administration exclues de Google (`robots.txt` et balise noindex).
+- **Téléphone perdu** : dans Supabase → Authentication → Users → votre compte, supprimez le facteur « totp » ; à la connexion suivante, un nouveau QR code s'affiche.
+
+À régler dans Supabase (Authentication) :
+- vérifier que **MFA → TOTP** est activé (c'est le cas par défaut) ;
+- longueur minimale des mots de passe : 12 caractères ; protection contre les mots de passe divulgués ;
+- facultatif : CAPTCHA (Turnstile ou hCaptcha) sur la connexion.
 
 ## Reste à faire
 

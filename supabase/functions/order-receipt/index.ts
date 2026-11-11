@@ -1,10 +1,10 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders, json } from "../_shared/http.ts";
-import { confirmPayment, secretKey } from "../_shared/paystack.ts";
+import { confirmPayment, jekoConfigured } from "../_shared/jeko.ts";
 
 /**
  * Renvoie le reçu d'une commande à partir de son jeton secret (présent dans le lien du reçu).
- * Si le paiement en ligne est encore en attente, revérifie son état auprès de Paystack.
+ * Si le paiement en ligne est encore en attente, revérifie son état auprès de Jèko.
  */
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders(req) });
@@ -18,8 +18,8 @@ Deno.serve(async (req) => {
   let { data: order } = await db.from("orders").select("*").eq("receipt_token", token).maybeSingle();
   if (!order) return json(req, { error: "Reçu introuvable." }, 404);
 
-  if (order.payment_method === "paystack" && order.payment_status !== "payee" && order.payment_reference && secretKey()) {
-    if ((await confirmPayment(db, order.payment_reference)) === "paid") {
+  if (order.payment_method === "jeko" && order.payment_status === "en_attente" && order.payment_reference && jekoConfigured()) {
+    if (["paid", "failed"].includes(await confirmPayment(db, order.payment_reference))) {
       order = (await db.from("orders").select("*").eq("id", order.id).single()).data ?? order;
     }
   }

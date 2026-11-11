@@ -8,6 +8,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Lock, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useContent } from "@/content/ContentProvider";
+import { useNoIndex } from "@/admin/useAdminGuards";
+
+const MAX_ATTEMPTS = 5;
+const LOCK_SECONDS = 60;
 
 /**
  * Connexion à l'administration. Il n'y a volontairement aucune inscription ici :
@@ -21,15 +25,28 @@ const AdminLogin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { localPreview } = useContent();
+  const [attempts, setAttempts] = useState(0);
+  const [lockedUntil, setLockedUntil] = useState(0);
+  useNoIndex();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Frein aux essais en série (Supabase limite aussi les tentatives côté serveur).
+    if (Date.now() < lockedUntil) {
+      toast({ title: "Trop de tentatives", description: `Patientez ${Math.ceil((lockedUntil - Date.now()) / 1000)} secondes.`, variant: "destructive" });
+      return;
+    }
     setLoading(true);
     const { error } = await signIn(email.trim(), password);
+    setPassword("");
     if (error) {
+      const next = attempts + 1;
+      setAttempts(next >= MAX_ATTEMPTS ? 0 : next);
+      if (next >= MAX_ATTEMPTS) setLockedUntil(Date.now() + LOCK_SECONDS * 1000);
       // Message volontairement vague : on ne dit pas si c'est l'e-mail ou le mot de passe qui est faux.
-      toast({ title: "Erreur de connexion", description: "Email ou mot de passe incorrect.", variant: "destructive" });
+      toast({ title: "Erreur de connexion", description: next >= MAX_ATTEMPTS ? `Trop de tentatives. Patientez ${LOCK_SECONDS} secondes.` : "Email ou mot de passe incorrect.", variant: "destructive" });
     } else {
+      // La double authentification est demandée à l'étape suivante.
       navigate("/admin");
     }
     setLoading(false);

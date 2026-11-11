@@ -4,7 +4,7 @@ import defaults from "./default-content.json" with { type: "json" };
 
 export interface ServerSettings {
   catalog: PricingCatalog;
-  delivery: PricingDelivery & { onlinePayment: boolean; payLater: boolean };
+  delivery: PricingDelivery & { onlinePayment: boolean; payLater: boolean; onlineMethods: string[] };
   whatsapp: string;
 }
 

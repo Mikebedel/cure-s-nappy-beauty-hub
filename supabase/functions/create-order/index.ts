@@ -2,13 +2,13 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders, json } from "../_shared/http.ts";
 import { loadSettings } from "../_shared/content.ts";
 import { priceOrder, checkCustomer } from "../_shared/pricing.ts";
-import { initializePayment, secretKey } from "../_shared/paystack.ts";
+import { createPaymentRequest, jekoConfigured, JEKO_METHODS, type JekoMethod } from "../_shared/jeko.ts";
 import { sendReceiptEmail } from "../_shared/email.ts";
 
 /**
  * Enregistre une commande. Le navigateur n'envoie que les articles (identifiant + quantité)
  * et les coordonnées : les prix, les frais et le total sont recalculés ici.
- * En paiement en ligne, renvoie l'adresse de la page de paiement Paystack.
+ * En paiement en ligne, renvoie l'adresse de la page de paiement Jèko.
  */
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders(req) });
@@ -22,11 +22,15 @@ Deno.serve(async (req) => {
     const settings = await loadSettings(db);
 
     const online = body.payment === "online";
-    const onlineAvailable = settings.delivery.onlinePayment && !!secretKey();
+    const onlineAvailable = settings.delivery.onlinePayment && jekoConfigured();
     if (online && !onlineAvailable) return json(req, { error: "Le paiement en ligne n'est pas disponible pour le moment." }, 400);
+    const method = body.method as JekoMethod;
+    if (online && (!JEKO_METHODS.includes(method) || !settings.delivery.onlineMethods.includes(method))) {
+      return json(req, { error: "Choisissez votre moyen de paiement." }, 400);
+    }
     if (!online && !settings.delivery.payLater) return json(req, { error: "Merci de choisir le paiement en ligne." }, 400);
 
-    const customerError = checkCustomer(customer, online);
+    const customerError = checkCustomer(customer, false);
     if (customerError) return json(req, { error: customerError }, 400);
 
     const priced = priceOrder(settings.catalog, settings.delivery, body.items, body.destination);
@@ -59,7 +63,8 @@ Deno.serve(async (req) => {
       delivery_fee_confirmed: priced.feeConfirmed,
       subtotal: priced.subtotal,
       total: priced.total,
-      payment_method: online ? "paystack" : "a_regler",
+      payment_method: online ? "jeko" : "a_regler",
+      payment_channel: online ? method : null,
       payment_status: "en_attente",
       payment_reference: online ? orderNumber : null,
       status: "nouvelle",
@@ -86,15 +91,16 @@ Deno.serve(async (req) => {
 
     const siteUrl = (Deno.env.get("SITE_URL") ?? req.headers.get("Origin") ?? "").replace(/\/$/, "");
     try {
-      const paymentUrl = await initializePayment({
-        email: email!,
+      const receiptUrl = `${siteUrl}/commande/${order.receipt_token}`;
+      const payment = await createPaymentRequest({
         amount: priced.total,
         reference: orderNumber,
-        callbackUrl: `${siteUrl}/commande/${order.receipt_token}`,
-        metadata: { order_number: orderNumber, customer_name: customerName, phone },
+        method,
+        successUrl: receiptUrl,
+        errorUrl: `${receiptUrl}?paiement=echec`,
       });
-      await db.from("orders").update({ payment_url: paymentUrl }).eq("id", order.id);
-      return json(req, { orderNumber, receiptToken: order.receipt_token, paymentUrl });
+      await db.from("orders").update({ payment_provider_id: payment.id, payment_url: payment.redirectUrl }).eq("id", order.id);
+      return json(req, { orderNumber, receiptToken: order.receipt_token, paymentUrl: payment.redirectUrl });
     } catch (error) {
       console.error("Ouverture du paiement impossible", error);
       await db.from("orders").update({ status: "annulee" }).eq("id", order.id);

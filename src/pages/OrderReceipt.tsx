@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { CheckCircle2, Clock, Printer, MessageCircle, Share2, Loader2, CreditCard, AlertCircle, Link2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useContent } from "@/content/ContentProvider";
 import wordmark from "@/assets/brand-wordmark.png";
+import { paymentMethodLabels } from "@/content/payment";
 
 interface Receipt {
   orderNumber: string;
@@ -32,11 +33,13 @@ interface Receipt {
 
 const fcfa = (n: number) => `${n.toLocaleString("fr-FR")} FCFA`;
 const date = (iso: string) => new Date(iso).toLocaleString("fr-FR", { dateStyle: "long", timeStyle: "short" });
-const channelLabel: Record<string, string> = { mobile_money: "Mobile Money", card: "Carte bancaire", bank: "Banque", apple_pay: "Apple Pay" };
+const channelLabel: Record<string, string> = { ...paymentMethodLabels, jeko: "Compte Jèko" };
 
 /** Page de confirmation et reçu d'une commande, à l'adresse /commande/<jeton secret>. */
 const OrderReceipt = () => {
   const { token = "" } = useParams();
+  const [search] = useSearchParams();
+  const returnedWithError = search.get("paiement") === "echec";
   const { contact } = useContent().content;
   const [receipt, setReceipt] = useState<Receipt | null>(null);
   const [error, setError] = useState(false);
@@ -50,8 +53,9 @@ const OrderReceipt = () => {
 
   useEffect(() => { load(); }, [load]);
 
-  // Retour de Paystack : le paiement peut mettre quelques secondes à être confirmé.
-  const waiting = receipt?.paymentMethod === "paystack" && receipt.paymentStatus !== "payee" && receipt.status !== "annulee";
+  // Retour de Jèko : le paiement peut mettre quelques secondes à être confirmé.
+  const waiting = receipt?.paymentMethod === "jeko" && receipt.paymentStatus === "en_attente" && receipt.status !== "annulee";
+  const failed = receipt?.paymentMethod === "jeko" && receipt.paymentStatus === "echouee";
   useEffect(() => {
     if (!waiting || checks >= 15) return;
     const timer = setTimeout(() => { setChecks((c) => c + 1); load(); }, 4000);
@@ -96,11 +100,21 @@ const OrderReceipt = () => {
             <Clock className="h-10 w-10 mb-3 text-accent" />
             <h1 className="font-heading font-bold !text-3xl md:!text-4xl mb-2">Paiement en attente</h1>
             <p className="text-muted-foreground text-lg mb-4">
-              {checks < 15 ? "Nous vérifions votre paiement auprès de Paystack…" : "Nous n’avons pas encore reçu la confirmation de votre paiement."} Si vous n’avez pas terminé le paiement, vous pouvez le reprendre.
+              {returnedWithError ? "Le paiement ne semble pas avoir abouti." : checks < 15 ? "Nous vérifions votre paiement auprès de Jèko…" : "Nous n’avons pas encore reçu la confirmation de votre paiement."} Si vous n’avez pas terminé le paiement, vous pouvez le reprendre.
             </p>
             <div className="flex flex-wrap gap-3">
               {receipt.paymentUrl && <Button asChild size="lg"><a href={receipt.paymentUrl}><CreditCard />Reprendre le paiement</a></Button>}
               <Button size="lg" variant="outline" onClick={() => { setChecks(0); load(); }}><Loader2 className={checks < 15 ? "animate-spin" : ""} />Vérifier à nouveau</Button>
+            </div>
+          </>
+        ) : failed ? (
+          <>
+            <AlertCircle className="h-10 w-10 mb-3 text-destructive" />
+            <h1 className="font-heading font-bold !text-3xl md:!text-4xl mb-2">Paiement non abouti</h1>
+            <p className="text-muted-foreground text-lg mb-4">Aucun montant n’a été débité pour cette commande. Vous pouvez repasser commande ou nous écrire sur WhatsApp, nous vous aidons à finaliser.</p>
+            <div className="flex flex-wrap gap-3">
+              <Button asChild size="lg"><Link to="/boutique">Repasser commande</Link></Button>
+              <Button asChild size="lg" variant="outline"><a href={`https://wa.me/${contact.whatsapp}?text=${encodeURIComponent(`Bonjour, mon paiement pour la commande ${receipt.orderNumber} n'a pas abouti.`)}`} target="_blank" rel="noopener noreferrer"><MessageCircle />Écrire sur WhatsApp</a></Button>
             </div>
           </>
         ) : receipt.status === "annulee" ? (
@@ -186,8 +200,8 @@ const OrderReceipt = () => {
         </div>
 
         <div className="mt-6 rounded-2xl bg-secondary/70 p-4 text-sm">
-          <p><strong>Statut du paiement :</strong> {paid ? `Payé${receipt.paidAt ? ` le ${date(receipt.paidAt)}` : ""}` : receipt.status === "annulee" ? "Annulé" : "En attente"}</p>
-          {receipt.paymentMethod === "paystack" && <p><strong>Moyen :</strong> Paiement en ligne Paystack{receipt.paymentChannel ? ` (${channelLabel[receipt.paymentChannel] ?? receipt.paymentChannel})` : ""}</p>}
+          <p><strong>Statut du paiement :</strong> {paid ? `Payé${receipt.paidAt ? ` le ${date(receipt.paidAt)}` : ""}` : failed ? "Non abouti" : receipt.status === "annulee" ? "Annulé" : "En attente"}</p>
+          {receipt.paymentMethod === "jeko" && <p><strong>Moyen :</strong> Paiement en ligne Jèko{receipt.paymentChannel ? ` (${channelLabel[receipt.paymentChannel] ?? receipt.paymentChannel})` : ""}</p>}
           {receipt.paymentMethod === "a_regler" && <p><strong>Moyen :</strong> À régler avec notre équipe</p>}
         </div>
 

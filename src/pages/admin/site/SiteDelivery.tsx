@@ -1,6 +1,7 @@
 import { useDraft } from "@/admin/DraftContext";
 import RestoreButton from "@/admin/RestoreButton";
-import { PageTitle, Panel, Grid, TextField, NumberField, LinesField, ToggleField, Repeater } from "@/admin/fields";
+import { PageTitle, Panel, Grid, TextField, NumberField, LinesField, ToggleField, ChecklistField, Repeater } from "@/admin/fields";
+import { paymentMethodLabels, type OnlineMethod } from "@/content/payment";
 
 const feeText = (fee: number | null) => (fee === null ? "à confirmer" : `${fee.toLocaleString("fr-FR")} FCFA`);
 
@@ -58,11 +59,14 @@ const SiteDelivery = () => {
       </Panel>
 
       <Panel title="Paiement">
-        <ToggleField label="Proposer le paiement en ligne (Paystack)" checked={draft.delivery.onlinePayment} onChange={(v) => update((d) => { d.delivery.onlinePayment = v; })}
-          hint="Wave, Orange Money, MTN et carte bancaire. Il faut aussi que la clé secrète Paystack soit configurée sur le serveur." />
+        <ToggleField label="Proposer le paiement en ligne (Jèko)" checked={draft.delivery.onlinePayment} onChange={(v) => update((d) => { d.delivery.onlinePayment = v; })}
+          hint="Il faut aussi que les clés Jèko soient configurées sur le serveur (voir SECURITE.md)." />
+        <ChecklistField label="Moyens de paiement en ligne proposés" value={draft.delivery.onlineMethods}
+          onChange={(v) => update((d) => { d.delivery.onlineMethods = (Object.keys(paymentMethodLabels) as OnlineMethod[]).filter((m) => v.includes(m)); })}
+          options={(Object.keys(paymentMethodLabels) as OnlineMethod[]).map((m) => ({ value: m, label: paymentMethodLabels[m] }))}
+          hint="Seuls les moyens activés sur votre compte Jèko fonctionneront." />
         <ToggleField label="Proposer « Payer plus tard »" checked={draft.delivery.payLater} onChange={(v) => update((d) => { d.delivery.payLater = v; })}
           hint="La commande est enregistrée et l'équipe recontacte le client sur WhatsApp. Toujours utilisé quand les frais d'expédition sont à confirmer." />
-        <LinesField label="Moyens de paiement affichés" value={draft.delivery.paymentMethods} onChange={(v) => update((d) => { d.delivery.paymentMethods = v; })} hint="Texte affiché sous « Payer maintenant ». Un moyen par ligne." />
       </Panel>
     </div>
   );

@@ -24,6 +24,7 @@ import OrderReceipt from "./pages/OrderReceipt";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminLayout from "./layouts/AdminLayout";
+import AdminMfa from "./admin/AdminMfa";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminOrders from "./pages/admin/AdminOrders";
 import SiteHome from "./pages/admin/site/SiteHome";
@@ -46,7 +47,7 @@ import AdminVideos from "./pages/admin/AdminVideos";
 const queryClient = new QueryClient();
 
 const ProtectedAdmin = ({ children }: { children: React.ReactNode }) => {
-  const { user, isAdmin, loading } = useAuth();
+  const { user, isAdmin, aal, loading } = useAuth();
   const { status, localPreview } = useContent();
   if (status === "checking") return <div className="min-h-screen flex items-center justify-center">Chargement...</div>;
   // Sur l'ordinateur de développement, base coupée : on ouvre le dashboard en aperçu local.
@@ -54,6 +55,8 @@ const ProtectedAdmin = ({ children }: { children: React.ReactNode }) => {
   if (loading) return <div className="min-h-screen flex items-center justify-center">Chargement...</div>;
   if (!user) return <Navigate to="/admin/login" replace />;
   if (!isAdmin) return <Navigate to="/" replace />;
+  // Mot de passe validé : il faut encore le code de la double authentification.
+  if (aal !== "aal2") return <AdminMfa />;
   return <>{children}</>;
 };
 

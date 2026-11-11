@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useCartNavigation } from "@/hooks/use-cart-navigation";
 import { useContent } from "@/content/ContentProvider";
+import { paymentMethodLabels, type OnlineMethod } from "@/content/payment";
 
 type PaymentChoice = "online" | "later";
 type DeliveryMode = "abidjan" | "national" | "international";
@@ -40,6 +41,7 @@ const Checkout = () => {
   });
   const modes: DeliveryMode[] = ["abidjan", ...(delivery.national.enabled ? ["national" as const] : []), ...(delivery.international.enabled ? ["international" as const] : [])];
   const [mode, setMode] = useState<DeliveryMode>("abidjan");
+  const [method, setMethod] = useState<OnlineMethod | "">(delivery.onlineMethods[0] ?? "");
   const [loading, setLoading] = useState(false);
   const [failed, setFailed] = useState<string | null>(null);
 
@@ -64,8 +66,12 @@ const Checkout = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.firstName || !form.lastName || !form.phone || !form.address || (online && !form.email)) {
-      toast({ title: "Champs manquants", description: online ? "Remplissez tous les champs, e-mail compris : il sert à recevoir votre reçu." : "Veuillez remplir tous les champs obligatoires.", variant: "destructive" });
+    if (!form.firstName || !form.lastName || !form.phone || !form.address) {
+      toast({ title: "Champs manquants", description: "Veuillez remplir tous les champs obligatoires.", variant: "destructive" });
+      return;
+    }
+    if (online && !method) {
+      toast({ title: "Paiement", description: "Choisissez votre moyen de paiement.", variant: "destructive" });
       return;
     }
     if ("error" in resolved) {
@@ -79,6 +85,7 @@ const Checkout = () => {
     const { data, error } = await supabase.functions.invoke("create-order", {
       body: {
         payment: online ? "online" : "later",
+        method: online ? method : undefined,
         items: items.map(({ product, quantity }) => ({ id: product.id, quantity })),
         destination: destinationInput,
         customer: { firstName: form.firstName, lastName: form.lastName, phone: form.phone, email: form.email, address: form.address },
@@ -95,7 +102,7 @@ const Checkout = () => {
 
     clearCart();
     if (data.paymentUrl) {
-      // Page de paiement sécurisée de Paystack ; elle renvoie ensuite vers le reçu.
+      // Page de paiement sécurisée de Jèko ; elle renvoie ensuite vers le reçu.
       window.location.assign(data.paymentUrl);
       return;
     }
@@ -172,9 +179,9 @@ const Checkout = () => {
                     <Input id="phone" required maxLength={20} autoComplete="tel" type="tel" value={form.phone} onChange={(e) => handleChange("phone", e.target.value)} placeholder="+225 07 00 00 00 00" />
                   </div>
                   <div>
-                    <Label htmlFor="email">E-mail{online ? " *" : ""}</Label>
-                    <Input id="email" required={online} maxLength={120} autoComplete="email" type="email" value={form.email} onChange={(e) => handleChange("email", e.target.value)} placeholder="votre@email.com" />
-                    {online && <p className="text-xs text-muted-foreground mt-1">Pour recevoir votre reçu.</p>}
+                    <Label htmlFor="email">E-mail (facultatif)</Label>
+                    <Input id="email" maxLength={120} autoComplete="email" type="email" value={form.email} onChange={(e) => handleChange("email", e.target.value)} placeholder="votre@email.com" />
+                    <p className="text-xs text-muted-foreground mt-1">Pour recevoir votre reçu par e-mail.</p>
                   </div>
                 </div>
               </div>
@@ -292,9 +299,22 @@ const Checkout = () => {
                     <CreditCard className="h-5 w-5 text-primary" /> Paiement
                   </h2>
                   <div className="grid sm:grid-cols-2 gap-3">
-                    {delivery.onlinePayment && choiceCard("online", "Payer maintenant", `${delivery.paymentMethods.join(", ")} ou carte bancaire, sur la page sécurisée de Paystack.`, ShieldCheck)}
+                    {delivery.onlinePayment && choiceCard("online", "Payer maintenant", `${delivery.onlineMethods.map((m) => paymentMethodLabels[m]).join(", ")}, sur la page sécurisée de Jèko.`, ShieldCheck)}
                     {delivery.payLater && choiceCard("later", "Payer plus tard", "Votre commande est enregistrée et notre équipe vous contacte sur WhatsApp pour le paiement.", MessageCircle)}
                   </div>
+                  {online && delivery.onlineMethods.length > 0 && (
+                    <div className="mt-4">
+                      <p id="method-label" className="text-sm font-semibold mb-2">Payer avec</p>
+                      <div role="radiogroup" aria-labelledby="method-label" className="flex flex-wrap gap-2">
+                        {delivery.onlineMethods.map((m) => (
+                          <button key={m} type="button" role="radio" aria-checked={method === m} onClick={() => setMethod(m)}
+                            className={`min-h-11 rounded-full border px-4 text-sm font-semibold transition-colors ${method === m ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card hover:border-primary/60"}`}>
+                            {paymentMethodLabels[m]}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -328,7 +348,7 @@ const Checkout = () => {
               </Button>
               <p className="text-sm text-muted-foreground text-center mt-3">
                 {online
-                  ? "Vous allez être redirigé vers Paystack. Cure's Nappy ne voit ni ne conserve vos données de carte ou de Mobile Money."
+                  ? `Vous allez être redirigé vers Jèko pour payer avec ${method ? paymentMethodLabels[method] : "votre Mobile Money"}. Cure's Nappy ne voit ni ne conserve vos données de paiement.`
                   : "Vous recevrez un reçu tout de suite ; le paiement se fait ensuite avec notre équipe."}
               </p>
               {failed && (

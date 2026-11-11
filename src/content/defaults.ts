@@ -86,7 +86,7 @@ export const defaultContent: SiteContent = {
         { name: "Reste du monde", fee: null, delay: "", countries: ["Arabie saoudite", "Australie", "Brésil", "Chine", "Émirats arabes unis", "Haïti", "Inde", "Japon", "Liban", "Qatar", "Turquie"] },
       ],
     },
-    paymentMethods: ["Wave", "Orange Money", "MTN MoMo"],
+    onlineMethods: ["wave", "orange", "mtn", "moov", "djamo"],
     onlinePayment: true,
     payLater: true,
   },

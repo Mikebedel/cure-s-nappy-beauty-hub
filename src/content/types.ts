@@ -88,8 +88,9 @@ export interface SiteContent {
     national: { enabled: boolean; delay: string; cities: { name: string; fee: number | null }[]; allowOther: boolean };
     /** Expédition à l'étranger, par zone de pays. Frais vides = à confirmer par l'équipe. */
     international: { enabled: boolean; zones: { name: string; fee: number | null; delay: string; countries: string[] }[]; allowOther: boolean };
-    paymentMethods: string[];
-    /** Paiement en ligne (Paystack) proposé à la commande. */
+    /** Moyens proposés pour le paiement en ligne Jèko. */
+    onlineMethods: ("wave" | "orange" | "mtn" | "moov" | "djamo")[];
+    /** Paiement en ligne (Jèko) proposé à la commande. */
     onlinePayment: boolean;
     /** Commande sans paiement en ligne : l'équipe recontacte le client sur WhatsApp. */
     payLater: boolean;
