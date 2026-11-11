@@ -17,7 +17,7 @@ Points vérifiés et sans problème : le fichier `.env` ne contient que la clé 
 
 ## À faire dans la console Supabase (quand la base sera activée)
 
-1. **Supprimer la fonction `create-admin` déjà en ligne.** La retirer du code ne l'efface pas du serveur. Console Supabase → Edge Functions → `create-admin` → Delete. Tant qu'elle existe en ligne, la faille critique reste ouverte.
+1. **Supprimer la fonction `create-admin` déjà en ligne.** Console Supabase → Edge Functions → `create-admin` → Delete. Tant qu'elle existe en ligne, la faille critique reste ouverte. Par précaution, le dossier `supabase/functions/create-admin` contient maintenant une version désactivée (elle répond toujours « fonction désactivée ») : si les fonctions sont redéployées depuis ce code avant la suppression, elle remplace l'ancienne. Une fois la fonction supprimée dans Supabase, supprimez aussi ce dossier.
 2. **Appliquer les migrations** du dossier `supabase/migrations` (Lovable le fait d'habitude en recevant le code) : `20261111090000_site_content.sql` et `20261111120000_orders_hardening.sql`.
 3. **Fermer les inscriptions publiques** : Authentication → Sign In / Providers → Email → désactiver « Allow new users to sign up ».
 4. **Créer votre compte admin** :
