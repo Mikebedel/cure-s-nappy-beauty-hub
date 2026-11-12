@@ -7,6 +7,17 @@ const API = "https://api.jeko.africa/partner_api";
 export const JEKO_METHODS = ["wave", "orange", "mtn", "moov", "djamo"] as const;
 export type JekoMethod = (typeof JEKO_METHODS)[number];
 
+/** MTN et Moov : l'opérateur envoie une demande de validation sur le téléphone, sans page à ouvrir. */
+export const PUSH_METHODS: JekoMethod[] = ["mtn", "moov"];
+
+/** Numéro ivoirien au format attendu par Jèko (225 + 01/05/07 + 8 chiffres), ou null s'il est invalide. */
+export function normalizePayerPhone(raw: unknown): string | null {
+  let digits = typeof raw === "string" ? raw.replace(/\D/g, "") : "";
+  if (digits.startsWith("00225")) digits = digits.slice(2);
+  if (digits.length === 10) digits = `225${digits}`;
+  return /^225(01|05|07)\d{8}$/.test(digits) ? `+${digits}` : null;
+}
+
 const env = (name: string) => Deno.env.get(name) ?? "";
 /** Vrai quand les clés Jèko sont configurées sur le serveur. */
 export const jekoConfigured = () => !!(env("JEKO_API_KEY") && env("JEKO_API_KEY_ID") && env("JEKO_STORE_ID"));
@@ -18,7 +29,7 @@ const headers = () => ({
 });
 
 /** Crée la demande de paiement ; Jèko renvoie l'adresse où envoyer la cliente. Montants en centimes (× 100). */
-export async function createPaymentRequest(params: { amount: number; reference: string; method: JekoMethod; successUrl: string; errorUrl: string }) {
+export async function createPaymentRequest(params: { amount: number; reference: string; method: JekoMethod; payerPhone: string; successUrl: string; errorUrl: string }) {
   const res = await fetch(`${API}/payment_requests`, {
     method: "POST",
     headers: headers(),
@@ -27,7 +38,9 @@ export async function createPaymentRequest(params: { amount: number; reference: 
       amountCents: params.amount * 100,
       currency: "XOF",
       reference: params.reference,
-      paymentDetails: { type: "redirect", data: { paymentMethod: params.method, successUrl: params.successUrl, errorUrl: params.errorUrl } },
+      // Mode direct : le numéro est saisi sur le site, la cliente va droit chez son opérateur
+      // (Wave, Orange, Djamo) ou reçoit une demande à valider sur son téléphone (MTN, Moov).
+      paymentDetails: { type: "redirect", data: { paymentMethod: params.method, forceProviderDirect: true, payerPhone: params.payerPhone, successUrl: params.successUrl, errorUrl: params.errorUrl } },
     }),
   });
   const body = await res.json().catch(() => null);

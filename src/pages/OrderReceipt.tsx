@@ -40,6 +40,9 @@ const OrderReceipt = () => {
   const { token = "" } = useParams();
   const [search] = useSearchParams();
   const returnedWithError = search.get("paiement") === "echec";
+  const awaitingPhone = search.get("attente") === "telephone";
+  // MTN / Moov : on laisse jusqu'à 3 minutes pour valider sur le téléphone.
+  const maxChecks = awaitingPhone ? 45 : 15;
   const { contact } = useContent().content;
   const [receipt, setReceipt] = useState<Receipt | null>(null);
   const [error, setError] = useState(false);
@@ -57,10 +60,10 @@ const OrderReceipt = () => {
   const waiting = receipt?.paymentMethod === "jeko" && receipt.paymentStatus === "en_attente" && receipt.status !== "annulee";
   const failed = receipt?.paymentMethod === "jeko" && receipt.paymentStatus === "echouee";
   useEffect(() => {
-    if (!waiting || checks >= 15) return;
+    if (!waiting || checks >= maxChecks) return;
     const timer = setTimeout(() => { setChecks((c) => c + 1); load(); }, 4000);
     return () => clearTimeout(timer);
-  }, [waiting, checks, load]);
+  }, [waiting, checks, load, maxChecks]);
 
   if (error) {
     return (
@@ -98,13 +101,13 @@ const OrderReceipt = () => {
         ) : waiting ? (
           <>
             <Clock className="h-10 w-10 mb-3 text-accent" />
-            <h1 className="font-heading font-bold !text-3xl md:!text-4xl mb-2">Paiement en attente</h1>
+            <h1 className="font-heading font-bold !text-3xl md:!text-4xl mb-2">{awaitingPhone ? "Validez le paiement sur votre téléphone" : "Paiement en attente"}</h1>
             <p className="text-muted-foreground text-lg mb-4">
-              {returnedWithError ? "Le paiement ne semble pas avoir abouti." : checks < 15 ? "Nous vérifions votre paiement auprès de Jèko…" : "Nous n’avons pas encore reçu la confirmation de votre paiement."} Si vous n’avez pas terminé le paiement, vous pouvez le reprendre.
+              {returnedWithError ? "Le paiement ne semble pas avoir abouti." : awaitingPhone && checks < maxChecks ? "Une demande de paiement vient d’être envoyée sur votre téléphone. Validez-la avec votre code secret Mobile Money : cette page se met à jour toute seule." : checks < maxChecks ? "Nous vérifions votre paiement auprès de Jèko…" : "Nous n’avons pas encore reçu la confirmation de votre paiement."}{receipt.paymentUrl ? " Si vous n’avez pas terminé le paiement, vous pouvez le reprendre." : ""}
             </p>
             <div className="flex flex-wrap gap-3">
               {receipt.paymentUrl && <Button asChild size="lg"><a href={receipt.paymentUrl}><CreditCard />Reprendre le paiement</a></Button>}
-              <Button size="lg" variant="outline" onClick={() => { setChecks(0); load(); }}><Loader2 className={checks < 15 ? "animate-spin" : ""} />Vérifier à nouveau</Button>
+              <Button size="lg" variant="outline" onClick={() => { setChecks(0); load(); }}><Loader2 className={checks < maxChecks ? "animate-spin" : ""} />Vérifier à nouveau</Button>
             </div>
           </>
         ) : failed ? (

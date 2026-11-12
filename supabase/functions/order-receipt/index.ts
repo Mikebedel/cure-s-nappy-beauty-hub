@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
     paymentChannel: order.payment_channel,
     paymentStatus: order.payment_status,
     status: order.status,
-    // Lien pour reprendre un paiement abandonné.
-    paymentUrl: order.payment_status === "payee" || order.status === "annulee" ? null : order.payment_url,
+    // Lien pour reprendre un paiement abandonné (pas pour MTN/Moov, validés sur le téléphone).
+    paymentUrl: order.payment_status === "payee" || order.status === "annulee" || ["mtn", "moov"].includes(order.payment_channel) ? null : order.payment_url,
   });
 });

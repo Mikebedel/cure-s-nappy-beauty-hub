@@ -42,6 +42,7 @@ const Checkout = () => {
   const modes: DeliveryMode[] = ["abidjan", ...(delivery.national.enabled ? ["national" as const] : []), ...(delivery.international.enabled ? ["international" as const] : [])];
   const [mode, setMode] = useState<DeliveryMode>("abidjan");
   const [method, setMethod] = useState<OnlineMethod | "">(delivery.onlineMethods[0] ?? "");
+  const [payerPhone, setPayerPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const [failed, setFailed] = useState<string | null>(null);
 
@@ -74,6 +75,10 @@ const Checkout = () => {
       toast({ title: "Paiement", description: "Choisissez votre moyen de paiement.", variant: "destructive" });
       return;
     }
+    if (online && !/^(\+?225|00225)?(01|05|07)\d{8}$/.test((payerPhone || form.phone).replace(/[\s.\-()]/g, ""))) {
+      toast({ title: "Numéro de paiement", description: "Indiquez le numéro Mobile Money qui va payer : 10 chiffres commençant par 01, 05 ou 07.", variant: "destructive" });
+      return;
+    }
     if ("error" in resolved) {
       toast({ title: "Livraison", description: resolved.error, variant: "destructive" });
       return;
@@ -86,6 +91,7 @@ const Checkout = () => {
       body: {
         payment: online ? "online" : "later",
         method: online ? method : undefined,
+        payerPhone: online ? (payerPhone || form.phone) : undefined,
         items: items.map(({ product, quantity }) => ({ id: product.id, quantity })),
         destination: destinationInput,
         customer: { firstName: form.firstName, lastName: form.lastName, phone: form.phone, email: form.email, address: form.address },
@@ -102,11 +108,12 @@ const Checkout = () => {
 
     clearCart();
     if (data.paymentUrl) {
-      // Page de paiement sécurisée de Jèko ; elle renvoie ensuite vers le reçu.
+      // Page de paiement de l'opérateur ; elle renvoie ensuite vers le reçu.
       window.location.assign(data.paymentUrl);
       return;
     }
-    navigate(`/commande/${data.receiptToken}`);
+    // MTN / Moov : la demande arrive sur le téléphone, le reçu attend la validation.
+    navigate(`/commande/${data.receiptToken}${data.awaitingPhone ? "?attente=telephone" : ""}`);
   };
 
   // Secours si l'enregistrement échoue : la commande part sur WhatsApp.
@@ -312,6 +319,17 @@ const Checkout = () => {
                             {paymentMethodLabels[m]}
                           </button>
                         ))}
+                      </div>
+                      <div className="mt-4 max-w-sm">
+                        <Label htmlFor="payerPhone">Numéro {method ? paymentMethodLabels[method] : "Mobile Money"} qui va payer *</Label>
+                        <Input id="payerPhone" type="tel" inputMode="tel" autoComplete="tel" maxLength={20} value={payerPhone} placeholder={form.phone || "07 00 00 00 00"}
+                          onChange={(e) => setPayerPhone(e.target.value)} />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {method === "mtn" || method === "moov"
+                            ? "Vous recevrez une demande de paiement sur ce téléphone : validez-la avec votre code secret."
+                            : "Vous serez dirigé vers votre application pour valider le paiement."}
+                          {!payerPhone && form.phone ? " Laissez vide pour utiliser votre numéro de téléphone." : ""}
+                        </p>
                       </div>
                     </div>
                   )}

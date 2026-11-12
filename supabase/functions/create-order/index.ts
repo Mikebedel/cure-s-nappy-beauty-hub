@@ -2,7 +2,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders, json } from "../_shared/http.ts";
 import { loadSettings } from "../_shared/content.ts";
 import { priceOrder, checkCustomer } from "../_shared/pricing.ts";
-import { createPaymentRequest, jekoConfigured, JEKO_METHODS, type JekoMethod } from "../_shared/jeko.ts";
+import { createPaymentRequest, jekoConfigured, normalizePayerPhone, JEKO_METHODS, PUSH_METHODS, type JekoMethod } from "../_shared/jeko.ts";
 import { sendReceiptEmail } from "../_shared/email.ts";
 
 /**
@@ -27,6 +27,10 @@ Deno.serve(async (req) => {
     const method = body.method as JekoMethod;
     if (online && (!JEKO_METHODS.includes(method) || !settings.delivery.onlineMethods.includes(method))) {
       return json(req, { error: "Choisissez votre moyen de paiement." }, 400);
+    }
+    const payerPhone = online ? normalizePayerPhone(body.payerPhone) : null;
+    if (online && !payerPhone) {
+      return json(req, { error: "Numéro de paiement invalide : un numéro ivoirien qui commence par 01, 05 ou 07 (10 chiffres)." }, 400);
     }
     if (!online && !settings.delivery.payLater) return json(req, { error: "Merci de choisir le paiement en ligne." }, 400);
 
@@ -96,11 +100,14 @@ Deno.serve(async (req) => {
         amount: priced.total,
         reference: orderNumber,
         method,
+        payerPhone: payerPhone!,
         successUrl: receiptUrl,
         errorUrl: `${receiptUrl}?paiement=echec`,
       });
       await db.from("orders").update({ payment_provider_id: payment.id, payment_url: payment.redirectUrl }).eq("id", order.id);
-      return json(req, { orderNumber, receiptToken: order.receipt_token, paymentUrl: payment.redirectUrl });
+      // MTN et Moov : rien à ouvrir, la cliente valide sur son téléphone pendant que le reçu attend la confirmation.
+      const push = PUSH_METHODS.includes(method);
+      return json(req, { orderNumber, receiptToken: order.receipt_token, paymentUrl: push ? null : payment.redirectUrl, awaitingPhone: push });
     } catch (error) {
       console.error("Ouverture du paiement impossible", error);
       await db.from("orders").update({ status: "annulee" }).eq("id", order.id);

@@ -82,3 +82,15 @@ Deno.test("paiement en échec : commande marquée échouée, jamais payée", asy
   assertEquals(await confirmPayment(db, "CN-5"), "failed");
   assertEquals(db.updates[0].payment_status, "echouee");
 });
+
+import { normalizePayerPhone } from "./jeko.ts";
+
+Deno.test("numéro de paiement : formats ivoiriens acceptés, le reste refusé", () => {
+  assertEquals(normalizePayerPhone("07 00 00 00 00"), "+2250700000000");
+  assertEquals(normalizePayerPhone("+225 05 12 34 56 78"), "+2250512345678");
+  assertEquals(normalizePayerPhone("00225 01 23 45 67 89"), "+2250123456789");
+  assertEquals(normalizePayerPhone("06 00 00 00 00"), null);
+  assertEquals(normalizePayerPhone("+33 6 12 34 56 78"), null);
+  assertEquals(normalizePayerPhone("0700"), null);
+  assertEquals(normalizePayerPhone(undefined), null);
+});
