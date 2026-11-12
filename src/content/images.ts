@@ -5,13 +5,11 @@
  * Passer par une clé évite de stocker des adresses qui changent à chaque mise en ligne.
  */
 const bundled = import.meta.glob("/src/assets/*.{jpg,jpeg,png,webp}", { eager: true, query: "?url", import: "default" }) as Record<string, string>;
-const hosted = import.meta.glob("/src/assets/*.asset.json", { eager: true, import: "default" }) as Record<string, { url: string }>;
 
-const keyOf = (path: string) => path.split("/").pop()!.replace(/\.asset\.json$/, "").replace(/\.(jpe?g|png|webp)$/i, "");
+const keyOf = (path: string) => path.split("/").pop()!.replace(/\.(jpe?g|png|webp)$/i, "");
 
 const registry = new Map<string, string>();
 for (const [path, url] of Object.entries(bundled)) registry.set(keyOf(path), url);
-for (const [path, file] of Object.entries(hosted)) registry.set(keyOf(path), file.url);
 
 const HIDDEN = new Set(["brand-wordmark"]);
 

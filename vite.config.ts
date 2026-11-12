@@ -11,14 +11,6 @@ export default defineConfig(({ mode }) => ({
     hmr: {
       overlay: false,
     },
-    // Les images ajoutées depuis Lovable (/__l5e/...) ne sont pas dans le dépôt :
-    // en local, on les relaie depuis l'hébergement du projet.
-    proxy: {
-      "/__l5e": {
-        target: "https://fb665217-bd65-48fc-a4a6-acb21186e21b.lovableproject.com",
-        changeOrigin: true,
-      },
-    },
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {
