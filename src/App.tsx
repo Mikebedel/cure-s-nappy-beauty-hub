@@ -15,6 +15,7 @@ import Index from "./pages/Index";
 import Boutique from "./pages/Boutique";
 import NosGammes from "./pages/NosGammes";
 import Conseils from "./pages/Conseils";
+import ArticlePage from "./pages/ArticlePage";
 import APropos from "./pages/APropos";
 import Contact from "./pages/Contact";
 import ProductDetail from "./pages/ProductDetail";
@@ -73,6 +74,7 @@ const PublicStore = () => {
           <Route path="/boutique" element={<Boutique />} />
           <Route path="/nos-gammes" element={<NosGammes />} />
           <Route path="/conseils" element={<Conseils />} />
+          <Route path="/conseils/:id" element={<ArticlePage />} />
           <Route path="/a-propos" element={<APropos />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/produit/:id" element={<ProductDetail />} />

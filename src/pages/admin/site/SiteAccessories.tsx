@@ -6,7 +6,7 @@ const SiteAccessories = () => {
   const { accessories } = draft.catalog;
   return (
     <div className="space-y-4">
-      <PageTitle title="Accessoires" description="Les accessoires de la boutique, commandés sur WhatsApp." />
+      <PageTitle title="Accessoires" description="Les accessoires de la boutique, ajoutés au panier comme les soins (un article par couleur)." />
 
       <Panel title={`Accessoires (${accessories.length})`} defaultOpen>
         <Repeater items={accessories} onChange={(v) => update((d) => { d.catalog.accessories = v; })}
@@ -17,7 +17,7 @@ const SiteAccessories = () => {
             <>
               <Grid>
                 <TextField label="Nom" value={a.name} onChange={(name) => change({ ...a, name })} />
-                <NumberField label="Prix (FCFA)" value={a.price} allowEmpty onChange={(price) => change({ ...a, price })} hint="Laissez vide pour ne pas afficher de prix." />
+                <NumberField label="Prix (FCFA)" value={a.price} allowEmpty onChange={(price) => change({ ...a, price })} hint="Indispensable pour le vendre en ligne : sans prix, la boutique affiche « Bientôt disponible » à la place du bouton Ajouter au panier." />
               </Grid>
               <TextField label="Présentation" multiline value={a.intro} onChange={(intro) => change({ ...a, intro })} />
               <TextField label="Accroche" multiline value={a.hook} onChange={(hook) => change({ ...a, hook })} />

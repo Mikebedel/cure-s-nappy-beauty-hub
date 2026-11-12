@@ -67,6 +67,14 @@ describe("priceOrder", () => {
     expect(priceOrder(catalog, delivery, lines, destination).ok).toBe(false);
   });
 
+  it("accessoire : prix du dashboard, couleur vérifiée, refusé sans prix", () => {
+    const withPrice = { ...catalog, accessories: catalog.accessories.map((x) => ({ ...x, price: 12000 })) };
+    expect(priceOrder(withPrice, delivery, [{ id: "acc-set-peignes-brosses::Vert", quantity: 2 }], abidjan("Cocody")))
+      .toMatchObject({ ok: true, subtotal: 24000, lines: [{ name: "Set de peignes & brosses Cure's Nappy — Vert" }] });
+    expect(priceOrder(withPrice, delivery, [{ id: "acc-set-peignes-brosses::Rose", quantity: 1 }], abidjan("Cocody")).ok).toBe(false);
+    expect(priceOrder(catalog, delivery, [{ id: "acc-set-peignes-brosses::Vert", quantity: 1 }], abidjan("Cocody")).ok).toBe(false);
+  });
+
   it("refuse un produit masqué dans le dashboard", () => {
     const hidden = { ...catalog, products: catalog.products.map((p) => (p.id === "1" ? { ...p, visible: false } : p)) };
     expect(priceOrder(hidden, delivery, [{ id: "1", quantity: 1 }], abidjan("Cocody")).ok).toBe(false);

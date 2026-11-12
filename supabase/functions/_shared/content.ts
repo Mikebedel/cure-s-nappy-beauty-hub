@@ -18,6 +18,7 @@ export async function loadSettings(db: SupabaseClient): Promise<ServerSettings> 
       products: Array.isArray(catalog.products) ? catalog.products : defaults.catalog.products,
       ranges: Array.isArray(catalog.ranges) ? catalog.ranges : defaults.catalog.ranges,
       duos: Array.isArray(catalog.duos) ? catalog.duos : defaults.catalog.duos,
+      accessories: Array.isArray(catalog.accessories) ? catalog.accessories : defaults.catalog.accessories,
     },
     delivery: { ...defaults.delivery, ...(stored.delivery ?? {}) },
     whatsapp: stored.contact?.whatsapp ?? "2250100848479",

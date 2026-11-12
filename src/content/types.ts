@@ -2,7 +2,8 @@
  * Tout le contenu modifiable du site, édité depuis le dashboard (/admin).
  * Les images sont des références : « asset:nom-du-fichier » ou une adresse complète.
  * Les textes longs (RichText) acceptent une mise en forme simple :
- *   ligne vide = nouveau paragraphe, « ## Titre », « - puce », « 1. étape », **gras**.
+ *   ligne vide = nouveau paragraphe, « ## Titre », « - puce », « 1. étape », **gras**,
+ *   « > encadré à retenir » et [texte du lien](https://adresse).
  */
 export type RichText = string;
 export type ImageRef = string;
@@ -63,11 +64,18 @@ export interface AccessoryContent {
 }
 
 export interface ArticleContent {
+  /** Sert aussi d'adresse : /conseils/<id>. */
   id: string;
   icon: string;
   title: string;
   intro: string;
+  /** Photo d'en-tête (facultative). */
+  image?: ImageRef;
   body: RichText;
+  /** Sources citées en bas de l'article. */
+  references?: { title: string; url: string }[];
+  /** Soins Cure's Nappy proposés en fin d'article. */
+  productIds?: string[];
 }
 
 export interface SiteContent {

@@ -1,49 +1,30 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, Clock, ArrowRight } from "lucide-react";
 import type { ArticleContent } from "@/content/types";
 import { useContent } from "@/content/ContentProvider";
 import { iconFor } from "@/content/icons";
-import RichText from "@/content/RichText";
+import { resolveImage } from "@/content/images";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogDescription,
-} from "@/components/ui/dialog";
 import PageHero from "@/components/PageHero";
 
+/** Carte d'article : mène à la page complète de l'article. */
 const ItemCard = ({ item }: { item: ArticleContent }) => {
   const Icon = iconFor(item.icon);
-  const [open, setOpen] = useState(false);
+  const minutes = Math.max(1, Math.round(item.body.split(/\s+/).filter(Boolean).length / 200));
+  const cover = resolveImage(item.image);
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <button className="product-card text-left bg-card border border-border/80 rounded-3xl p-6 md:p-7 group flex flex-col h-full">
-          <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-5"><Icon className="h-6 w-6" strokeWidth={1.6} /></span>
-          <h3 className="font-heading text-lg font-bold mb-2 leading-tight">{item.title}</h3>
-          <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{item.intro}</p>
-          <span className="mt-auto text-sm font-semibold text-primary group-hover:underline">
-            Lire l'article →
-          </span>
-        </button>
-      </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto rounded-3xl">
-        <DialogHeader>
-          <div className="flex items-center gap-3 mb-2">
-            <Icon className="h-5 w-5 shrink-0 text-primary" strokeWidth={1.5} />
-            <DialogTitle className="font-heading text-xl md:text-2xl text-left">
-              {item.title}
-            </DialogTitle>
-          </div>
-          <DialogDescription className="text-left">{item.intro}</DialogDescription>
-        </DialogHeader>
-        <RichText text={item.body} className="pt-2 space-y-4 text-sm text-muted-foreground" />
-      </DialogContent>
-    </Dialog>
+    <Link to={`/conseils/${item.id}`} className="product-card text-left bg-card border border-border/80 rounded-3xl overflow-hidden group flex flex-col h-full">
+      {cover && <img src={cover} alt="" loading="lazy" className="aspect-[16/9] w-full object-cover" />}
+      <div className="p-6 md:p-7 flex flex-col flex-1">
+        <div className="flex items-center justify-between gap-3 mb-5">
+          <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary"><Icon className="h-6 w-6" strokeWidth={1.6} /></span>
+          <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground"><Clock className="h-3.5 w-3.5" />{minutes} min</span>
+        </div>
+        <h3 className="font-heading text-lg font-bold mb-2 leading-tight">{item.title}</h3>
+        <p className="text-sm text-muted-foreground line-clamp-3 mb-4">{item.intro}</p>
+        <span className="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-primary">Lire l'article <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" /></span>
+      </div>
+    </Link>
   );
 };
 

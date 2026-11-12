@@ -5,6 +5,7 @@ import { resolveImage } from "./images";
 import { BackendStatus, clearDraft, loadDraft, loadRemote, mergeContent, saveDraft, saveRemote } from "./store";
 import type { Accessory, GammePack, Product } from "@/data/products";
 import { packToProduct } from "@/data/products";
+import { accessoryItemId } from "../../supabase/functions/_shared/pricing";
 
 /** « remote » : la base en ligne ; « local » : l'aperçu enregistré dans ce navigateur. */
 export type SaveTarget = "remote" | "local";
@@ -118,10 +119,32 @@ export const useCatalog = () => {
       colors: a.colors.map((c) => ({ ...c, image: resolveImage(c.image) })),
     }));
 
-    /** Retrouve un article du panier (soin, gamme ou duo) à partir de son identifiant. */
+    /** L'accessoire dans une couleur, sous la forme d'un article de panier (null s'il n'a pas de prix). */
+    const accessoryProduct = (accessory: Accessory, colorIndex: number): Product | null => {
+      if (accessory.price === null) return null;
+      const color = accessory.colors[colorIndex];
+      const many = accessory.colors.length > 1;
+      return {
+        id: accessoryItemId(accessory.id, color?.name ?? ""),
+        name: many && color ? `${accessory.name} — ${color.name}` : accessory.name,
+        description: accessory.intro, shortDescription: accessory.intro,
+        price: accessory.price, image: color?.image ?? "", gamme: "accessoire",
+        benefits: [], ingredients: [], usage: "",
+      };
+    };
+
+    /** Retrouve un article du panier (soin, gamme, duo ou accessoire) à partir de son identifiant. */
     const findItem = (id: string): Product | undefined => {
       const product = byId.get(id);
       if (product) return product;
+      if (id.startsWith("acc-")) {
+        const [accessoryId, color = ""] = id.slice(4).split("::");
+        const accessory = accessories.find((a) => a.id === accessoryId);
+        if (!accessory) return undefined;
+        const index = Math.max(0, accessory.colors.findIndex((c) => c.name === color));
+        if (accessory.colors.length > 1 && accessory.colors[index]?.name !== color) return undefined;
+        return accessoryProduct(accessory, index) ?? undefined;
+      }
       const pack = [...ranges, ...duos].find((p) => `pack-${p.id}` === id);
       return pack ? packToProduct(pack) : undefined;
     };
@@ -134,6 +157,7 @@ export const useCatalog = () => {
       rangeById: (id: string) => ranges.find((r) => r.id === id),
       duos,
       accessories,
+      accessoryProduct,
       findItem,
     };
   }, [content]);

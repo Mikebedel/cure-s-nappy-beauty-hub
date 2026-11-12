@@ -1,4 +1,5 @@
 import type { SiteContent } from "./types";
+import { defaultTips, defaultAdvice } from "./articles";
 
 /**
  * Contenu d'origine du site. Il s'affiche tant que rien n'a été enregistré
@@ -269,7 +270,7 @@ export const defaultContent: SiteContent = {
     guarantees: [
       { icon: "shield", title: "Qualité garantie", text: "Chaque produit est contrôlé avant expédition." },
       { icon: "truck", title: "Livraison partout", text: "Abidjan, expédition dans tout le pays et à l'international." },
-      { icon: "sparkles", title: "Commande simple", text: "Mobile Money, Fineo Pay, WhatsApp." },
+      { icon: "sparkles", title: "Paiement simple", text: "Wave, Orange Money, MTN, Moov ou Djamo, directement sur le site." },
       { icon: "chat", title: "Conseils inclus", text: "Routines personnalisées pour vos cheveux." },
     ],
     featured: { eyebrow: "La collection", title: "Nos soins", highlight: "du moment", productIds: ["1", "2", "3", "4"] },
@@ -291,7 +292,7 @@ export const defaultContent: SiteContent = {
       badge: "Nouveauté",
       title: "Le set de peignes & brosses est arrivé",
       text: "Une brosse à shampoing en silicone, une brosse en paille de blé et un peigne à dents larges, réunis dans un sac Cure's Nappy. Disponible en vert et en beige.",
-      highlight: "Commande sur WhatsApp",
+      highlight: "Disponible dans la boutique",
       image: "asset:set-accessoires-vert",
       ctaLabel: "Découvrir le set",
       ctaLink: "/boutique#accessoires",
@@ -377,47 +378,9 @@ export const defaultContent: SiteContent = {
     highlight: "Conseils",
     description: "« Le meilleur remède pour tous vos bobos capillaires. »",
     tipsTitle: "Astuces",
-    tips: [
-      {
-        id: "pousse", icon: "sparkles",
-        title: "Stimuler la pousse des cheveux crépus",
-        intro: "Le guide complet Cure's Nappy pour relancer la croissance.",
-        body: "La pousse ne dépend pas uniquement des produits, mais aussi des gestes quotidiens. Le massage du cuir chevelu est l'étape clé d'une routine réussie.\n\n## 🔥 Le problème\n- ❌ Stagnation — Plus de prise de longueur\n- ❌ Cassure — Pointes fragiles\n- ❌ Rétention — La longueur ne se maintient pas\n\n## 💆🏾‍♀️ La solution\nMassage circulaire 5 à 10 min, 3-4 fois par semaine avec l'Huile Extra Pousse.\n\n## 📋 Routine 3 étapes\n1. Appliquez quelques gouttes d'Huile Extra Pousse\n2. Massez en mouvements circulaires (5-10 min)\n3. Répétez 3-4 fois par semaine",
-      },
-      {
-        id: "hydratation", icon: "lightbulb",
-        title: "Hydratation longue durée",
-        intro: "Le secret pour des cheveux toujours souples.",
-        body: "Méthode LOC (Liquide → Huile → Crème) appliquée chaque semaine :\n- **L** — Magical Spray sur cheveux humides\n- **O** — Huile 2 en 1 pour sceller l'hydratation\n- **C** — Crème Hydratante & Volume + pour la nutrition\n\nRafraîchir au Magical Spray tous les 2-3 jours.",
-      },
-    ],
+    tips: defaultTips,
     adviceTitle: "Conseils",
-    advice: [
-      {
-        id: "chute", icon: "shield-alert",
-        title: "Comment éviter la chute des cheveux",
-        intro: "Stress, alimentation, coiffures serrées : agissez maintenant.",
-        body: "- Évitez tresses et tissages trop serrés\n- Massez avec l'Huile Extra Pousse 3-4 fois par semaine\n- Alimentation riche en protéines, fer, biotine, zinc\n- Cures régulières avec le Masque Fortifiant\n- Limitez la chaleur (sèche-cheveux, lisseur)",
-      },
-      {
-        id: "pellicules", icon: "sparkles",
-        title: "Comment éviter les pellicules",
-        intro: "Déséquilibre, sébum, champignon : les bons réflexes.",
-        body: "- Shampoing Doux & Clarifiant 1 fois par semaine\n- Évitez l'eau trop chaude\n- Massez délicatement pendant le shampoing\n- Hydratez régulièrement avec le Magical Spray\n- Évitez sulfates et silicones agressifs",
-      },
-      {
-        id: "defrisants", icon: "alert",
-        title: "Les défrisants : danger pour la santé",
-        intro: "Les études scientifiques tirent la sonnette d'alarme.",
-        body: "- Risque accru de cancer (utérus, sein)\n- Brûlures du cuir chevelu, alopécie cicatricielle\n- Affaiblissement durable de la fibre\n- Perturbations endocriniennes\n- Préférez les soins naturels Cure's Nappy",
-      },
-      {
-        id: "maladies", icon: "lightbulb",
-        title: "Les maladies du cuir chevelu",
-        intro: "Les reconnaître pour mieux les traiter.",
-        body: "- **Alopécie de traction** — Coiffures tirées\n- **Dermatite séborrhéique** — Pellicules grasses + démangeaisons\n- **Pelade** — Perte par plaques\n- **Trichorrexie noueuse** — Cheveux qui se cassent en nœuds\n- **Folliculite** — Inflammation des follicules",
-      },
-    ],
+    advice: defaultAdvice,
   },
 
   about: {

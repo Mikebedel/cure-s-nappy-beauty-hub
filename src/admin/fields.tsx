@@ -74,7 +74,7 @@ export const TextField = ({ label, value, onChange, hint, multiline = false, row
 
 export const RichTextField = ({ label, value, onChange, rows = 8 }: { label: string; value: string; onChange: (value: string) => void; rows?: number }) => (
   <TextField label={label} value={value} onChange={onChange} multiline rows={rows}
-    hint="Ligne vide = nouveau paragraphe · « ## Titre » = sous-titre · « - texte » = puce · « 1. texte » = étape · **texte** = gras" />
+    hint="Ligne vide = nouveau paragraphe · « ## Titre » = sous-titre · « - texte » = puce · « 1. texte » = étape · **texte** = gras · « > texte » = encadré à retenir · [texte](https://adresse) ou [texte](/conseils/pellicules) = lien" />
 );
 
 export const NumberField = ({ label, value, onChange, hint, allowEmpty = false }: { label: string; value: number | null; onChange: (value: number | null) => void; hint?: string; allowEmpty?: boolean }) => {

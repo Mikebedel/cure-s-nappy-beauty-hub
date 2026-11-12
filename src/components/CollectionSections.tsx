@@ -1,6 +1,6 @@
 import { useCartNavigation } from "@/hooks/use-cart-navigation";
 import { useState } from "react";
-import { ShoppingBag, ChevronDown, Check, MessageCircle } from "lucide-react";
+import { ShoppingBag, ChevronDown, Check } from "lucide-react";
 import { packToProduct, GammePack, Accessory } from "@/data/products";
 import { useCatalog, useContent } from "@/content/ContentProvider";
 import Highlight from "@/content/Highlight";
@@ -63,9 +63,11 @@ export const DuosSection = () => {
 
 const AccessoryCard = ({ item }: { item: Accessory }) => {
   const [color, setColor] = useState(0);
-  const whatsapp = useContent().content.contact.whatsapp;
+  const { accessoryProduct } = useCatalog();
+  const { addToCart } = useCart();
+  const openCart = useCartNavigation();
   const current = item.colors[Math.min(color, item.colors.length - 1)] ?? { name: "", swatch: "", image: "" };
-  const colorLabel = current.name ? ` (couleur ${current.name})` : "";
+  const cartItem = accessoryProduct(item, Math.min(color, Math.max(0, item.colors.length - 1)));
   return (
     <article className="surface overflow-hidden p-2 md:p-3">
       <div className="grid md:grid-cols-2 gap-2 md:gap-8 items-center">
@@ -85,7 +87,14 @@ const AccessoryCard = ({ item }: { item: Accessory }) => {
             </div>
           </div>}
           {item.price !== null && <p className="font-heading font-bold text-xl text-primary">{item.price.toLocaleString("fr-FR")} FCFA</p>}
-          <Button asChild size="lg" className="w-full sm:w-fit"><a href={`https://wa.me/${whatsapp}?text=${encodeURIComponent(`Bonjour, je souhaite commander le ${item.name}${colorLabel}.`)}`} target="_blank" rel="noopener noreferrer"><MessageCircle />Commander sur WhatsApp</a></Button>
+          {cartItem ? (
+            <div className="flex flex-wrap gap-3">
+              <Button size="lg" onClick={() => addToCart(cartItem)}><ShoppingBag />Ajouter au panier</Button>
+              <Button size="lg" variant="outline" onClick={() => { addToCart(cartItem); openCart(); }}>Commander maintenant</Button>
+            </div>
+          ) : (
+            <p className="rounded-2xl bg-secondary/70 px-4 py-3 text-sm text-muted-foreground">Bientôt disponible à la commande en ligne.</p>
+          )}
         </div>
       </div>
 

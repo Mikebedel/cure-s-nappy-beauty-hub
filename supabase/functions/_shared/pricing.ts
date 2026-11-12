@@ -8,7 +8,11 @@ export interface PricingCatalog {
   products: { id: string; name: string; price: number; visible: boolean }[];
   ranges: { id: string; name: string; price: number }[];
   duos: { id: string; name: string; productIds: string[] }[];
+  accessories?: { id: string; name: string; price: number | null; colors: { name: string }[] }[];
 }
+
+/** Identifiant panier d'un accessoire dans une couleur : « acc-<accessoire>::<couleur> ». */
+export const accessoryItemId = (accessoryId: string, color: string) => `acc-${accessoryId}::${color}`;
 
 export interface PricingDelivery {
   abidjan: { delay: string; communes: { name: string; fee: number }[] };
@@ -103,7 +107,15 @@ export function priceOrder(catalog: PricingCatalog, delivery: PricingDelivery, r
     if (quantity > MAX_QUANTITY) return { ok: false, error: `Quantité trop élevée (${MAX_QUANTITY} au maximum par article).` };
     let name: string | undefined;
     let unitPrice: number | undefined;
-    if (id.startsWith("pack-")) {
+    if (id.startsWith("acc-")) {
+      const [accessoryId, color = ""] = id.slice(4).split("::");
+      const accessory = catalog.accessories?.find((a) => a.id === accessoryId);
+      const colorOk = accessory && (accessory.colors.length <= 1 ? true : accessory.colors.some((c) => c.name === color));
+      if (accessory && colorOk && typeof accessory.price === "number") {
+        name = color && accessory.colors.length > 1 ? `${accessory.name} — ${color}` : accessory.name;
+        unitPrice = accessory.price;
+      }
+    } else if (id.startsWith("pack-")) {
       const packId = id.slice(5);
       const range = catalog.ranges.find((r) => r.id === packId);
       const duo = catalog.duos.find((d) => d.id === packId);
