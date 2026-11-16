@@ -1,12 +1,12 @@
 import { useCartNavigation } from "@/hooks/use-cart-navigation";
 import { Price, PromoBadge } from "@/components/Price";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Star, ShoppingBag, ChevronLeft, ChevronRight, Zap, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { packToProduct } from "@/data/products";
+import { packPath, packToProduct } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
-import ProductCard from "@/components/ProductCard";
+import ProductRail from "@/components/ProductRail";
 import HomeVideo from "@/components/HomeVideo";
 import HairProblems from "@/components/HairProblems";
 import SectionHeading from "@/components/SectionHeading";
@@ -103,6 +103,14 @@ const HeroSlider = ({ slides }: { slides: string[] }) => {
   );
 };
 
+/** Texte sous le titre : un retour à la ligne saisi dans l'admin est respecté ; sinon la citation (entre guillemets) passe sur sa propre ligne. */
+function heroLines(text: string): string[] {
+  if (text.includes("\n")) return text.split("\n").map((l) => l.trim()).filter(Boolean);
+  const quote = text.search(/\s["«“]/);
+  if (quote <= 0) return [text];
+  return [text.slice(0, quote).trim(), text.slice(quote).trim()];
+}
+
 const Index = () => {
   const { addToCart } = useCart();
   const openCart = useCartNavigation();
@@ -137,7 +145,9 @@ const Index = () => {
               {home.hero.line2 && <span aria-hidden="true" className="block text-primary">{home.hero.line2}</span>}
               <RotatingWord words={home.hero.rotatingWords} />
             </h1>
-            <p className="text-muted-foreground text-lg leading-relaxed max-w-xl mb-8">{home.hero.description}</p>
+            <p className="text-muted-foreground text-lg leading-relaxed max-w-xl mb-8">
+              {heroLines(home.hero.description).map((line, i) => <span key={i} className="block">{line}</span>)}
+            </p>
             <div className="flex flex-wrap gap-3">
               <Button asChild size="lg">
                 <Link to="/boutique">{home.hero.primaryCta} <ArrowRight /></Link>
@@ -155,11 +165,15 @@ const Index = () => {
 
           {home.hero.stats.length > 0 && (
             <div className="lg:self-start">
-              <dl className="grid grid-cols-3 gap-3 max-w-lg">
+              {/* Toutes les cases sur une ligne (2 par ligne sur petit téléphone), quel que soit leur nombre. */}
+              <dl
+                className="grid grid-cols-2 gap-2 sm:gap-2.5 max-w-xl sm:[grid-template-columns:repeat(var(--stat-cols),minmax(0,1fr))]"
+                style={{ "--stat-cols": home.hero.stats.length } as CSSProperties}
+              >
                 {home.hero.stats.map((stat) => (
-                  <div key={stat.label} className="surface !rounded-2xl px-3 sm:px-4 py-4 flex flex-col-reverse min-w-0">
-                    <dt className="text-[11px] sm:text-xs uppercase tracking-wider text-muted-foreground mt-1">{stat.label}</dt>
-                    <dd className="font-heading text-xl sm:text-2xl md:text-3xl font-bold text-primary break-words">{stat.value}</dd>
+                  <div key={stat.label} className="surface !rounded-xl px-3 py-2.5 flex flex-col-reverse justify-end min-w-0">
+                    <dt className="text-[10px] leading-tight uppercase tracking-wide text-muted-foreground mt-0.5">{stat.label}</dt>
+                    <dd className="font-heading text-lg sm:text-xl font-bold text-primary leading-tight break-words">{stat.value}</dd>
                   </div>
                 ))}
               </dl>
@@ -194,9 +208,8 @@ const Index = () => {
         <section className="reveal-section pb-16 md:pb-24">
           <div className="container mx-auto">
             <SectionHeading eyebrow={home.featured.eyebrow} title={<Highlight title={home.featured.title} highlight={home.featured.highlight} />} action={seeAll} />
-            <div className="product-grid">
-              {featured.map((p) => p && <ProductCard key={p.id} product={p} />)}
-            </div>
+            {/* Une seule ligne, en petites cartes : les soins en plus se découvrent en faisant glisser ou avec les flèches */}
+            <ProductRail products={featured.filter((p): p is NonNullable<typeof p> => Boolean(p))} label={`${home.featured.title} ${home.featured.highlight}`.trim() || "Nos soins du moment"} center />
           </div>
         </section>
       )}
@@ -256,7 +269,7 @@ const Index = () => {
                 <h2 className="font-heading font-bold mt-3 mb-5">
                   {curlCream.name} {home.spotlight.highlight && <span className="block text-primary">{home.spotlight.highlight}</span>}
                 </h2>
-                <p className="text-muted-foreground text-lg leading-relaxed mb-6">{curlCream.description}</p>
+                <p className="text-muted-foreground text-lg leading-relaxed mb-6">{home.spotlight.description.trim() || curlCream.description}</p>
                 {curlCream.benefits.length > 0 && (
                   <ul className="grid grid-cols-2 gap-2.5 mb-7">
                     {curlCream.benefits.map((benefit) => (
@@ -339,7 +352,7 @@ const Index = () => {
                   <ShoppingBag /> Ajouter au panier
                 </Button>
                 <Button asChild size="lg" variant="outline" className="bg-primary-foreground/10 border-primary-foreground/50 text-primary-foreground hover:bg-primary-foreground hover:text-primary">
-                  <Link to="/nos-gammes#gammes">Voir le détail</Link>
+                  <Link to={packPath(boxSet)}>Voir le détail</Link>
                 </Button>
               </div>
             </div>

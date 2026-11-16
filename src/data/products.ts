@@ -30,6 +30,14 @@ export interface GammePack {
   benefits: string[];
   contains: string[];
   note?: string;
+  /** Gamme, duo (2 soins) ou trio (3 soins et plus) : sert au repère de la page détail. */
+  kind: "gamme" | "duo" | "trio";
+  /** Soin du catalogue lié à chaque ligne de `contains` (retrouvé par son nom pour les gammes), null si aucun. */
+  containsIds: (string | null)[];
+  /** Les mêmes soins, sans doublon. */
+  productIds: string[];
+  details?: string;
+  usage?: string;
 }
 
 export interface Accessory {
@@ -44,6 +52,9 @@ export interface Accessory {
 }
 
 export const formatPrice = (amount: number) => `${amount.toLocaleString("fr-FR")} FCFA`;
+
+/** Adresse de la page détail d'une gamme, d'un duo ou d'un trio. */
+export const packPath = (pack: Pick<GammePack, "id">) => `/gamme/${pack.id}`;
 
 export const packToProduct = (pack: GammePack): Product => ({
   id: `pack-${pack.id}`,

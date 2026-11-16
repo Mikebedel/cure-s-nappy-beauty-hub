@@ -1,3 +1,4 @@
+import { useConfirm } from "./useConfirm";
 import { useCallback, useEffect, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { Mail, Download, Send, Trash2, RefreshCw } from "lucide-react";
@@ -31,8 +32,9 @@ const NewsletterCard = () => {
   };
   // Un seul e-mail, toutes les adresses en copie cachée : personne ne voit les adresses des autres.
   const writeAll = () => { window.location.href = `mailto:?bcc=${encodeURIComponent(active.map((s) => s.email).join(","))}&subject=${encodeURIComponent("Cure's Nappy")}`; };
+  const { confirm, dialog } = useConfirm();
   const remove = async (s: Subscriber) => {
-    if (!window.confirm(`Retirer ${s.email} de la newsletter ?`)) return;
+    if (!(await confirm({ title: `Retirer ${s.email} de la newsletter ?`, confirmLabel: "Retirer", destructive: true }))) return;
     await db.from("newsletter_subscribers").delete().eq("id", s.id);
     load();
   };
@@ -43,6 +45,7 @@ const NewsletterCard = () => {
         <CardTitle className="text-lg flex items-center gap-2"><Mail className="h-5 w-5" /> Newsletter</CardTitle>
         <Button size="icon" variant="ghost" onClick={load} aria-label="Actualiser la liste"><RefreshCw /></Button>
       </CardHeader>
+      {dialog}
       <CardContent className="space-y-4">
         <div className="text-center p-4 bg-muted/50 rounded-lg">
           <div className="text-2xl font-bold">{list === null ? "…" : active.length}</div>

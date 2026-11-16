@@ -12,6 +12,7 @@ import { imageLibrary, resolveImage } from "@/content/images";
 import { icons } from "@/content/icons";
 import { uploadImage } from "@/content/store";
 import { useContent } from "@/content/ContentProvider";
+import { useConfirm } from "./useConfirm";
 import type { Heading } from "@/content/types";
 
 /* ---------- Mise en page ---------- */
@@ -305,6 +306,7 @@ export function Repeater<T>({ items, onChange, render, create, itemTitle, addLab
   startOpen?: boolean;
 }) {
   const [openIndex, setOpenIndex] = useState<number | null>(startOpen ? 0 : null);
+  const { confirm, dialog } = useConfirm();
   const move = (from: number, to: number) => {
     if (to < 0 || to >= items.length) return;
     const next = [...items];
@@ -326,8 +328,13 @@ export function Repeater<T>({ items, onChange, render, create, itemTitle, addLab
               </button>
               <button type="button" aria-label="Monter" onClick={() => move(i, i - 1)} disabled={i === 0} className="h-9 w-9 inline-flex items-center justify-center rounded-lg hover:bg-secondary disabled:opacity-30"><ArrowUp className="h-4 w-4" /></button>
               <button type="button" aria-label="Descendre" onClick={() => move(i, i + 1)} disabled={i === items.length - 1} className="h-9 w-9 inline-flex items-center justify-center rounded-lg hover:bg-secondary disabled:opacity-30"><ArrowDown className="h-4 w-4" /></button>
-              <button type="button" aria-label="Supprimer" onClick={() => {
-                if (!window.confirm(`Supprimer « ${itemTitle(item, i) || `élément ${i + 1}`} » ? (Rien n'est perdu tant que vous n'avez pas enregistré.)`)) return;
+              <button type="button" aria-label="Supprimer" onClick={async () => {
+                const ok = await confirm({
+                  title: `Supprimer « ${itemTitle(item, i) || `élément ${i + 1}`} » ?`,
+                  description: "Rien n'est perdu tant que vous n'avez pas cliqué sur Enregistrer.",
+                  confirmLabel: "Supprimer", destructive: true,
+                });
+                if (!ok) return;
                 onChange(items.filter((_, j) => j !== i));
                 setOpenIndex(null);
               }} className="h-9 w-9 inline-flex items-center justify-center rounded-lg text-destructive hover:bg-destructive/10"><Trash2 className="h-4 w-4" /></button>
@@ -337,6 +344,7 @@ export function Repeater<T>({ items, onChange, render, create, itemTitle, addLab
         );
       })}
       <Button type="button" variant="outline" onClick={() => { onChange([...items, create()]); setOpenIndex(items.length); }}><Plus />{addLabel}</Button>
+      {dialog}
     </div>
   );
 }

@@ -76,6 +76,32 @@ export const useContent = () => {
   return ctx;
 };
 
+const STOP_WORDS = new Set(["de", "d", "du", "des", "la", "le", "les", "et", "en", "a"]);
+const words = (text: string) =>
+  text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").split(/[^a-z0-9]+/).filter((w) => w && !STOP_WORDS.has(w));
+
+/**
+ * Retrouve les soins du catalogue nommés dans la liste « Soins inclus » d'une gamme
+ * (« Leave-in » → Leave-in Conditionner, « Spray » → Magical Spray) : le produit qui partage le plus de mots.
+ */
+const matchProducts = (names: string[], products: Product[]): (string | null)[] =>
+  names.map((name) => {
+    const wanted = words(name);
+    let best: { id: string; score: number } | null = null;
+    for (const p of products) {
+      const have = new Set(words(p.name));
+      const score = wanted.filter((w) => have.has(w) || [...have].some((h) => h.length > 4 && w.length > 4 && (h.startsWith(w.slice(0, 6)) || w.startsWith(h.slice(0, 6))))).length;
+      if (score > 0 && (!best || score > best.score)) best = { id: p.id, score };
+    }
+    return best?.id ?? null;
+  });
+
+/** Soin lié à chaque ligne « inclus » (null si introuvable ou masqué), et la liste sans doublon. */
+const packProducts = (containsIds: (string | null)[]) => ({
+  containsIds,
+  productIds: [...new Set(containsIds.filter((id): id is string => !!id))],
+});
+
 /** Le catalogue prêt à afficher : images résolues, prix des duos calculés, articles masqués retirés. */
 export const useCatalog = () => {
   const { content } = useContent();
@@ -108,14 +134,17 @@ export const useCatalog = () => {
 
     const ranges: GammePack[] = catalog.ranges.map((r) => ({
       id: r.id, name: r.name, description: r.description, note: r.note || undefined,
-      ...promo(`pack-${r.id}`, r.price), image: resolveImage(r.image), benefits: r.benefits, contains: r.contains,
+      ...promo(`pack-${r.id}`, r.price), image: resolveImage(r.image), benefits: r.benefits ?? [], contains: r.contains,
+      kind: "gamme" as const, ...packProducts(matchProducts(r.contains, products)), details: r.details || undefined, usage: r.usage || undefined,
     }));
 
     const duos: GammePack[] = catalog.duos.map((d) => {
       const items = d.productIds.map((id) => byId.get(id)).filter((p): p is Product => !!p);
       return {
-        id: d.id, name: d.name, description: d.description, image: resolveImage(d.image), benefits: [],
+        id: d.id, name: d.name, description: d.description, image: resolveImage(d.image), benefits: d.benefits ?? [],
         contains: items.map((p) => p.name),
+        kind: items.length >= 3 ? "trio" as const : "duo" as const, ...packProducts(items.map((p) => (hidden.has(p.id) ? null : p.id))),
+        details: d.details || undefined, usage: d.usage || undefined,
         // Le duo vaut la somme des prix d'origine de ses soins ; la promotion s'applique ensuite sur ce total.
         ...promo(`pack-${d.id}`, d.productIds.reduce((sum, id) => sum + (catalog.products.find((p) => p.id === id)?.price ?? 0), 0)),
       };

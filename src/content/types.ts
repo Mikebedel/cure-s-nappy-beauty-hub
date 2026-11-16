@@ -41,6 +41,9 @@ export interface RangeContent {
   image: ImageRef;
   benefits: string[];
   contains: string[];
+  /** Page détail (/gamme/<id>) : présentation longue et conseils d'utilisation, facultatifs. */
+  details?: RichText;
+  usage?: string;
 }
 
 /** Duo ou trio : composé de produits du catalogue, son prix est la somme de leurs prix. */
@@ -50,6 +53,10 @@ export interface DuoContent {
   description: string;
   image: ImageRef;
   productIds: string[];
+  /** Page détail (/gamme/<id>) : bienfaits, présentation longue et conseils d'utilisation, facultatifs. */
+  benefits?: string[];
+  details?: RichText;
+  usage?: string;
 }
 
 export interface AccessoryContent {
@@ -147,7 +154,7 @@ export interface SiteContent {
     featured: Heading & { productIds: string[] };
     video: Heading & { text: string; points: string[] };
     rituals: Heading & { cards: { rangeId: string; label: string; subtitle: string; description: string }[] };
-    spotlight: { visible: boolean; productId: string; badge: string; eyebrow: string; highlight: string };
+    spotlight: { visible: boolean; productId: string; badge: string; eyebrow: string; highlight: string; /** Vide : reprend la description de la fiche produit. */ description: string };
     flashNews: {
       visible: boolean;
       badge: string;
@@ -185,6 +192,8 @@ export interface SiteContent {
     advice: ArticleContent[];
     /** Carte « Pose ta question » (page Conseils et bas des articles) : ouvre WhatsApp avec ce message. */
     ask: { title: string; text: string; label: string; message: string };
+    /** Titre au-dessus des soins conseillés en bas de chaque article (la fin est en vert). */
+    productsHeading: { title: string; highlight: string };
   };
   about: {
     eyebrow: string;

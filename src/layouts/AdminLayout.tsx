@@ -1,3 +1,4 @@
+import { useConfirm } from "@/admin/useConfirm";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, ShoppingCart, Package, Users, BarChart3, Megaphone, Star, FileText, MessageSquare, Video,
@@ -75,14 +76,16 @@ const ModeBanner = () => {
 const SaveBar = () => {
   const { dirty, saving, save, discard } = useDraft();
   const { saveTarget } = useContent();
-  if (!dirty) return null;
+  const { confirm, dialog } = useConfirm();
+  if (!dirty) return dialog;
   return (
     <div className="sticky bottom-0 z-30 -mx-4 lg:-mx-8 mt-8 border-t border-border bg-background/95 backdrop-blur px-4 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
       <p className="text-sm font-medium">Modifications non enregistrées{saveTarget === "local" ? " (aperçu local)" : ""}</p>
       <div className="flex gap-2">
-        <Button variant="ghost" onClick={() => { if (window.confirm("Annuler toutes les modifications non enregistrées ?")) discard(); }} disabled={saving}><Undo2 />Annuler</Button>
+        <Button variant="ghost" onClick={async () => { if (await confirm({ title: "Annuler toutes les modifications non enregistrées ?", confirmLabel: "Tout annuler", destructive: true })) discard(); }} disabled={saving}><Undo2 />Annuler</Button>
         <Button onClick={save} disabled={saving || !saveTarget}>{saving ? <Loader2 className="animate-spin" /> : <Save />}Enregistrer</Button>
       </div>
+      {dialog}
     </div>
   );
 };

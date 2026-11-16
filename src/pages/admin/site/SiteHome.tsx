@@ -9,6 +9,7 @@ const SiteHome = () => {
   const { draft, update } = useDraft();
   const home = draft.home;
   const productOptions = draft.catalog.products.map((p) => ({ value: p.id, label: p.name }));
+  const spotlightProduct = draft.catalog.products.find((p) => p.id === draft.home.spotlight.productId);
   const rangeOptions = draft.catalog.ranges.map((r) => ({ value: r.id, label: r.name }));
   const articleOptions = [...draft.advice.tips, ...draft.advice.advice].map((a) => ({ value: a.id, label: a.title }));
 
@@ -24,7 +25,7 @@ const SiteHome = () => {
           <TextField label="Titre, 2e ligne (en vert)" value={home.hero.line2} onChange={(v) => update((d) => { d.home.hero.line2 = v; })} />
         </Grid>
         <LinesField label="Mots qui changent à la fin du titre (en doré)" value={home.hero.rotatingWords} onChange={(v) => update((d) => { d.home.hero.rotatingWords = v; })} hint="Un mot par ligne, sans point : il est ajouté automatiquement." />
-        <TextField label="Texte sous le titre" multiline value={home.hero.description} onChange={(v) => update((d) => { d.home.hero.description = v; })} />
+        <TextField label="Texte sous le titre" hint="Appuie sur Entrée pour aller à la ligne. Une citation entre guillemets passe toute seule à la ligne." multiline value={home.hero.description} onChange={(v) => update((d) => { d.home.hero.description = v; })} />
         <Grid>
           <TextField label="Bouton principal (vers la boutique)" value={home.hero.primaryCta} onChange={(v) => update((d) => { d.home.hero.primaryCta = v; })} />
           <TextField label="Bouton secondaire (vers Nos gammes)" value={home.hero.secondaryCta} onChange={(v) => update((d) => { d.home.hero.secondaryCta = v; })} />
@@ -98,14 +99,18 @@ const SiteHome = () => {
           )} />
       </Panel>
 
-      <Panel title="Soin vedette" description="Un produit mis en grand (actuellement la Crème Bouclante)">
+      <Panel title="Soin vedette" description={`Un produit mis en grand (actuellement : ${spotlightProduct?.name ?? "aucun"})`}>
         <ToggleField label="Afficher ce bloc" checked={home.spotlight.visible} onChange={(v) => update((d) => { d.home.spotlight.visible = v; })} />
-        <SelectField label="Produit" value={home.spotlight.productId} onChange={(v) => update((d) => { d.home.spotlight.productId = v; })} options={productOptions} hint="Le texte, le prix et les bienfaits viennent de la fiche du produit. Si le produit a 2 photos, la 2e s'affiche en petit." />
+        <SelectField label="Produit" value={home.spotlight.productId} onChange={(v) => update((d) => { d.home.spotlight.productId = v; })} options={productOptions} hint="Le prix et les bienfaits viennent de la fiche du produit. Si le produit a 2 photos, la 2e s'affiche en petit." />
         <Grid cols={3}>
           <TextField label="Pastille sur la photo" value={home.spotlight.badge} onChange={(v) => update((d) => { d.home.spotlight.badge = v; })} />
           <TextField label="Petit repère" value={home.spotlight.eyebrow} onChange={(v) => update((d) => { d.home.spotlight.eyebrow = v; })} />
           <TextField label="Phrase sous le nom (en couleur)" value={home.spotlight.highlight} onChange={(v) => update((d) => { d.home.spotlight.highlight = v; })} />
         </Grid>
+        <TextField label="Texte sous le titre" multiline value={home.spotlight.description}
+          onChange={(v) => update((d) => { d.home.spotlight.description = v; })}
+          placeholder={spotlightProduct?.description}
+          hint="Laisser vide pour reprendre la description de la fiche produit (affichée en gris dans la case)." />
       </Panel>
 
       <Panel title="Flash News" description="Promotion, communiqué ou nouveauté mis en lumière">

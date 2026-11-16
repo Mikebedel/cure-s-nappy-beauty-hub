@@ -325,7 +325,7 @@ export const defaultContent: SiteContent = {
         { rangeId: "gamme-soin-profond", label: "Soin profond", subtitle: "Répare & traite", description: "Une routine ciblée pour réparer en profondeur les cheveux abîmés." },
       ],
     },
-    spotlight: { visible: true, productId: "13", badge: "Soin vedette", eyebrow: "Définition de boucle", highlight: "des boucles qui tiennent" },
+    spotlight: { visible: true, productId: "13", badge: "Soin vedette", eyebrow: "Définition de boucle", highlight: "des boucles qui tiennent", description: "" },
     flashNews: {
       visible: true,
       badge: "Nouveauté",
@@ -426,6 +426,7 @@ export const defaultContent: SiteContent = {
       label: "Pose ta question",
       message: "Bonjour Cure's Nappy, j'ai une question sur mes cheveux : ",
     },
+    productsHeading: { title: "Ta solution", highlight: "Cure's Nappy" },
   },
 
   about: {

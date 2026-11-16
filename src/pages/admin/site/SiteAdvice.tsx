@@ -49,6 +49,13 @@ const SiteAdvice = () => {
         <TextField label="Texte" value={page.description} onChange={(v) => update((d) => { d.advice.description = v; })} />
       </Panel>
 
+      <Panel title="Titre des soins conseillés" description="Au-dessus des produits, en bas de chaque article">
+        <Grid>
+          <TextField label="Début du titre" value={page.productsHeading.title} onChange={(v) => update((d) => { d.advice.productsHeading.title = v; })} />
+          <TextField label="Fin du titre (en vert)" value={page.productsHeading.highlight} onChange={(v) => update((d) => { d.advice.productsHeading.highlight = v; })} />
+        </Grid>
+      </Panel>
+
       <Panel title="Carte « Pose ta question »" description="En bas de la page Conseils et de chaque article : ouvre WhatsApp avec un message déjà commencé">
         <Grid>
           <TextField label="Titre" value={page.ask.title} onChange={(v) => update((d) => { d.advice.ask.title = v; })} hint="Laisser vide pour masquer la carte." />

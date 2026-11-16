@@ -3,7 +3,8 @@ import { Price, PromoBadge } from "@/components/Price";
 import { useAlignedRows } from "@/hooks/useAlignedRows";
 import { useState } from "react";
 import { ShoppingBag, ChevronDown, Check } from "lucide-react";
-import { packToProduct, GammePack, Accessory } from "@/data/products";
+import { Link } from "react-router-dom";
+import { packPath, packToProduct, GammePack, Accessory } from "@/data/products";
 import { useCatalog, useContent } from "@/content/ContentProvider";
 import Highlight from "@/content/Highlight";
 import { useCart } from "@/contexts/CartContext";
@@ -15,10 +16,14 @@ const RangeCard = ({ pack }: { pack: GammePack }) => {
   const { addToCart } = useCart();
   const openCart = useCartNavigation();
   return (
-    <article className="product-card flex flex-col min-w-0 bg-card border border-border/80 rounded-3xl overflow-hidden p-2">
-      <div className="aspect-square overflow-hidden bg-muted rounded-2xl"><img src={pack.image} alt={pack.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-500 ease-out hover:scale-105" /></div>
+    <article className="product-card group flex flex-col min-w-0 bg-card border border-border/80 rounded-3xl overflow-hidden p-2">
+      {/* La photo et le nom ouvrent la page détail de la gamme, comme pour un soin */}
+      <Link to={packPath(pack)} className="block relative aspect-square overflow-hidden bg-muted rounded-2xl" aria-label={`Voir le détail : ${pack.name}`}>
+        <img src={pack.image} alt={pack.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105" />
+        <PromoBadge price={pack.price} original={pack.originalPrice} className="absolute top-3 right-3" />
+      </Link>
       <div className="px-2 pt-4 pb-2 sm:px-3 flex flex-col gap-3">
-        <h3 data-align="title" className="font-heading font-semibold text-base sm:text-lg leading-6">{pack.name}</h3>
+        <h3 data-align="title" className="font-heading font-semibold text-base sm:text-lg leading-6"><Link to={packPath(pack)} className="hover:text-primary transition-colors">{pack.name}</Link></h3>
         <p data-align="description" className="text-sm text-muted-foreground leading-6">{pack.description}</p>
         <Button variant="ghost" aria-expanded={expanded} aria-controls={`contains-${pack.id}`} className="justify-between px-0 text-primary whitespace-normal text-left rounded-none hover:bg-transparent hover:text-primary/80" onClick={() => setExpanded(value => !value)}>
           Les {pack.contains.length} soins inclus <ChevronDown className={expanded ? "rotate-180 transition-transform duration-200" : "transition-transform duration-200"} />
@@ -26,7 +31,8 @@ const RangeCard = ({ pack }: { pack: GammePack }) => {
         <div id={`contains-${pack.id}`} className="range-content" data-open={expanded} aria-hidden={!expanded}>
           <div><ul className="text-sm text-muted-foreground space-y-2 pb-3">{pack.contains.map(item => <li key={item} className="flex items-start gap-2"><Check className="h-4 w-4 mt-0.5 shrink-0 text-primary" />{item}</li>)}</ul>{pack.note && <p className="text-sm text-muted-foreground pb-3">{pack.note}</p>}</div>
         </div>
-        <p className="flex items-center gap-2 flex-wrap"><Price price={pack.price} original={pack.originalPrice} className="font-heading font-bold text-lg text-primary" /><PromoBadge price={pack.price} original={pack.originalPrice} /></p>
+        <p className="flex items-center gap-2 flex-wrap"><Price price={pack.price} original={pack.originalPrice} className="font-heading font-bold text-lg text-primary" /></p>
+        <Link to={packPath(pack)} className="-mt-1 text-sm font-semibold text-primary underline-offset-4 hover:underline">Voir le détail →</Link>
         <Button className="w-full" onClick={() => { addToCart(packToProduct(pack)); openCart(); }}><ShoppingBag />Ajouter</Button>
       </div>
     </article>

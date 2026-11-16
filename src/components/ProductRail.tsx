@@ -7,8 +7,9 @@ import ProductCard from "@/components/ProductCard";
  * Une seule ligne de produits, à la même largeur de cartes que les gammes
  * (5 visibles sur ordinateur, 3 sur tablette, 2 sur téléphone). Les produits en plus
  * se découvrent en faisant glisser la ligne, ou avec les flèches.
+ * `center` : quand tous les produits tiennent sur la ligne, ils sont centrés (1, 2, 3 ou 4 produits).
  */
-const ProductRail = ({ products, label }: { products: Product[]; label: string }) => {
+const ProductRail = ({ products, label, center = false }: { products: Product[]; label: string; center?: boolean }) => {
   const railRef = useRef<HTMLDivElement>(null);
   const [edges, setEdges] = useState({ start: true, end: true });
 
@@ -34,7 +35,7 @@ const ProductRail = ({ products, label }: { products: Product[]; label: string }
   const scrollable = !(edges.start && edges.end);
   return (
     <div className="relative">
-      <div ref={railRef} className="product-rail" role="list" aria-label={label}>
+      <div ref={railRef} className={center ? "product-rail product-rail--center" : "product-rail"} role="list" aria-label={label}>
         {products.map((p) => (
           <div key={p.id} role="listitem" className="product-rail__item">
             <ProductCard product={p} hideBadge />

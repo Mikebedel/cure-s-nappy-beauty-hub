@@ -126,6 +126,8 @@
 /* Une ligne de produits qui défile : mêmes largeurs de cartes que la grille des gammes */
 .product-rail { --rail-gap: 12px; --rail-cols: 2.15; display: flex; gap: var(--rail-gap); overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 2px; padding: 4px 2px 12px; scrollbar-width: none; overscroll-behavior-x: contain; }
 .product-rail::-webkit-scrollbar { display: none; }
+/* Centré seulement s'il reste de la place : « safe » revient au début dès que la ligne défile */
+.product-rail--center { justify-content: safe center; }
 .product-rail__item { flex: 0 0 calc((100% - (var(--rail-cols) - 1) * var(--rail-gap)) / var(--rail-cols)); min-width: 0; scroll-snap-align: start; display: flex; }
 .product-rail__item > * { width: 100%; }
 @media (max-width: 359px) { .product-rail { --rail-cols: 1.2; } }

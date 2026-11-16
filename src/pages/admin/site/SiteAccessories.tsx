@@ -22,20 +22,25 @@ const SiteAccessories = () => {
               <TextField label="Présentation" multiline value={a.intro} onChange={(intro) => change({ ...a, intro })} />
               <TextField label="Accroche" multiline value={a.hook} onChange={(hook) => change({ ...a, hook })} />
 
+              {/* Photos : une par couleur. Ouvert d'office pour que le champ photo se voie tout de suite. */}
               <div className="space-y-2">
-                <p className="text-sm font-semibold">Couleurs</p>
-                <Repeater items={a.colors} onChange={(colors) => change({ ...a, colors })}
-                  itemTitle={(c) => c.name || "Couleur"} create={() => ({ name: "", swatch: "#7a8f4a", image: "" })} addLabel="Ajouter une couleur"
+                <p className="text-sm font-semibold">Photos et couleurs</p>
+                <p className="text-sm text-muted-foreground">Une photo par couleur. S'il n'existe qu'une couleur, laisse simplement son nom vide.</p>
+                <Repeater items={a.colors} onChange={(colors) => change({ ...a, colors })} startOpen
+                  itemTitle={(c, ci) => c.name ? `Couleur : ${c.name}` : ci === 0 ? "Photo principale" : `Couleur ${ci + 1}`}
+                  create={() => ({ name: "", swatch: "#7a8f4a", image: "" })} addLabel="Ajouter une couleur"
+                  emptyText="Aucune photo : ajoute une couleur pour mettre une photo."
                   render={(c, changeColor, ci) => (
                     <>
+                      <ImageField label={a.colors.length > 1 ? "Photo dans cette couleur" : "Photo de l'accessoire"} value={c.image} onChange={(image) => changeColor({ ...c, image })} allowEmpty={false}
+                        hint="« Envoyer » pour prendre une photo de ton ordinateur ou téléphone, « Bibliothèque » pour une photo déjà sur le site." />
                       <Grid>
-                        <TextField label="Nom de la couleur" value={c.name} onChange={(name) => changeColor({ ...c, name })} />
+                        <TextField label="Nom de la couleur (si plusieurs)" value={c.name} onChange={(name) => changeColor({ ...c, name })} placeholder="ex. Vert" />
                         <div className="space-y-1.5">
                           <label className="block text-sm font-semibold" htmlFor={`swatch-${a.id}-${ci}`}>Pastille</label>
                           <input id={`swatch-${a.id}-${ci}`} type="color" value={c.swatch.startsWith("#") ? c.swatch : "#7a8f4a"} onChange={(e) => changeColor({ ...c, swatch: e.target.value })} className="h-11 w-24 rounded-xl border border-input bg-background p-1" />
                         </div>
                       </Grid>
-                      <ImageField label="Photo dans cette couleur" value={c.image} onChange={(image) => changeColor({ ...c, image })} allowEmpty={false} />
                     </>
                   )} />
               </div>

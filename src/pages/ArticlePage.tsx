@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Clock, BookOpen, ExternalLink, Stethoscope } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import ProductCard from "@/components/ProductCard";
+import ProductRail from "@/components/ProductRail";
 import { AskQuestion } from "@/components/HairProblems";
 import { useCatalog, useContent } from "@/content/ContentProvider";
 import { iconFor } from "@/content/icons";
@@ -35,53 +35,62 @@ const ArticlePage = () => {
       <header className="px-3 pt-[88px]">
         <div className="relative overflow-hidden rounded-[2rem] bg-primary text-primary-foreground px-5 py-12 md:py-16">
           <div aria-hidden="true" className="absolute -top-24 -right-16 h-72 w-72 rounded-full bg-accent/25 blur-3xl" />
-          <div className="relative max-w-3xl mx-auto">
+          <div className={`relative mx-auto ${cover ? "max-w-6xl" : "max-w-3xl"}`}>
             <Link to="/conseils" className="inline-flex items-center gap-1.5 text-sm text-primary-foreground/85 hover:text-primary-foreground mb-6 min-h-11"><ArrowLeft className="h-4 w-4" />Tous les conseils</Link>
             <div className="flex flex-wrap items-center gap-3 mb-4 text-sm">
               <span className="inline-flex items-center gap-2 rounded-full bg-primary-foreground/15 px-3 py-1.5 font-semibold"><Icon className="h-4 w-4" />{article.kind}</span>
               <span className="inline-flex items-center gap-1.5 text-primary-foreground/85"><Clock className="h-4 w-4" />{readingTime(article.body)} min de lecture</span>
             </div>
-            <h1 className="font-heading font-bold">{article.title}</h1>
-            <p className="mt-4 text-lg md:text-xl text-primary-foreground/90 leading-relaxed">{article.intro}</p>
+            <h1 className="font-heading font-bold max-w-4xl">{article.title}</h1>
+            <p className="mt-4 max-w-3xl text-lg md:text-xl text-primary-foreground/90 leading-relaxed">{article.intro}</p>
           </div>
         </div>
       </header>
 
       <div className="container mx-auto">
-        {cover && <img src={cover} alt="" className="mx-auto mt-8 w-full max-w-3xl aspect-[16/9] object-cover rounded-3xl" />}
+        {/* Comme un livre ouvert : la photo entière à gauche (elle reste visible pendant la lecture), le texte à droite.
+            Sur téléphone, la photo entière au-dessus du texte. */}
+        <div className={cover ? "mx-auto mt-8 max-w-6xl lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-12 lg:items-start" : "mx-auto mt-10 max-w-3xl"}>
+          {cover && (
+            <figure className="lg:sticky lg:top-28">
+              <img src={cover} alt="" className="mx-auto block h-auto w-auto max-w-full max-h-[75vh] lg:max-h-[calc(100vh-8rem)] rounded-3xl shadow-soft" />
+            </figure>
+          )}
+          <div className="min-w-0">
+            {/* Texte */}
+            <RichText text={article.body} variant="article"
+              className="mt-8 lg:mt-0 space-y-5 text-[17px] md:text-lg leading-[1.8] text-foreground/90" />
 
-        {/* Texte */}
-        <RichText text={article.body} variant="article"
-          className="mx-auto max-w-3xl mt-10 space-y-5 text-[17px] md:text-lg leading-[1.8] text-foreground/90" />
+            <p className="mt-10 flex gap-3 rounded-2xl bg-secondary/70 p-5 text-sm text-muted-foreground">
+              <Stethoscope className="h-5 w-5 shrink-0 text-primary mt-0.5" />
+              Ces conseils sont donnés à titre d'information et ne remplacent pas l'avis d'un médecin ou d'un dermatologue. En cas de perte de cheveux importante, de douleur, de plaies ou de démangeaisons qui durent, consultez.
+            </p>
 
-        <p className="mx-auto max-w-3xl mt-10 flex gap-3 rounded-2xl bg-secondary/70 p-5 text-sm text-muted-foreground">
-          <Stethoscope className="h-5 w-5 shrink-0 text-primary mt-0.5" />
-          Ces conseils sont donnés à titre d'information et ne remplacent pas l'avis d'un médecin ou d'un dermatologue. En cas de perte de cheveux importante, de douleur, de plaies ou de démangeaisons qui durent, consultez.
-        </p>
-
-        {/* Sources */}
-        {references.length > 0 && (
-          <section className="mx-auto max-w-3xl mt-10" aria-labelledby="sources">
-            <h2 id="sources" className="font-heading font-bold !text-2xl mb-4 flex items-center gap-2"><BookOpen className="h-6 w-6 text-primary" />Sources et pour aller plus loin</h2>
-            <ol className="space-y-2.5 list-decimal pl-6 marker:text-muted-foreground">
-              {references.map((ref, i) => (
-                <li key={`${ref.url}-${i}`}>
-                  <a href={ref.url} target="_blank" rel="noopener noreferrer" className="group inline-flex items-start gap-1.5 hover:text-primary">
-                    <span className="underline underline-offset-2 decoration-border group-hover:decoration-primary">{ref.title}</span>
-                    <ExternalLink className="h-3.5 w-3.5 mt-1.5 shrink-0 text-muted-foreground" />
-                  </a>
-                  <span className="block text-xs text-muted-foreground">{host(ref.url)}</span>
-                </li>
-              ))}
-            </ol>
-          </section>
-        )}
+            {/* Sources */}
+            {references.length > 0 && (
+              <section className="mt-10" aria-labelledby="sources">
+                <h2 id="sources" className="font-heading font-bold !text-2xl mb-4 flex items-center gap-2"><BookOpen className="h-6 w-6 text-primary" />Sources et pour aller plus loin</h2>
+                <ol className="space-y-2.5 list-decimal pl-6 marker:text-muted-foreground">
+                  {references.map((ref, i) => (
+                    <li key={`${ref.url}-${i}`}>
+                      <a href={ref.url} target="_blank" rel="noopener noreferrer" className="group inline-flex items-start gap-1.5 hover:text-primary">
+                        <span className="underline underline-offset-2 decoration-border group-hover:decoration-primary">{ref.title}</span>
+                        <ExternalLink className="h-3.5 w-3.5 mt-1.5 shrink-0 text-muted-foreground" />
+                      </a>
+                      <span className="block text-xs text-muted-foreground">{host(ref.url)}</span>
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            )}
+          </div>
+        </div>
 
         {/* Soins conseillés */}
         {products.length > 0 && (
           <section className="mt-16" aria-labelledby="soins">
-            <h2 id="soins" className="font-heading font-bold mb-8 text-center">Les soins Cure's Nappy <span className="text-primary">pour aller plus loin</span></h2>
-            <div className="product-grid max-w-5xl mx-auto">{products.map((p) => p && <ProductCard key={p.id} product={p} />)}</div>
+            <h2 id="soins" className="font-heading font-bold mb-8 text-center">{page.productsHeading.title} <span className="text-primary">{page.productsHeading.highlight}</span></h2>
+            <ProductRail products={products.filter((p): p is NonNullable<typeof p> => Boolean(p))} label={`${page.productsHeading.title} ${page.productsHeading.highlight}`.trim() || "Soins conseillés"} center />
           </section>
         )}
 

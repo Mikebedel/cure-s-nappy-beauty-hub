@@ -19,6 +19,7 @@ import ArticlePage from "./pages/ArticlePage";
 import APropos from "./pages/APropos";
 import Contact from "./pages/Contact";
 import ProductDetail from "./pages/ProductDetail";
+import PackDetail from "./pages/PackDetail";
 import Panier from "./pages/Panier";
 import Checkout from "./pages/Checkout";
 import OrderReceipt from "./pages/OrderReceipt";
@@ -79,6 +80,7 @@ const PublicStore = () => {
           <Route path="/a-propos" element={<APropos />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/produit/:id" element={<ProductDetail />} />
+          <Route path="/gamme/:id" element={<PackDetail />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/commande/:token" element={<OrderReceipt />} />
           <Route path="*" element={<NotFound />} />
