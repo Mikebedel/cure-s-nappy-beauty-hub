@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useCallback, useContext, useRef, useState, useEffect, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 
@@ -24,6 +24,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [aal, setAal] = useState<"aal1" | "aal2" | null>(null);
   const [loading, setLoading] = useState(true);
+  const userIdRef = useRef<string | null>(null);
 
   const refreshAal = useCallback(async () => {
     const { data } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
@@ -32,19 +33,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Rôle admin et niveau de connexion sont lus avant de déclarer le chargement terminé,
   // pour ne jamais rediriger à tort pendant la vérification.
+  // Le compte n'est publié qu'avec son rôle : juste après la connexion, la page admin ne doit
+  // jamais voir « connecté mais pas encore admin » (elle renverrait vers l'accueil).
   const load = useCallback(async (current: Session | null) => {
-    setSession(current);
-    setUser(current?.user ?? null);
     if (!current?.user) {
+      userIdRef.current = null;
+      setSession(null);
+      setUser(null);
       setIsAdmin(false);
       setAal(null);
       setLoading(false);
       return;
     }
+    // Écran de chargement seulement quand le compte change (connexion), pas au renouvellement
+    // automatique du jeton : le dashboard ouvert ne doit pas être démonté.
+    if (current.user.id !== userIdRef.current) setLoading(true);
+    userIdRef.current = current.user.id;
     const [{ data: role }] = await Promise.all([
       supabase.from("user_roles").select("role").eq("user_id", current.user.id).eq("role", "admin").maybeSingle(),
       refreshAal(),
     ]);
+    setSession(current);
+    setUser(current.user);
     setIsAdmin(!!role);
     setLoading(false);
   }, [refreshAal]);
@@ -59,7 +69,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [load]);
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    // Compte, rôle et niveau de connexion sont chargés avant que la page de connexion ouvre /admin.
+    if (!error) await load(data.session);
     return { error: error as Error | null };
   };
 
