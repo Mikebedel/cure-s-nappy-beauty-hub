@@ -14,6 +14,8 @@ export const defaultContent: SiteContent = {
     email: "contact@curesnappy.ci",
     address: "Abidjan, Côte d'Ivoire",
     facebookUrl: "https://www.facebook.com/curenappy",
+    instagramUrl: "https://www.instagram.com/cures_nappy_officiel/",
+    tiktokUrl: "https://www.tiktok.com/@cures.nappy_offic",
     whatsappCatalogUrl: "https://wa.me/c/2250100848479",
   },
 

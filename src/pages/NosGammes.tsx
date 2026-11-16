@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { productMatchesCategory } from "@/data/products";
 import { useCatalog, useContent } from "@/content/ContentProvider";
 import Highlight from "@/content/Highlight";
-import ProductCard from "@/components/ProductCard";
+import ProductRail from "@/components/ProductRail";
 import PageHero from "@/components/PageHero";
 import SectionHeading from "@/components/SectionHeading";
 import { GammesSection, DuosSection } from "@/components/CollectionSections";
@@ -44,11 +44,7 @@ const NosGammes = () => {
                     Voir tout <ArrowRight className="h-4 w-4" />
                   </Link>
                 </div>
-                <div className="product-grid">
-                  {gProducts.map((p) => (
-                    <ProductCard key={p.id} product={p} hideBadge />
-                  ))}
-                </div>
+                <ProductRail products={gProducts} label={g.name} />
               </div>
             );
           })}

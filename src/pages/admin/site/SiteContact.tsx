@@ -18,7 +18,9 @@ const SiteContact = () => {
           <TextField label="E-mail" value={contact.email} onChange={(v) => update((d) => { d.contact.email = v.trim(); })} />
           <TextField label="Adresse" value={contact.address} onChange={(v) => update((d) => { d.contact.address = v; })} />
           <TextField label="Lien du catalogue WhatsApp" value={contact.whatsappCatalogUrl} onChange={(v) => update((d) => { d.contact.whatsappCatalogUrl = v.trim(); })} />
-          <TextField label="Lien de la page Facebook" value={contact.facebookUrl} onChange={(v) => update((d) => { d.contact.facebookUrl = v.trim(); })} />
+          <TextField label="Lien de la page Facebook" value={contact.facebookUrl} onChange={(v) => update((d) => { d.contact.facebookUrl = v.trim(); })} hint="Adresse complète commençant par https://. Laisser vide pour masquer le bouton." />
+          <TextField label="Lien du compte Instagram" value={contact.instagramUrl} onChange={(v) => update((d) => { d.contact.instagramUrl = v.trim(); })} hint="Ex. https://www.instagram.com/cures_nappy_officiel/ — laisser vide pour masquer le bouton." />
+          <TextField label="Lien du compte TikTok" value={contact.tiktokUrl} onChange={(v) => update((d) => { d.contact.tiktokUrl = v.trim(); })} hint="Ex. https://www.tiktok.com/@cures.nappy_offic — laisser vide pour masquer le bouton." />
         </Grid>
       </Panel>
 

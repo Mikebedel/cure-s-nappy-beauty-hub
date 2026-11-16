@@ -43,8 +43,8 @@ const Panier = () => {
   }, [location.state]);
 
   return (
-    <div className="fixed inset-0 z-40 bg-foreground/25 backdrop-blur-sm pt-24 pb-5 px-3 flex items-start justify-end" onClick={close}>
-      <section ref={panelRef} data-closing={closing} role="dialog" aria-modal="true" aria-labelledby="cart-title" className="cart-panel bg-card border border-border rounded-3xl w-full max-w-md max-h-[calc(100dvh-7rem)] flex flex-col overflow-hidden" onClick={event => event.stopPropagation()}>
+    <div className="fixed inset-0 z-40 bg-foreground/25 backdrop-blur-sm pt-24 pb-5 px-3 [@media(max-height:740px)]:pt-[5.5rem] [@media(max-height:740px)]:pb-3 flex items-start justify-end" onClick={close}>
+      <section ref={panelRef} data-closing={closing} role="dialog" aria-modal="true" aria-labelledby="cart-title" className="cart-panel bg-card border border-border rounded-3xl w-full max-w-md max-h-[calc(100dvh-7rem)] [@media(max-height:740px)]:max-h-[calc(100dvh-6.25rem)] flex flex-col overflow-hidden" onClick={event => event.stopPropagation()}>
         <header className="flex items-center justify-between px-5 py-4 border-b border-border">
           <h1 id="cart-title" className="font-heading font-bold text-xl">Votre panier <span className="text-sm text-muted-foreground">({items.length})</span></h1>
           <Button variant="ghost" size="icon" aria-label="Fermer votre panier" onClick={close}><X /></Button>
@@ -57,7 +57,7 @@ const Panier = () => {
           </div>
         ) : (
           <>
-            <div className="overflow-y-auto px-5 divide-y divide-border">
+            <div className="overflow-y-auto overscroll-contain px-5 divide-y divide-border">
               {items.map(({ product, quantity }) => (
                 <div key={product.id} className="flex gap-3 py-4">
                   <img src={product.image} alt={product.name} className="h-16 w-16 rounded-xl object-cover bg-muted shrink-0" />
@@ -74,9 +74,9 @@ const Panier = () => {
                 </div>
               ))}
             </div>
-            <footer className="border-t border-border p-5 space-y-4">
+            <footer className="border-t border-border p-5 space-y-4 [@media(max-height:740px)]:p-4 [@media(max-height:740px)]:space-y-3">
               <div className="flex justify-between font-bold"><span>Sous-total</span><span className="text-primary">{totalPrice.toLocaleString("fr-FR")} FCFA</span></div>
-              <p className="text-sm text-muted-foreground">{delivery.abidjan.communes.length > 0 && <>Livraison à Abidjan : {Math.min(...delivery.abidjan.communes.map((c) => c.fee)).toLocaleString("fr-FR")} à {Math.max(...delivery.abidjan.communes.map((c) => c.fee)).toLocaleString("fr-FR")} FCFA selon la commune. </>}Expédition possible partout en Côte d’Ivoire et à l’international : vous choisissez à l’étape suivante.</p>
+              <p className="text-sm text-muted-foreground [@media(max-height:740px)]:hidden">{delivery.abidjan.communes.length > 0 && <>Livraison à Abidjan : {Math.min(...delivery.abidjan.communes.map((c) => c.fee)).toLocaleString("fr-FR")} à {Math.max(...delivery.abidjan.communes.map((c) => c.fee)).toLocaleString("fr-FR")} FCFA selon la commune. </>}Expédition possible partout en Côte d’Ivoire et à l’international : vous choisissez à l’étape suivante.</p>
               <Button asChild className="w-full bg-action text-action-foreground hover:bg-action/90"><Link to="/checkout">Passer la commande</Link></Button>
               <Button variant="ghost" className="w-full" onClick={close}><ArrowLeft />Continuer les achats</Button>
             </footer>

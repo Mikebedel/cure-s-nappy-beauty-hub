@@ -116,9 +116,25 @@
 .product-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
 @media (min-width: 360px) { .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 640px) { .product-grid { gap: 20px; } }
+@media (min-width: 720px) { .product-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (min-width: 1024px) { .product-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 .product-grid--3 { align-items: start; }
+/* Les gammes : 3 par ligne sur tablette et petit ordinateur, toutes sur une ligne à partir de 1280 px */
+@media (min-width: 1024px) { .product-grid--ranges { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1280px) { .product-grid--ranges { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; } }
 @media (min-width: 1024px) { .product-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+/* Une ligne de produits qui défile : mêmes largeurs de cartes que la grille des gammes */
+.product-rail { --rail-gap: 12px; --rail-cols: 2.15; display: flex; gap: var(--rail-gap); overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 2px; padding: 4px 2px 12px; scrollbar-width: none; overscroll-behavior-x: contain; }
+.product-rail::-webkit-scrollbar { display: none; }
+.product-rail__item { flex: 0 0 calc((100% - (var(--rail-cols) - 1) * var(--rail-gap)) / var(--rail-cols)); min-width: 0; scroll-snap-align: start; display: flex; }
+.product-rail__item > * { width: 100%; }
+@media (max-width: 359px) { .product-rail { --rail-cols: 1.2; } }
+@media (min-width: 640px) { .product-rail { --rail-gap: 20px; } }
+@media (min-width: 720px) { .product-rail { --rail-cols: 3; } }
+@media (min-width: 1280px) { .product-rail { --rail-gap: 16px; --rail-cols: 5; } }
+.product-rail__arrow { position: absolute; top: 38%; z-index: 2; display: none; height: 44px; width: 44px; align-items: center; justify-content: center; border-radius: 9999px; background: hsl(var(--card)); color: hsl(var(--primary)); border: 1px solid hsl(var(--border)); box-shadow: var(--shadow-soft); transition: opacity 200ms ease; }
+.product-rail__arrow:disabled { opacity: 0; pointer-events: none; }
+@media (min-width: 720px) and (hover: hover) { .product-rail__arrow { display: inline-flex; } }
 .product-card { box-shadow: var(--shadow-soft); transition: box-shadow 260ms ease, border-color 260ms ease, transform 260ms ease; }
 .product-card:hover { box-shadow: var(--shadow-product); border-color: hsl(var(--primary) / 0.3); transform: translateY(-3px); }
 

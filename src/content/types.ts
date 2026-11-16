@@ -86,6 +86,9 @@ export interface SiteContent {
     email: string;
     address: string;
     facebookUrl: string;
+    /** Laisser vide pour masquer le bouton du pied de page. */
+    instagramUrl: string;
+    tiktokUrl: string;
     whatsappCatalogUrl: string;
   };
   footer: { tagline: string; quote: string };

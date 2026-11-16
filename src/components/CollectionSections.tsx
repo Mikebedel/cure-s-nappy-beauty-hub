@@ -1,4 +1,5 @@
 import { useCartNavigation } from "@/hooks/use-cart-navigation";
+import { useAlignedRows } from "@/hooks/useAlignedRows";
 import { useState } from "react";
 import { ShoppingBag, ChevronDown, Check } from "lucide-react";
 import { packToProduct, GammePack, Accessory } from "@/data/products";
@@ -16,8 +17,8 @@ const RangeCard = ({ pack }: { pack: GammePack }) => {
     <article className="product-card flex flex-col min-w-0 bg-card border border-border/80 rounded-3xl overflow-hidden p-2">
       <div className="aspect-square overflow-hidden bg-muted rounded-2xl"><img src={pack.image} alt={pack.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-500 ease-out hover:scale-105" /></div>
       <div className="px-2 pt-4 pb-2 sm:px-3 flex flex-col gap-3">
-        <h3 className="font-heading font-semibold text-base sm:text-lg leading-6 min-h-12">{pack.name}</h3>
-        <p className="text-sm text-muted-foreground leading-6">{pack.description}</p>
+        <h3 data-align="title" className="font-heading font-semibold text-base sm:text-lg leading-6">{pack.name}</h3>
+        <p data-align="description" className="text-sm text-muted-foreground leading-6">{pack.description}</p>
         <Button variant="ghost" aria-expanded={expanded} aria-controls={`contains-${pack.id}`} className="justify-between px-0 text-primary whitespace-normal text-left rounded-none hover:bg-transparent hover:text-primary/80" onClick={() => setExpanded(value => !value)}>
           Les {pack.contains.length} soins inclus <ChevronDown className={expanded ? "rotate-180 transition-transform duration-200" : "transition-transform duration-200"} />
         </Button>
@@ -34,12 +35,13 @@ const RangeCard = ({ pack }: { pack: GammePack }) => {
 export const GammesSection = () => {
   const { ranges } = useCatalog();
   const heading = useContent().content.shop.rangesHeading;
+  const gridRef = useAlignedRows<HTMLDivElement>(["title", "description"], [ranges]);
   if (!ranges.length) return null;
   return (
     <section id="gammes" className="section scroll-mt-24 reveal-section">
       <div className="container mx-auto">
         <SectionHeading eyebrow={heading.eyebrow} title={<Highlight title={heading.title} highlight={heading.highlight} />} description={heading.text} />
-        <div className="product-grid items-start">{ranges.map(pack => <RangeCard key={pack.id} pack={pack} />)}</div>
+        <div ref={gridRef} className="product-grid product-grid--ranges items-start">{ranges.map(pack => <RangeCard key={pack.id} pack={pack} />)}</div>
       </div>
     </section>
   );
@@ -48,12 +50,13 @@ export const GammesSection = () => {
 export const DuosSection = () => {
   const { duos } = useCatalog();
   const heading = useContent().content.shop.duosHeading;
+  const gridRef = useAlignedRows<HTMLDivElement>(["title", "description"], [duos]);
   if (!duos.length) return null;
   return (
     <section id="duos" className="section bg-secondary/60 scroll-mt-24">
       <div className="container mx-auto">
         <SectionHeading eyebrow={heading.eyebrow} title={<Highlight title={heading.title} highlight={heading.highlight} />} description={heading.text} />
-        <div className="product-grid product-grid--3">
+        <div ref={gridRef} className="product-grid product-grid--3">
           {duos.map(pack => <RangeCard key={pack.id} pack={pack} />)}
         </div>
       </div>
