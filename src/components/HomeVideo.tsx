@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, Play } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getYoutubeId } from "@/lib/youtube";
 import { Button } from "@/components/ui/button";
@@ -11,19 +11,32 @@ type Video = { id: string; title: string | null; youtube_url: string };
 
 const FALLBACK: Video = { id: "f", title: null, youtube_url: "https://youtube.com/shorts/STG6odV72s8" };
 
+// Le lecteur YouTube pèse environ 4 Mo : on affiche d'abord l'image de la vidéo,
+// et le lecteur ne se charge que lorsque la visiteuse appuie sur lecture.
 const VideoFrame = ({ video }: { video: Video }) => {
+  const [playing, setPlaying] = useState(false);
   const id = getYoutubeId(video.youtube_url);
   if (!id) return null;
+  const title = video.title ?? "Vidéo Cure's Nappy";
   return (
-    <div className="w-full aspect-[9/16] rounded-[1.75rem] overflow-hidden bg-deep shadow-lift ring-8 ring-card">
-      <iframe
-        src={`https://www.youtube.com/embed/${id}`}
-        title={video.title ?? "Vidéo Cure's Nappy"}
-        className="w-full h-full"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-        loading="lazy"
-      />
+    <div className="relative w-full aspect-[9/16] rounded-[1.75rem] overflow-hidden bg-deep shadow-lift ring-8 ring-card">
+      {playing ? (
+        <iframe
+          src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&playsinline=1`}
+          title={title}
+          className="w-full h-full"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      ) : (
+        <button type="button" onClick={() => setPlaying(true)} aria-label={`Lire la vidéo : ${title}`} className="group absolute inset-0 w-full h-full">
+          <img src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`} alt="" loading="lazy" className="w-full h-full object-cover" />
+          <span className="absolute inset-0 bg-deep/25 transition-colors group-hover:bg-deep/10" />
+          <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 inline-flex h-16 w-16 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-lift transition-transform group-hover:scale-105">
+            <Play className="h-7 w-7 translate-x-0.5" fill="currentColor" />
+          </span>
+        </button>
+      )}
     </div>
   );
 };

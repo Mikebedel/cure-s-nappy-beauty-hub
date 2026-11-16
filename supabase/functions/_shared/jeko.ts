@@ -45,7 +45,9 @@ export async function createPaymentRequest(params: { amount: number; reference: 
   });
   const body = await res.json().catch(() => null);
   if (!res.ok || !body?.id || !body?.redirectUrl) {
-    throw new Error(`Jèko a refusé la demande de paiement (${res.status}) ${body?.id ?? body?.message ?? ""}`);
+    // Raison donnée par Jèko, pour le journal des fonctions (numéros de téléphone masqués).
+    const detail = JSON.stringify(body ?? {}).replace(/\+?\d{8,}/g, "•••").slice(0, 600);
+    throw new Error(`Jèko a refusé la demande de paiement (${res.status}) ${detail}`);
   }
   return { id: body.id as string, redirectUrl: body.redirectUrl as string };
 }

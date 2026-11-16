@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
-import { CheckCircle2, Clock, Printer, MessageCircle, Share2, Loader2, CreditCard, AlertCircle, Link2 } from "lucide-react";
-import { toast } from "sonner";
+import { CheckCircle2, Clock, Download, MessageCircle, Share2, Loader2, CreditCard, AlertCircle, Link2 } from "lucide-react";
+import ShareSheet, { copyText, nativeShare } from "@/components/ShareSheet";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useContent } from "@/content/ContentProvider";
@@ -47,6 +47,7 @@ const OrderReceipt = () => {
   const [receipt, setReceipt] = useState<Receipt | null>(null);
   const [error, setError] = useState(false);
   const [checks, setChecks] = useState(0);
+  const [shareOpen, setShareOpen] = useState(false);
 
   const load = useCallback(async () => {
     const { data, error: fnError } = await supabase.functions.invoke("order-receipt", { body: { token } });
@@ -84,19 +85,28 @@ const OrderReceipt = () => {
   const link = window.location.href;
   const shareText = `Mon reçu Cure's Nappy — commande ${receipt.orderNumber} (${fcfa(receipt.total)}) : ${link}`;
   const teamText = `Bonjour Cure's Nappy, je vous écris au sujet de ma commande ${receipt.orderNumber}.`;
+  // Menu de partage du téléphone (WhatsApp, SMS, e-mail…) ; sinon, copie du lien.
+  const shareData = { title: `Reçu Cure's Nappy ${receipt.orderNumber}`, text: `Mon reçu Cure's Nappy — commande ${receipt.orderNumber} (${fcfa(receipt.total)})`, url: link };
+  const share = async () => { if (!(await nativeShare(shareData))) setShareOpen(true); };
 
   return (
     <div className="container mx-auto pt-28 pb-16 max-w-3xl receipt-page">
+      <ShareSheet open={shareOpen} onOpenChange={setShareOpen} {...shareData} />
       {/* Message de confirmation */}
       <div className={`no-print rounded-[2rem] p-6 md:p-8 mb-6 ${paid ? "bg-primary text-primary-foreground" : "bg-card border border-border"}`}>
         {paid ? (
           <>
             <CheckCircle2 className="h-10 w-10 mb-3 text-accent" />
-            <h1 className="font-heading font-bold !text-3xl md:!text-4xl mb-2">Paiement reçu, merci {receipt.customerName.split(" ")[0]} !</h1>
+            <h1 className="font-heading font-bold !text-3xl md:!text-4xl mb-2">Félicitations {receipt.customerName.split(" ")[0]}, votre paiement est confirmé !</h1>
             <p className="text-primary-foreground/90 text-lg">
               Nous avons bien reçu votre commande <strong>{receipt.orderNumber}</strong>.
               {receipt.deliveryEstimate && <> Elle sera {receipt.zone === "abidjan" ? "livrée" : "expédiée"} <strong>{receipt.deliveryEstimate}</strong> {receipt.zone === "abidjan" ? "à" : "vers"} {receipt.place}.</>} Nous vous contacterons sur WhatsApp avant la livraison.
             </p>
+            <p className="mt-3 text-primary-foreground/90">Votre reçu est prêt juste en dessous : téléchargez-le ou partagez-le.</p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90" onClick={() => window.print()}><Download />Télécharger le reçu</Button>
+              <Button size="lg" variant="outline" className="bg-transparent border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground" onClick={share}><Share2 />Partager</Button>
+            </div>
           </>
         ) : waiting ? (
           <>
@@ -140,10 +150,12 @@ const OrderReceipt = () => {
 
       {/* Actions sur le reçu */}
       <div className="no-print flex flex-wrap gap-2 mb-6">
-        <Button variant="outline" onClick={() => window.print()}><Printer />Imprimer ou enregistrer en PDF</Button>
-        <Button variant="outline" asChild><a href={`https://wa.me/?text=${encodeURIComponent(shareText)}`} target="_blank" rel="noopener noreferrer"><Share2 />Envoyer sur WhatsApp</a></Button>
+        {/* Commande payée : ces deux boutons sont déjà dans le message de félicitations. */}
+        {!paid && <Button variant="outline" onClick={() => window.print()}><Download />Télécharger ou imprimer (PDF)</Button>}
+        {!paid && <Button variant="outline" onClick={share}><Share2 />Partager</Button>}
+        <Button variant="outline" asChild><a href={`https://wa.me/?text=${encodeURIComponent(shareText)}`} target="_blank" rel="noopener noreferrer"><MessageCircle />Envoyer sur WhatsApp</a></Button>
         <Button variant="outline" asChild><a href={`https://wa.me/${contact.whatsapp}?text=${encodeURIComponent(teamText)}`} target="_blank" rel="noopener noreferrer"><MessageCircle />Contacter Cure's Nappy</a></Button>
-        <Button variant="ghost" onClick={() => navigator.clipboard?.writeText(link).then(() => toast.success("Lien du reçu copié"), () => toast.error("Copie impossible"))}><Link2 />Copier le lien</Button>
+        <Button variant="ghost" onClick={() => copyText(link)}><Link2 />Copier le lien</Button>
       </div>
 
       {/* Le reçu (c'est la seule partie imprimée) */}
