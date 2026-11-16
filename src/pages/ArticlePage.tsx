@@ -2,6 +2,7 @@ import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Clock, BookOpen, ExternalLink, Stethoscope } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/ProductCard";
+import { AskQuestion } from "@/components/HairProblems";
 import { useCatalog, useContent } from "@/content/ContentProvider";
 import { iconFor } from "@/content/icons";
 import { resolveImage } from "@/content/images";
@@ -83,6 +84,8 @@ const ArticlePage = () => {
             <div className="product-grid max-w-5xl mx-auto">{products.map((p) => p && <ProductCard key={p.id} product={p} />)}</div>
           </section>
         )}
+
+        <AskQuestion className="mt-16" />
 
         {/* À lire aussi */}
         {others.length > 0 && (

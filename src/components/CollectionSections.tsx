@@ -1,4 +1,5 @@
 import { useCartNavigation } from "@/hooks/use-cart-navigation";
+import { Price, PromoBadge } from "@/components/Price";
 import { useAlignedRows } from "@/hooks/useAlignedRows";
 import { useState } from "react";
 import { ShoppingBag, ChevronDown, Check } from "lucide-react";
@@ -25,7 +26,7 @@ const RangeCard = ({ pack }: { pack: GammePack }) => {
         <div id={`contains-${pack.id}`} className="range-content" data-open={expanded} aria-hidden={!expanded}>
           <div><ul className="text-sm text-muted-foreground space-y-2 pb-3">{pack.contains.map(item => <li key={item} className="flex items-start gap-2"><Check className="h-4 w-4 mt-0.5 shrink-0 text-primary" />{item}</li>)}</ul>{pack.note && <p className="text-sm text-muted-foreground pb-3">{pack.note}</p>}</div>
         </div>
-        <p className="font-heading font-bold text-lg text-primary">{pack.price.toLocaleString("fr-FR")} FCFA</p>
+        <p className="flex items-center gap-2 flex-wrap"><Price price={pack.price} original={pack.originalPrice} className="font-heading font-bold text-lg text-primary" /><PromoBadge price={pack.price} original={pack.originalPrice} /></p>
         <Button className="w-full" onClick={() => { addToCart(packToProduct(pack)); openCart(); }}><ShoppingBag />Ajouter</Button>
       </div>
     </article>
@@ -89,7 +90,7 @@ const AccessoryCard = ({ item }: { item: Accessory }) => {
               ))}
             </div>
           </div>}
-          {item.price !== null && <p className="font-heading font-bold text-xl text-primary">{item.price.toLocaleString("fr-FR")} FCFA</p>}
+          {cartItem && <p className="flex items-center gap-2 flex-wrap"><Price price={cartItem.price} original={cartItem.originalPrice} className="font-heading font-bold text-xl text-primary" /><PromoBadge price={cartItem.price} original={cartItem.originalPrice} /></p>}
           {cartItem ? (
             <div className="flex flex-wrap gap-3">
               <Button size="lg" onClick={() => addToCart(cartItem)}><ShoppingBag />Ajouter au panier</Button>

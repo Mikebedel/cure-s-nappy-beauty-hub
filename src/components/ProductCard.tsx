@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Price, PromoBadge } from "@/components/Price";
 import { ShoppingBag } from "lucide-react";
 import { Product } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
@@ -29,6 +30,7 @@ const ProductCard = ({ product, hideBadge = false }: { product: Product; hideBad
               {gammeLabels[product.gamme]}
             </span>
           )}
+          <PromoBadge price={product.price} original={product.originalPrice} className="absolute top-3 right-3" />
           {product.volume && (
             <span className="absolute bottom-3 right-3 bg-background/90 backdrop-blur text-foreground/80 text-xs font-medium px-2.5 py-1 rounded-full">
               {product.volume}
@@ -44,7 +46,7 @@ const ProductCard = ({ product, hideBadge = false }: { product: Product; hideBad
         </Link>
         <p className="text-sm leading-6 text-muted-foreground mb-4 line-clamp-2 min-h-12">{product.shortDescription}</p>
         <div className="flex flex-col items-stretch mt-auto gap-3">
-          <span className="font-heading text-lg font-bold text-primary">{product.price.toLocaleString("fr-FR")} FCFA</span>
+          <Price price={product.price} original={product.originalPrice} className="font-heading text-lg font-bold text-primary" />
           <Button
             size="sm"
             className="bg-action text-action-foreground hover:bg-action/90 font-semibold"

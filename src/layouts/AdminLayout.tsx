@@ -1,7 +1,7 @@
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, ShoppingCart, Package, Users, BarChart3, Megaphone, Star, FileText, MessageSquare, Video,
-  LogOut, Menu, Home, Store, Layers, Sparkles, BookOpen, Info, Phone, Truck, ExternalLink, Save, Undo2, Loader2, AlertTriangle, CloudOff, Cloud,
+  LogOut, Menu, Home, Store, Layers, Sparkles, BookOpen, Info, Phone, Truck, ExternalLink, Save, Undo2, Loader2, AlertTriangle, CloudOff, Cloud, BadgePercent,
 } from "lucide-react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
@@ -24,6 +24,7 @@ const navGroups = [
       { label: "À propos", path: "/admin/site/a-propos", icon: Info },
       { label: "Contact & infos", path: "/admin/site/contact", icon: Phone },
       { label: "Livraison & paiement", path: "/admin/site/livraison", icon: Truck },
+      { label: "Promotion", path: "/admin/site/promotion", icon: BadgePercent },
       { label: "Vidéos", path: "/admin/videos", icon: Video },
     ],
   },

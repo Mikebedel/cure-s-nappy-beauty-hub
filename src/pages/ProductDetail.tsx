@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Price, PromoBadge } from "@/components/Price";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, ShoppingBag } from "lucide-react";
 import { useCatalog } from "@/content/ContentProvider";
@@ -57,7 +58,7 @@ const ProductDetail = () => {
             <h1 className="font-heading text-3xl md:text-4xl font-bold mt-2 mb-3">{product.name}</h1>
             {product.volume && <p className="text-muted-foreground mb-4">{product.volume}</p>}
 
-            <p className="text-2xl font-bold text-primary mb-4">{product.price.toLocaleString("fr-FR")} FCFA</p>
+            <p className="mb-4 flex items-center gap-3"><Price price={product.price} original={product.originalPrice} className="text-2xl font-bold text-primary" /><PromoBadge price={product.price} original={product.originalPrice} /></p>
             <p className="text-base leading-7 mb-6">{product.shortDescription}</p>
 
             <Button

@@ -1,12 +1,15 @@
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ShoppingBag, Menu, X, Home } from "lucide-react";
+import { ShoppingBag, Menu, X, Home, Tag } from "lucide-react";
+import { useCatalog } from "@/content/ContentProvider";
 import { useCart } from "@/contexts/CartContext";
 import wordmark from "@/assets/brand-wordmark.png";
 import logo from "@/assets/logo.jpg";
 import { Button } from "@/components/ui/button";
 
 const Navbar = () => {
+  const { promotion } = useCatalog();
+  const promoEnd = promotion ? new Date(`${promotion.endDate}T12:00:00Z`).toLocaleDateString("fr-FR", { day: "numeric", month: "long" }) : "";
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { totalItems } = useCart();
@@ -74,6 +77,14 @@ const Navbar = () => {
 
   return (
     <nav aria-label="Navigation principale" className="fixed top-0 left-0 right-0 z-50 px-3 pt-3">
+      {/* Bandeau de promotion, seulement pendant la période réglée dans le dashboard */}
+      {promotion && (
+        <Link to="/boutique" className="mx-auto mb-1.5 flex max-w-max items-center gap-2 rounded-full bg-accent px-4 py-1.5 text-xs sm:text-sm font-semibold text-accent-foreground shadow-soft hover:brightness-95 transition">
+          <Tag className="h-3.5 w-3.5 shrink-0" />
+          <span className="sm:hidden whitespace-nowrap">{promotion.badge || `-${promotion.percent} %`} sur le site · jusqu'au {promoEnd}</span>
+          <span className="hidden sm:inline truncate max-w-[70vw]">{promotion.banner} · jusqu'au {promoEnd}</span>
+        </Link>
+      )}
       <div className={`mx-auto max-w-[1240px] flex items-center justify-between gap-2 rounded-full border bg-background/85 backdrop-blur-xl pl-4 pr-2 transition-all duration-300 ${scrolled ? "py-1.5 border-border shadow-lift" : "py-2 border-border/60 shadow-soft"}`}>
         <Link
           to="/"

@@ -5,7 +5,7 @@ import { resolveImage } from "./images";
 import { BackendStatus, clearDraft, loadDraft, loadRemote, mergeContent, saveDraft, saveRemote } from "./store";
 import type { Accessory, GammePack, Product } from "@/data/products";
 import { packToProduct } from "@/data/products";
-import { accessoryItemId } from "../../supabase/functions/_shared/pricing";
+import { accessoryItemId, discountedPrice, promotionActive, promotionPercent } from "../../supabase/functions/_shared/pricing";
 
 /** « remote » : la base en ligne ; « local » : l'aperçu enregistré dans ce navigateur. */
 export type SaveTarget = "remote" | "local";
@@ -80,13 +80,19 @@ export const useContent = () => {
 export const useCatalog = () => {
   const { content } = useContent();
   return useMemo(() => {
-    const { catalog } = content;
+    const { catalog, promotion } = content;
+    // Promotion en cours : même règle que le serveur, prix d'origine gardé pour l'afficher barré.
+    const now = new Date();
+    const promo = (itemId: string, price: number) => {
+      const percent = promotionPercent(promotion, itemId, now);
+      return percent > 0 ? { price: discountedPrice(price, percent), originalPrice: price } : { price };
+    };
     const allProducts: Product[] = catalog.products.map((p) => ({
       id: p.id,
       name: p.name,
       description: p.description,
       shortDescription: p.shortDescription,
-      price: p.price,
+      ...promo(p.id, p.price),
       image: resolveImage(p.image),
       gamme: p.category,
       categories: [p.category, ...p.extraCategories],
@@ -102,7 +108,7 @@ export const useCatalog = () => {
 
     const ranges: GammePack[] = catalog.ranges.map((r) => ({
       id: r.id, name: r.name, description: r.description, note: r.note || undefined,
-      price: r.price, image: resolveImage(r.image), benefits: r.benefits, contains: r.contains,
+      ...promo(`pack-${r.id}`, r.price), image: resolveImage(r.image), benefits: r.benefits, contains: r.contains,
     }));
 
     const duos: GammePack[] = catalog.duos.map((d) => {
@@ -110,7 +116,8 @@ export const useCatalog = () => {
       return {
         id: d.id, name: d.name, description: d.description, image: resolveImage(d.image), benefits: [],
         contains: items.map((p) => p.name),
-        price: items.reduce((sum, p) => sum + p.price, 0),
+        // Le duo vaut la somme des prix d'origine de ses soins ; la promotion s'applique ensuite sur ce total.
+        ...promo(`pack-${d.id}`, d.productIds.reduce((sum, id) => sum + (catalog.products.find((p) => p.id === id)?.price ?? 0), 0)),
       };
     });
 
@@ -128,7 +135,7 @@ export const useCatalog = () => {
         id: accessoryItemId(accessory.id, color?.name ?? ""),
         name: many && color ? `${accessory.name} — ${color.name}` : accessory.name,
         description: accessory.intro, shortDescription: accessory.intro,
-        price: accessory.price, image: color?.image ?? "", gamme: "accessoire",
+        ...promo(accessoryItemId(accessory.id, color?.name ?? ""), accessory.price), image: color?.image ?? "", gamme: "accessoire",
         benefits: [], ingredients: [], usage: "",
       };
     };
@@ -150,6 +157,7 @@ export const useCatalog = () => {
     };
 
     return {
+      promotion: promotionActive(promotion, now) ? promotion : null,
       categories: catalog.categories,
       products,
       productById: (id: string) => byId.get(id),

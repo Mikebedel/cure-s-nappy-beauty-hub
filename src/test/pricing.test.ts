@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { priceOrder, checkCustomer } from "../../supabase/functions/_shared/pricing";
+import { priceOrder, checkCustomer, promotionActive, promotionPercent, discountedPrice, type Promotion } from "../../supabase/functions/_shared/pricing";
 import { defaultContent } from "@/content/defaults";
 
 const catalog = defaultContent.catalog;
@@ -104,5 +104,48 @@ describe("copie serveur du catalogue d'origine", () => {
     const expected = JSON.stringify({ catalog, delivery }, null, 2) + "\n";
     if (process.env.UPDATE_SERVER_DEFAULTS) writeFileSync(file, expected);
     expect(readFileSync(file, "utf8")).toBe(expected);
+  });
+});
+
+describe("promotion", () => {
+  const promo: Promotion = { ...defaultContent.promotion, enabled: true, percent: 20, startDate: "2026-12-01", endDate: "2026-12-07" };
+  const during = new Date("2026-12-04T10:00:00Z");
+  const huile = catalog.products.find((p) => p.id === "8")!;
+
+  it("ne s'applique que pendant la période, dates incluses", () => {
+    expect(promotionActive(promo, new Date("2026-11-30T23:59:00Z"))).toBe(false);
+    expect(promotionActive(promo, new Date("2026-12-01T00:00:00Z"))).toBe(true);
+    expect(promotionActive(promo, new Date("2026-12-07T23:59:00Z"))).toBe(true);
+    expect(promotionActive(promo, new Date("2026-12-08T00:00:00Z"))).toBe(false);
+    expect(promotionActive({ ...promo, enabled: false }, during)).toBe(false);
+    expect(promotionActive({ ...promo, startDate: "" }, during)).toBe(false);
+    expect(promotionActive({ ...promo, percent: 95 }, during)).toBe(false);
+  });
+
+  it("le serveur facture le prix réduit, arrondi aux 5 FCFA", () => {
+    const result = priceOrder(catalog, delivery, [{ id: "8", quantity: 2 }], abidjan("Cocody"), promo, during);
+    if (!result.ok) throw new Error(result.error);
+    expect(result.lines[0].unitPrice).toBe(discountedPrice(huile.price, 20));
+    expect(result.lines[0].unitPrice % 5).toBe(0);
+    expect(result.subtotal).toBe(discountedPrice(huile.price, 20) * 2);
+    const after = priceOrder(catalog, delivery, [{ id: "8", quantity: 1 }], abidjan("Cocody"), promo, new Date("2026-12-09T10:00:00Z"));
+    if (!after.ok) throw new Error(after.error);
+    expect(after.lines[0].unitPrice).toBe(huile.price);
+  });
+
+  it("respecte les articles concernés : gammes, sélection, accessoires", () => {
+    expect(promotionPercent(promo, "pack-gamme-minie", during)).toBe(20);
+    expect(promotionPercent({ ...promo, includePacks: false }, "pack-gamme-minie", during)).toBe(0);
+    expect(promotionPercent(promo, "acc-set-peignes-brosses::Vert", during)).toBe(0);
+    expect(promotionPercent({ ...promo, includeAccessories: true }, "acc-set-peignes-brosses::Vert", during)).toBe(20);
+    const selection: Promotion = { ...promo, scope: "selection", productIds: ["8"] };
+    expect(promotionPercent(selection, "8", during)).toBe(20);
+    expect(promotionPercent(selection, "1", during)).toBe(0);
+  });
+
+  it("aucune réduction sans promotion enregistrée", () => {
+    const result = priceOrder(catalog, delivery, [{ id: "8", quantity: 1 }], abidjan("Cocody"), null, during);
+    if (!result.ok) throw new Error(result.error);
+    expect(result.lines[0].unitPrice).toBe(huile.price);
   });
 });

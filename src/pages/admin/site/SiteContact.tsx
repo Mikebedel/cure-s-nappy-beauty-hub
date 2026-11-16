@@ -1,6 +1,6 @@
 import { useDraft } from "@/admin/DraftContext";
 import RestoreButton from "@/admin/RestoreButton";
-import { PageTitle, Panel, Grid, TextField } from "@/admin/fields";
+import { PageTitle, Panel, Grid, TextField, ToggleField } from "@/admin/fields";
 
 const SiteContact = () => {
   const { draft, update } = useDraft();
@@ -41,6 +41,21 @@ const SiteContact = () => {
       <Panel title="Pied de page">
         <TextField label="Présentation" multiline value={footer.tagline} onChange={(v) => update((d) => { d.footer.tagline = v; })} />
         <TextField label="Citation (en doré)" value={footer.quote} onChange={(v) => update((d) => { d.footer.quote = v; })} />
+      </Panel>
+
+      <Panel title="Newsletter" description="La bande d'inscription au-dessus du pied de page (toutes les pages) et sur la page Contact. La liste des inscrites est dans Marketing.">
+        <ToggleField label="Afficher l'inscription à la newsletter" checked={footer.newsletter.visible} onChange={(v) => update((d) => { d.footer.newsletter.visible = v; })} />
+        <Grid>
+          <TextField label="Titre" value={footer.newsletter.title} onChange={(v) => update((d) => { d.footer.newsletter.title = v; })} />
+          <TextField label="Bouton" value={footer.newsletter.button} onChange={(v) => update((d) => { d.footer.newsletter.button = v; })} />
+        </Grid>
+        <TextField label="Texte" multiline value={footer.newsletter.text} onChange={(v) => update((d) => { d.footer.newsletter.text = v; })} />
+        <Grid>
+          <TextField label="Texte dans la case e-mail" value={footer.newsletter.placeholder} onChange={(v) => update((d) => { d.footer.newsletter.placeholder = v; })} />
+          <TextField label="Petite mention sous la case" value={footer.newsletter.privacy} onChange={(v) => update((d) => { d.footer.newsletter.privacy = v; })} />
+          <TextField label="Message après inscription" value={footer.newsletter.success} onChange={(v) => update((d) => { d.footer.newsletter.success = v; })} />
+          <TextField label="Message si déjà inscrite" value={footer.newsletter.already} onChange={(v) => update((d) => { d.footer.newsletter.already = v; })} />
+        </Grid>
       </Panel>
     </div>
   );

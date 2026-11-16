@@ -11,6 +11,49 @@ export interface PricingCatalog {
   accessories?: { id: string; name: string; price: number | null; colors: { name: string }[] }[];
 }
 
+/**
+ * Promotion réglée dans le dashboard : un pourcentage, une période (dates incluses, heure d'Abidjan = UTC)
+ * et les articles concernés. La même règle sert au site (prix barrés) et au serveur (prix facturé).
+ */
+export interface Promotion {
+  enabled: boolean;
+  percent: number;
+  /** AAAA-MM-JJ, premier et dernier jour inclus. */
+  startDate: string;
+  endDate: string;
+  /** « all » : tous les soins ; « selection » : seulement les identifiants de productIds (soins, ou « pack-<id> » pour une gamme ou un duo). */
+  scope: "all" | "selection";
+  productIds: string[];
+  /** Avec « all » : les gammes et les duos sont aussi en promotion. */
+  includePacks: boolean;
+  includeAccessories: boolean;
+  banner: string;
+  badge: string;
+}
+
+const DAY = /^\d{4}-\d{2}-\d{2}$/;
+
+/** La promotion est-elle en cours à cette date ? */
+export function promotionActive(promo: Promotion | undefined | null, now: Date = new Date()): boolean {
+  if (!promo?.enabled) return false;
+  if (!Number.isInteger(promo.percent) || promo.percent < 1 || promo.percent > 90) return false;
+  if (!DAY.test(promo.startDate ?? "") || !DAY.test(promo.endDate ?? "")) return false;
+  const today = now.toISOString().slice(0, 10);
+  return today >= promo.startDate && today <= promo.endDate;
+}
+
+/** Prix réduit, arrondi aux 5 FCFA (plus petite pièce). */
+export const discountedPrice = (price: number, percent: number) => Math.max(5, Math.round((price * (100 - percent)) / 100 / 5) * 5);
+
+/** Pourcentage de réduction d'un article du panier (0 s'il n'est pas concerné). */
+export function promotionPercent(promo: Promotion | undefined | null, itemId: string, now: Date = new Date()): number {
+  if (!promo || !promotionActive(promo, now)) return 0;
+  if (itemId.startsWith("acc-")) return promo.includeAccessories ? promo.percent : 0;
+  if (promo.scope === "selection") return promo.productIds.includes(itemId) ? promo.percent : 0;
+  if (itemId.startsWith("pack-")) return promo.includePacks ? promo.percent : 0;
+  return promo.percent;
+}
+
 /** Identifiant panier d'un accessoire dans une couleur : « acc-<accessoire>::<couleur> ». */
 export const accessoryItemId = (accessoryId: string, color: string) => `acc-${accessoryId}::${color}`;
 
@@ -88,7 +131,7 @@ export const MAX_QUANTITY = 20;
 
 const isWholePositive = (n: unknown): n is number => typeof n === "number" && Number.isInteger(n) && n > 0;
 
-export function priceOrder(catalog: PricingCatalog, delivery: PricingDelivery, rawLines: unknown, rawDestination: unknown): PricingResult {
+export function priceOrder(catalog: PricingCatalog, delivery: PricingDelivery, rawLines: unknown, rawDestination: unknown, promotion?: Promotion | null, now: Date = new Date()): PricingResult {
   if (!Array.isArray(rawLines) || rawLines.length === 0) return { ok: false, error: "Le panier est vide." };
   if (rawLines.length > MAX_LINES) return { ok: false, error: "Trop d'articles différents dans le panier." };
 
@@ -132,6 +175,8 @@ export function priceOrder(catalog: PricingCatalog, delivery: PricingDelivery, r
       if (product && product.visible) { name = product.name; unitPrice = product.price; }
     }
     if (!name || !isWholePositive(unitPrice)) return { ok: false, error: "Un article du panier n'est plus disponible. Retirez-le puis réessayez." };
+    const percent = promotionPercent(promotion, id, now);
+    if (percent > 0) unitPrice = discountedPrice(unitPrice, percent);
     lines.push({ id, name, unitPrice, quantity, lineTotal: unitPrice * quantity });
   }
 

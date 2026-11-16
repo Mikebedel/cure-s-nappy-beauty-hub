@@ -1,4 +1,5 @@
 import { useCartNavigation } from "@/hooks/use-cart-navigation";
+import { Price, PromoBadge } from "@/components/Price";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Star, ShoppingBag, ChevronLeft, ChevronRight, Zap, Check } from "lucide-react";
@@ -7,6 +8,7 @@ import { packToProduct } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import ProductCard from "@/components/ProductCard";
 import HomeVideo from "@/components/HomeVideo";
+import HairProblems from "@/components/HairProblems";
 import SectionHeading from "@/components/SectionHeading";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
@@ -184,25 +186,8 @@ const Index = () => {
         </section>
       )}
 
-      {/* ============ GARANTIES ============ */}
-      {home.guarantees.length > 0 && (
-        <section className="container mx-auto py-12 md:py-16">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
-            {home.guarantees.map((item) => {
-              const Icon = iconFor(item.icon);
-              return (
-                <div key={item.title} className="surface p-5 md:p-6">
-                  <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-4">
-                    <Icon className="h-6 w-6" strokeWidth={1.6} />
-                  </span>
-                  <h3 className="font-heading text-base md:text-lg font-semibold mb-1.5">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{item.text}</p>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
+      {/* ============ QUEL EST TON PROBLÈME CAPILLAIRE ? ============ */}
+      <HairProblems />
 
       {/* ============ SOINS DU MOMENT ============ */}
       {featured.length > 0 && (
@@ -281,7 +266,7 @@ const Index = () => {
                     ))}
                   </ul>
                 )}
-                <p className="font-heading text-3xl font-bold text-primary mb-6">{curlCream.price.toLocaleString("fr-FR")} FCFA</p>
+                <p className="mb-6 flex items-center gap-3 flex-wrap"><Price price={curlCream.price} original={curlCream.originalPrice} className="font-heading text-3xl font-bold text-primary" /><PromoBadge price={curlCream.price} original={curlCream.originalPrice} /></p>
                 <div className="flex flex-wrap gap-3">
                   <Button size="lg" onClick={() => { addToCart(curlCream); openCart(); }}>
                     <ShoppingBag /> Ajouter au panier
@@ -347,7 +332,7 @@ const Index = () => {
               {home.boxSet.eyebrow && <span className="eyebrow eyebrow--light">{home.boxSet.eyebrow}</span>}
               <h2 className="font-heading font-bold mt-3 mb-4">{home.boxSet.title || boxSet.name}</h2>
               <p className="text-primary-foreground/90 text-lg leading-relaxed max-w-lg mb-6">{home.boxSet.text}</p>
-              <p className="font-heading text-3xl md:text-4xl font-bold text-accent mb-1">{boxSet.price.toLocaleString("fr-FR")} FCFA</p>
+              <p className="mb-1"><Price price={boxSet.price} original={boxSet.originalPrice} className="font-heading text-3xl md:text-4xl font-bold text-accent" originalClassName="text-primary-foreground/70" /></p>
               <p className="text-primary-foreground/80 mb-7">{boxSet.contains.length} soins inclus</p>
               <div className="flex flex-wrap gap-3">
                 <Button onClick={() => { addToCart(packToProduct(boxSet)); openCart(); }} size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
@@ -418,6 +403,26 @@ const Index = () => {
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* ============ GARANTIES ============ */}
+      {home.guarantees.length > 0 && (
+        <section className="container mx-auto py-12 md:py-16 reveal-section">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
+            {home.guarantees.map((item) => {
+              const Icon = iconFor(item.icon);
+              return (
+                <div key={item.title} className="surface p-5 md:p-6">
+                  <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-4">
+                    <Icon className="h-6 w-6" strokeWidth={1.6} />
+                  </span>
+                  <h3 className="font-heading text-base md:text-lg font-semibold mb-1.5">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{item.text}</p>
+                </div>
+              );
+            })}
           </div>
         </section>
       )}

@@ -37,7 +37,7 @@ Deno.serve(async (req) => {
     const customerError = checkCustomer(customer, false);
     if (customerError) return json(req, { error: customerError }, 400);
 
-    const priced = priceOrder(settings.catalog, settings.delivery, body.items, body.destination);
+    const priced = priceOrder(settings.catalog, settings.delivery, body.items, body.destination, settings.promotion);
     if (!priced.ok) return json(req, { error: priced.error }, 400);
     // Sans tarif connu pour la destination, le total final n'existe pas encore : pas de paiement en ligne.
     if (online && !priced.feeConfirmed) {

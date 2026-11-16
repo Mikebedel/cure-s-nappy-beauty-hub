@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Check, Play } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,31 +11,70 @@ type Video = { id: string; title: string | null; youtube_url: string };
 
 const FALLBACK: Video = { id: "f", title: null, youtube_url: "https://youtube.com/shorts/STG6odV72s8" };
 
-// Le lecteur YouTube pèse environ 4 Mo : on affiche d'abord l'image de la vidéo,
-// et le lecteur ne se charge que lorsque la visiteuse appuie sur lecture.
+// Origines contactées par le lecteur YouTube : on ouvre les connexions à l'avance.
+const YT_ORIGINS = ["https://www.youtube-nocookie.com", "https://www.youtube.com", "https://i.ytimg.com", "https://www.google.com", "https://jnn-pa.googleapis.com"];
+const warmConnections = () => {
+  for (const href of YT_ORIGINS) {
+    if (document.head.querySelector(`link[rel="preconnect"][href="${href}"]`)) continue;
+    const link = Object.assign(document.createElement("link"), { rel: "preconnect", href, crossOrigin: "anonymous" });
+    document.head.appendChild(link);
+  }
+};
+/** Pré-chargement complet seulement sur une bonne connexion, sans mode « économie de données ». */
+const goodConnection = () => {
+  const c = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+  return !c || (!c.saveData && (c.effectiveType === undefined || c.effectiveType === "4g"));
+};
+
+// Le lecteur YouTube pèse près de 2 Mo : on affiche d'abord l'image de la vidéo. Quand la vidéo approche
+// à l'écran, les connexions s'ouvrent ; au survol, au toucher, ou après quelques secondes à l'écran sur une
+// bonne connexion, le lecteur se charge en arrière-plan (sans lecture). L'appui sur ▶ démarre alors vite.
 const VideoFrame = ({ video }: { video: Video }) => {
   const [playing, setPlaying] = useState(false);
+  const [warm, setWarm] = useState(false);
+  const box = useRef<HTMLDivElement>(null);
   const id = getYoutubeId(video.youtube_url);
+
+  useEffect(() => {
+    const el = box.current;
+    if (!el || !id) return;
+    let timer: number | undefined;
+    const near = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { warmConnections(); near.disconnect(); } }, { rootMargin: "800px 0px" });
+    const seen = new IntersectionObserver(([entry]) => {
+      window.clearTimeout(timer);
+      if (entry.isIntersecting && goodConnection()) timer = window.setTimeout(() => setWarm(true), 1500);
+    }, { threshold: 0.6 });
+    near.observe(el); seen.observe(el);
+    return () => { near.disconnect(); seen.disconnect(); window.clearTimeout(timer); };
+  }, [id]);
+
   if (!id) return null;
   const title = video.title ?? "Vidéo Cure's Nappy";
+  const src = `https://www.youtube-nocookie.com/embed/${id}?playsinline=1&rel=0`;
+  const prepare = () => { warmConnections(); setWarm(true); };
   return (
-    <div className="relative w-full aspect-[9/16] rounded-[1.75rem] overflow-hidden bg-deep shadow-lift ring-8 ring-card">
+    <div ref={box} className="relative w-full aspect-[9/16] rounded-[1.75rem] overflow-hidden bg-deep shadow-lift ring-8 ring-card">
       {playing ? (
         <iframe
-          src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&playsinline=1`}
+          src={`${src}&autoplay=1`}
           title={title}
           className="w-full h-full"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
         />
       ) : (
-        <button type="button" onClick={() => setPlaying(true)} aria-label={`Lire la vidéo : ${title}`} className="group absolute inset-0 w-full h-full">
-          <img src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`} alt="" loading="lazy" className="w-full h-full object-cover" />
-          <span className="absolute inset-0 bg-deep/25 transition-colors group-hover:bg-deep/10" />
-          <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 inline-flex h-16 w-16 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-lift transition-transform group-hover:scale-105">
-            <Play className="h-7 w-7 translate-x-0.5" fill="currentColor" />
-          </span>
-        </button>
+        <>
+          {/* Lecteur préchargé, invisible : il remplit le cache pour que la lecture démarre vite. */}
+          {warm && <iframe src={src} title="" aria-hidden="true" tabIndex={-1} className="absolute inset-0 w-full h-full opacity-0 pointer-events-none" />}
+          <button type="button" onClick={() => setPlaying(true)} onPointerEnter={prepare} onTouchStart={prepare} onFocus={prepare}
+            aria-label={`Lire la vidéo : ${title}`} className="group absolute inset-0 w-full h-full">
+            <img src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`} alt="" loading="lazy" className="w-full h-full object-cover" />
+            <span className="absolute inset-0 bg-deep/25 transition-colors group-hover:bg-deep/10" />
+            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 inline-flex h-16 w-16 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-lift transition-transform group-hover:scale-105">
+              <Play className="h-7 w-7 translate-x-0.5" fill="currentColor" />
+            </span>
+          </button>
+        </>
       )}
     </div>
   );

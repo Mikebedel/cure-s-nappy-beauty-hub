@@ -37,6 +37,7 @@ import SiteAdvice from "./pages/admin/site/SiteAdvice";
 import SiteAbout from "./pages/admin/site/SiteAbout";
 import SiteContact from "./pages/admin/site/SiteContact";
 import SiteDelivery from "./pages/admin/site/SiteDelivery";
+import SitePromotion from "./pages/admin/site/SitePromotion";
 import AdminClients from "./pages/admin/AdminClients";
 import AdminAnalytics from "./pages/admin/AdminAnalytics";
 import AdminMarketing from "./pages/admin/AdminMarketing";
@@ -122,6 +123,7 @@ const App = () => (
                 <Route path="site/a-propos" element={<SiteAbout />} />
                 <Route path="site/contact" element={<SiteContact />} />
                 <Route path="site/livraison" element={<SiteDelivery />} />
+                <Route path="site/promotion" element={<SitePromotion />} />
                 <Route path="clients" element={<AdminClients />} />
                 <Route path="analytics" element={<AdminAnalytics />} />
                 <Route path="marketing" element={<AdminMarketing />} />

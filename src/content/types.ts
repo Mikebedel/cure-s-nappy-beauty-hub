@@ -78,6 +78,8 @@ export interface ArticleContent {
   productIds?: string[];
 }
 
+import type { Promotion } from "../../supabase/functions/_shared/pricing";
+
 export interface SiteContent {
   version: 1;
   contact: {
@@ -91,7 +93,14 @@ export interface SiteContent {
     tiktokUrl: string;
     whatsappCatalogUrl: string;
   };
-  footer: { tagline: string; quote: string };
+  /** Promotion sur le site : prix barrés, badge, bandeau ; le serveur applique la même réduction. */
+  promotion: Promotion;
+  footer: {
+    tagline: string;
+    quote: string;
+    /** Bande d'inscription à la newsletter, au-dessus du pied de page et sur la page Contact. */
+    newsletter: { visible: boolean; title: string; text: string; placeholder: string; button: string; success: string; already: string; privacy: string };
+  };
   delivery: {
     /** Livraison dans le Grand Abidjan : un prix par commune. */
     abidjan: { delay: string; communes: { name: string; fee: number }[] };
@@ -126,6 +135,15 @@ export interface SiteContent {
     };
     ticker: string[];
     guarantees: { icon: string; title: string; text: string }[];
+    /** « Quel est ton problème capillaire ? » : chaque carte mène à un article de la page Conseils. */
+    problems: Heading & {
+      visible: boolean;
+      text: string;
+      items: { id: string; icon: string; title: string; text: string; articleId: string }[];
+      /** Défilement automatique de la ligne de cartes, et délai entre deux cartes (secondes). */
+      autoplay: boolean;
+      delay: number;
+    };
     featured: Heading & { productIds: string[] };
     video: Heading & { text: string; points: string[] };
     rituals: Heading & { cards: { rangeId: string; label: string; subtitle: string; description: string }[] };
@@ -165,6 +183,8 @@ export interface SiteContent {
     tips: ArticleContent[];
     adviceTitle: string;
     advice: ArticleContent[];
+    /** Carte « Pose ta question » (page Conseils et bas des articles) : ouvre WhatsApp avec ce message. */
+    ask: { title: string; text: string; label: string; message: string };
   };
   about: {
     eyebrow: string;

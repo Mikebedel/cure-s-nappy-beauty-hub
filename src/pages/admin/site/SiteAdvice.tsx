@@ -49,6 +49,15 @@ const SiteAdvice = () => {
         <TextField label="Texte" value={page.description} onChange={(v) => update((d) => { d.advice.description = v; })} />
       </Panel>
 
+      <Panel title="Carte « Pose ta question »" description="En bas de la page Conseils et de chaque article : ouvre WhatsApp avec un message déjà commencé">
+        <Grid>
+          <TextField label="Titre" value={page.ask.title} onChange={(v) => update((d) => { d.advice.ask.title = v; })} hint="Laisser vide pour masquer la carte." />
+          <TextField label="Bouton" value={page.ask.label} onChange={(v) => update((d) => { d.advice.ask.label = v; })} />
+        </Grid>
+        <TextField label="Texte" multiline value={page.ask.text} onChange={(v) => update((d) => { d.advice.ask.text = v; })} />
+        <TextField label="Message WhatsApp déjà écrit" value={page.ask.message} onChange={(v) => update((d) => { d.advice.ask.message = v; })} hint="La cliente le complète avec sa question avant d'envoyer." />
+      </Panel>
+
       <Panel title={`${page.tipsTitle || "Astuces"} (${page.tips.length})`} defaultOpen>
         <TextField label="Titre de la rubrique" value={page.tipsTitle} onChange={(v) => update((d) => { d.advice.tipsTitle = v; })} />
         <Repeater items={page.tips} onChange={(v) => update((d) => { d.advice.tips = v; })} itemTitle={(a) => a.title} create={create} addLabel="Ajouter une astuce"

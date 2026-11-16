@@ -1,11 +1,12 @@
 import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
-import type { PricingCatalog, PricingDelivery } from "./pricing.ts";
+import type { PricingCatalog, PricingDelivery, Promotion } from "./pricing.ts";
 import defaults from "./default-content.json" with { type: "json" };
 
 export interface ServerSettings {
   catalog: PricingCatalog;
   delivery: PricingDelivery & { onlinePayment: boolean; payLater: boolean; onlineMethods: string[] };
   whatsapp: string;
+  promotion: Promotion | null;
 }
 
 /** Catalogue et livraison publiés depuis le dashboard, ou ceux d'origine si rien n'a été enregistré. */
@@ -22,5 +23,7 @@ export async function loadSettings(db: SupabaseClient): Promise<ServerSettings> 
     },
     delivery: { ...defaults.delivery, ...(stored.delivery ?? {}) },
     whatsapp: stored.contact?.whatsapp ?? "2250100848479",
+    // Promotion : uniquement celle enregistrée depuis le dashboard (aucune par défaut).
+    promotion: stored.promotion ?? null,
   };
 }

@@ -15,7 +15,7 @@ const SiteDelivery = () => {
       </PageTitle>
 
       <Panel title={`Livraison à Abidjan (${abidjan.communes.length} communes)`} description="Un prix par commune" defaultOpen>
-        <TextField label="Délai annoncé" value={abidjan.delay} onChange={(v) => update((d) => { d.delivery.abidjan.delay = v; })} hint="Affiché après « Livrée … » : ex. sous 24 à 48 h" />
+        <TextField label="Délai annoncé" value={abidjan.delay} onChange={(v) => update((d) => { d.delivery.abidjan.delay = v; })} hint="Affiché après « Livrée … » : ex. en moins de 24 h" />
         <Repeater items={abidjan.communes} onChange={(v) => update((d) => { d.delivery.abidjan.communes = v; })}
           itemTitle={(c) => `${c.name} · ${feeText(c.fee)}`} create={() => ({ name: "Nouvelle commune", fee: 1500 })} addLabel="Ajouter une commune"
           render={(c, change) => (

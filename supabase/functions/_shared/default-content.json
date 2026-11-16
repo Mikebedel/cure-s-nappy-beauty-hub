@@ -489,7 +489,7 @@
   },
   "delivery": {
     "abidjan": {
-      "delay": "sous 24 à 48 h",
+      "delay": "en moins de 24 h",
       "communes": [
         {
           "name": "Cocody",

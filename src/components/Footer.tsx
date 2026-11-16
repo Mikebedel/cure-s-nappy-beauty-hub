@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import NewsletterSignup from "@/components/NewsletterSignup";
 import { Facebook, Instagram, MapPin, Phone, Mail, MessageCircle } from "lucide-react";
 import type { ComponentType } from "react";
 
@@ -25,8 +26,11 @@ const links = [
 
 const Footer = () => {
   const { contact, footer } = useContent().content;
+  // La page Contact affiche déjà l'inscription à la newsletter.
+  const onContact = useLocation().pathname === "/contact";
   return (
     <footer className="px-3 pb-3 pt-8">
+      {!onContact && <NewsletterSignup className="container mx-auto mb-3" />}
       <div className="rounded-[2rem] bg-deep text-deep-foreground">
         <div className="container mx-auto py-12 md:py-16">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">

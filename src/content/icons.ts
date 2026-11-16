@@ -1,6 +1,6 @@
 import {
   ShieldCheck, Truck, Sparkles, MessageCircleHeart, Eye, Target, Heart, Leaf, Users, Award,
-  Lightbulb, ShieldAlert, AlertTriangle, Droplets, Star, Gift, Clock, Package, Smile, Flower2,
+  Lightbulb, ShieldAlert, AlertTriangle, Droplets, Star, Gift, Clock, Package, Smile, Flower2, Sprout, Scissors,
   type LucideIcon,
 } from "lucide-react";
 
@@ -26,6 +26,8 @@ export const icons: Record<string, { label: string; icon: LucideIcon }> = {
   package: { label: "Colis", icon: Package },
   smile: { label: "Sourire", icon: Smile },
   flower: { label: "Fleur", icon: Flower2 },
+  sprout: { label: "Pousse", icon: Sprout },
+  scissors: { label: "Ciseaux / casse", icon: Scissors },
 };
 
 export const iconFor = (key: string): LucideIcon => icons[key]?.icon ?? Sparkles;

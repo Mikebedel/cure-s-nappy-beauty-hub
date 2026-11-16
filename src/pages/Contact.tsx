@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import PageHero from "@/components/PageHero";
+import NewsletterSignup from "@/components/NewsletterSignup";
 import { useContent } from "@/content/ContentProvider";
 
 const Contact = () => {
@@ -112,6 +113,7 @@ const Contact = () => {
             </form>
           </div>
         </div>
+        <NewsletterSignup source="contact" className="max-w-5xl mx-auto mt-5" />
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Price } from "@/components/Price";
 import { Trash2, Plus, Minus, ArrowLeft, ShoppingBag, X } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useContent } from "@/content/ContentProvider";
@@ -63,7 +64,7 @@ const Panier = () => {
                   <img src={product.image} alt={product.name} className="h-16 w-16 rounded-xl object-cover bg-muted shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-sm leading-5">{product.name}</p>
-                    <p className="text-sm text-primary font-bold mt-1">{product.price.toLocaleString("fr-FR")} FCFA</p>
+                    <p className="text-sm mt-1"><Price price={product.price} original={product.originalPrice} className="text-primary font-bold" /></p>
                     <div className="flex items-center mt-1 gap-1">
                       <Button variant="ghost" size="icon" aria-label={`Diminuer la quantité de ${product.name}`} onClick={() => updateQuantity(product.id, quantity - 1)}><Minus /></Button>
                       <span className="w-6 text-center text-sm">{quantity}</span>

@@ -2,7 +2,7 @@ import { useDraft } from "@/admin/DraftContext";
 import RestoreButton from "@/admin/RestoreButton";
 import {
   PageTitle, Panel, Grid, TextField, RichTextField, LinesField, ToggleField, SelectField, IconField,
-  ImageField, ImagesField, ChecklistField, HeadingFields, Repeater,
+  ImageField, ImagesField, ChecklistField, HeadingFields, Repeater, newId, NumberField,
 } from "@/admin/fields";
 
 const SiteHome = () => {
@@ -10,6 +10,7 @@ const SiteHome = () => {
   const home = draft.home;
   const productOptions = draft.catalog.products.map((p) => ({ value: p.id, label: p.name }));
   const rangeOptions = draft.catalog.ranges.map((r) => ({ value: r.id, label: r.name }));
+  const articleOptions = [...draft.advice.tips, ...draft.advice.advice].map((a) => ({ value: a.id, label: a.title }));
 
   return (
     <div className="space-y-4">
@@ -46,21 +47,30 @@ const SiteHome = () => {
         <LinesField label="Phrases" value={home.ticker} onChange={(v) => update((d) => { d.home.ticker = v; })} hint="Une phrase par ligne. Laissez vide pour masquer le bandeau." />
       </Panel>
 
-      <Panel title="Garanties" description="Les 4 cartes avec icône (qualité, livraison…)">
-        <Repeater items={home.guarantees} onChange={(v) => update((d) => { d.home.guarantees = v; })}
-          itemTitle={(g) => g.title} create={() => ({ icon: "sparkles", title: "Nouvelle garantie", text: "" })} addLabel="Ajouter une garantie"
-          render={(g, change) => (
+
+      <Panel title="Quel est ton problème capillaire ?" description="La ligne de cartes juste après le bandeau défilant : chacune ouvre un article de la page Conseils">
+        <ToggleField label="Afficher ce bloc" checked={home.problems.visible} onChange={(v) => update((d) => { d.home.problems.visible = v; })} />
+        <HeadingFields value={home.problems} onChange={(v) => update((d) => { d.home.problems = { ...d.home.problems, ...v }; })} />
+        <TextField label="Texte d'introduction (affiché sur ordinateur)" multiline value={home.problems.text} onChange={(v) => update((d) => { d.home.problems.text = v; })} />
+        <Repeater items={home.problems.items} onChange={(v) => update((d) => { d.home.problems.items = v; })}
+          itemTitle={(p) => p.title} create={() => ({ id: newId("probleme"), icon: "sparkles", title: "Nouveau problème", text: "", articleId: articleOptions[0]?.value ?? "" })} addLabel="Ajouter un problème"
+          render={(p, change) => (
             <>
               <Grid>
-                <TextField label="Titre" value={g.title} onChange={(title) => change({ ...g, title })} />
-                <IconField value={g.icon} onChange={(icon) => change({ ...g, icon })} />
+                <TextField label="Problème" value={p.title} onChange={(title) => change({ ...p, title })} />
+                <IconField value={p.icon} onChange={(icon) => change({ ...p, icon })} />
               </Grid>
-              <TextField label="Texte" value={g.text} onChange={(text) => change({ ...g, text })} />
+              <TextField label="Texte court (bulle d'aide au survol)" multiline value={p.text} onChange={(text) => change({ ...p, text })} />
+              <SelectField label="Article ouvert par « Que faire ? »" value={p.articleId} onChange={(articleId) => change({ ...p, articleId })} options={articleOptions} hint="Les articles se rédigent dans « Conseils ». Une carte dont l'article n'existe plus est masquée." />
             </>
           )} />
+        <Grid>
+          <ToggleField label="Défilement automatique" checked={home.problems.autoplay} onChange={(v) => update((d) => { d.home.problems.autoplay = v; })} hint="Les cartes défilent seules ; les flèches restent disponibles." />
+          <NumberField label="Délai entre deux cartes (secondes)" value={home.problems.delay} onChange={(v) => update((d) => { d.home.problems.delay = Math.max(1.5, v ?? 3); })} hint="Entre 2 et 5 secondes conseillé." />
+        </Grid>
       </Panel>
 
-      <Panel title="Nos soins du moment" description="Les produits mis en avant juste après les garanties">
+      <Panel title="Nos soins du moment" description="Les produits mis en avant juste après « Quel est ton problème capillaire ? »">
         <HeadingFields value={home.featured} onChange={(v) => update((d) => { d.home.featured = { ...d.home.featured, ...v }; })} />
         <ChecklistField label="Produits affichés" value={home.featured.productIds} onChange={(v) => update((d) => { d.home.featured.productIds = v; })} options={productOptions} hint="Ils s'affichent dans l'ordre où vous les cochez. 4 produits remplissent une ligne." />
       </Panel>
@@ -138,6 +148,20 @@ const SiteHome = () => {
             <>
               <TextField label="Nom" value={r.name} onChange={(name) => change({ ...r, name })} />
               <TextField label="Avis" multiline value={r.text} onChange={(text) => change({ ...r, text })} />
+            </>
+          )} />
+      </Panel>
+
+      <Panel title="Garanties" description="Les 4 cartes avec icône (qualité, livraison…), en bas de page avant « Notre raison d'être »">
+        <Repeater items={home.guarantees} onChange={(v) => update((d) => { d.home.guarantees = v; })}
+          itemTitle={(g) => g.title} create={() => ({ icon: "sparkles", title: "Nouvelle garantie", text: "" })} addLabel="Ajouter une garantie"
+          render={(g, change) => (
+            <>
+              <Grid>
+                <TextField label="Titre" value={g.title} onChange={(title) => change({ ...g, title })} />
+                <IconField value={g.icon} onChange={(icon) => change({ ...g, icon })} />
+              </Grid>
+              <TextField label="Texte" value={g.text} onChange={(text) => change({ ...g, text })} />
             </>
           )} />
       </Panel>

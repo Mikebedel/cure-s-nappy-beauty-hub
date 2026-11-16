@@ -5,6 +5,7 @@ import { useContent } from "@/content/ContentProvider";
 import { iconFor } from "@/content/icons";
 import { resolveImage } from "@/content/images";
 import { Button } from "@/components/ui/button";
+import { AskQuestion } from "@/components/HairProblems";
 import PageHero from "@/components/PageHero";
 
 /** Carte d'article : mène à la page complète de l'article. */
@@ -50,6 +51,8 @@ const Conseils = () => {
             {page.advice.map((item) => <ItemCard key={item.id} item={item} />)}
           </div>
         </>}
+
+        <AskQuestion className="mt-12" />
 
         <div className="mt-12 max-w-md mx-auto">
           <Button asChild size="lg" className="w-full h-12">

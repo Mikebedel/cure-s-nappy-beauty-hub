@@ -8,6 +8,8 @@ export interface Product {
   description: string;
   shortDescription: string;
   price: number;
+  /** Prix avant promotion, quand une promotion s'applique (affiché barré). */
+  originalPrice?: number;
   image: string;
   gamme: string;
   categories?: string[];
@@ -23,6 +25,7 @@ export interface GammePack {
   name: string;
   description: string;
   price: number;
+  originalPrice?: number;
   image: string;
   benefits: string[];
   contains: string[];
@@ -48,6 +51,7 @@ export const packToProduct = (pack: GammePack): Product => ({
   description: pack.description,
   shortDescription: pack.description,
   price: pack.price,
+  originalPrice: pack.originalPrice,
   image: pack.image,
   gamme: "pack",
   benefits: pack.benefits,

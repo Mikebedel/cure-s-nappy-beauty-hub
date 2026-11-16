@@ -19,14 +19,36 @@ export const defaultContent: SiteContent = {
     whatsappCatalogUrl: "https://wa.me/c/2250100848479",
   },
 
+  promotion: {
+    enabled: false,
+    percent: 20,
+    startDate: "",
+    endDate: "",
+    scope: "all",
+    productIds: [],
+    includePacks: true,
+    includeAccessories: false,
+    banner: "-20 % sur tous nos soins en commandant sur le site",
+    badge: "-20 %",
+  },
   footer: {
     tagline: "Des soins capillaires naturels, formulés à Abidjan pour les cheveux crépus, bouclés et naturels.",
     quote: "« Le meilleur remède pour tous vos bobos capillaires. »",
+    newsletter: {
+      visible: true,
+      title: "La newsletter Cure's Nappy",
+      text: "Conseils capillaires, nouveautés et offres réservées aux abonnées, une à deux fois par mois.",
+      placeholder: "Ton adresse e-mail",
+      button: "Je m'inscris",
+      success: "Merci ! Tu es bien inscrite à la newsletter.",
+      already: "Tu es déjà inscrite : merci de ta fidélité !",
+      privacy: "Pas de spam. Pour te désinscrire, réponds simplement à l'un de nos e-mails.",
+    },
   },
 
   delivery: {
     abidjan: {
-      delay: "sous 24 à 48 h",
+      delay: "en moins de 24 h",
       communes: [
         { name: "Cocody", fee: 1500 },
         { name: "Plateau", fee: 1500 },
@@ -275,6 +297,21 @@ export const defaultContent: SiteContent = {
       { icon: "sparkles", title: "Paiement simple", text: "Wave, Orange Money, MTN, Moov ou Djamo, directement sur le site." },
       { icon: "chat", title: "Conseils inclus", text: "Routines personnalisées pour vos cheveux." },
     ],
+    problems: {
+      visible: true,
+      eyebrow: "Diagnostic", title: "Quel est ton", highlight: "problème capillaire ?",
+      text: "Choisis ce qui te ressemble : on t'explique les causes, les bons gestes et les soins Cure's Nappy qui t'aideront.",
+      items: [
+        { id: "pousse", icon: "sprout", title: "Pousse lente", text: "Tes cheveux ne semblent plus pousser ? Souvent, ils poussent… mais cassent avant de prendre de la longueur.", articleId: "stimuler-la-pousse" },
+        { id: "chute", icon: "alert", title: "Chute & alopécie", text: "Tempes dégarnies, chute en touffes, cheveux sur l'oreiller : les causes et quoi faire.", articleId: "chute-des-cheveux" },
+        { id: "pellicules", icon: "shield-alert", title: "Pellicules & démangeaisons", text: "Cuir chevelu sec ou vraies pellicules ? Le test simple et la routine qui marche.", articleId: "pellicules" },
+        { id: "secs", icon: "drop", title: "Cheveux secs & cassants", text: "Cheveux rêches qui cassent au démêlage : l'hydratation qui dure, expliquée simplement.", articleId: "hydratation-longue-duree" },
+        { id: "defrisage", icon: "scissors", title: "Abîmés par le défrisage", text: "Brûlures, casse, santé : ce que disent les études, et comment revenir au naturel.", articleId: "defrisants-sante" },
+        { id: "cuir-chevelu", icon: "heart", title: "Cuir chevelu irrité", text: "Boutons, plaques, rougeurs : reconnaître les problèmes du cuir chevelu et quand consulter.", articleId: "maladies-du-cuir-chevelu" },
+      ],
+      autoplay: true,
+      delay: 3,
+    },
     featured: { eyebrow: "La collection", title: "Nos soins", highlight: "du moment", productIds: ["1", "2", "3", "4"] },
     video: {
       eyebrow: "En vidéo", title: "Découvrez", highlight: "Cure's Nappy",
@@ -383,6 +420,12 @@ export const defaultContent: SiteContent = {
     tips: defaultTips,
     adviceTitle: "Conseils",
     advice: defaultAdvice,
+    ask: {
+      title: "Ton problème n'est pas dans la liste ?",
+      text: "Pose ta question : notre équipe te répond sur WhatsApp et te conseille les soins Cure's Nappy adaptés à tes cheveux.",
+      label: "Pose ta question",
+      message: "Bonjour Cure's Nappy, j'ai une question sur mes cheveux : ",
+    },
   },
 
   about: {

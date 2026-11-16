@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Price } from "@/components/Price";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, User, CreditCard, Truck, MessageCircle, ShieldCheck, Clock, Loader2, Building2, Globe2 } from "lucide-react";
 import { OTHER, resolveDestination } from "../../supabase/functions/_shared/pricing";
@@ -343,7 +344,7 @@ const Checkout = () => {
                 {items.map(({ product, quantity }) => (
                   <div key={product.id} className="flex justify-between gap-4 text-sm">
                     <span className="text-muted-foreground">{product.name} × {quantity}</span>
-                    <span className="shrink-0">{(product.price * quantity).toLocaleString("fr-FR")} FCFA</span>
+                    <span className="shrink-0 text-right"><Price price={product.price * quantity} original={product.originalPrice ? product.originalPrice * quantity : undefined} /></span>
                   </div>
                 ))}
               </div>
