@@ -2,6 +2,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Price } from "@/components/Price";
 import { Trash2, Plus, Minus, ArrowLeft, ShoppingBag, X } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { useOrderDiscount } from "@/hooks/useOrderDiscount";
 import { useContent } from "@/content/ContentProvider";
 import { Button } from "@/components/ui/button";
 import { useEffect, useRef, useState } from "react";
@@ -9,6 +10,7 @@ import { useEffect, useRef, useState } from "react";
 const Panier = () => {
   const { items, updateQuantity, removeFromCart, totalPrice } = useCart();
   const { delivery } = useContent().content;
+  const { discount, missing, amount } = useOrderDiscount();
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -76,7 +78,13 @@ const Panier = () => {
               ))}
             </div>
             <footer className="border-t border-border p-5 space-y-4 [@media(max-height:740px)]:p-4 [@media(max-height:740px)]:space-y-3">
-              <div className="flex justify-between font-bold"><span>Sous-total</span><span className="text-primary">{totalPrice.toLocaleString("fr-FR")} FCFA</span></div>
+              {discount > 0 && <div className="flex justify-between text-sm font-semibold text-primary"><span>Remise promotion</span><span>-{discount.toLocaleString("fr-FR")} FCFA</span></div>}
+              {missing > 0 && amount > 0 && (
+                <p className="rounded-xl bg-accent/20 px-3 py-2 text-sm font-medium">
+                  Ajoute encore {missing} produit{missing > 1 ? "s" : ""} pour profiter de -{amount.toLocaleString("fr-FR")} FCFA.
+                </p>
+              )}
+              <div className="flex justify-between font-bold"><span>Sous-total</span><span className="text-primary">{discount > 0 && <s className="mr-2 text-sm font-normal text-muted-foreground">{totalPrice.toLocaleString("fr-FR")} FCFA</s>}{(totalPrice - discount).toLocaleString("fr-FR")} FCFA</span></div>
               <p className="text-sm text-muted-foreground [@media(max-height:740px)]:hidden">{delivery.abidjan.communes.length > 0 && <>Livraison à Abidjan : {Math.min(...delivery.abidjan.communes.map((c) => c.fee)).toLocaleString("fr-FR")} à {Math.max(...delivery.abidjan.communes.map((c) => c.fee)).toLocaleString("fr-FR")} FCFA selon la commune. </>}Expédition possible partout en Côte d’Ivoire et à l’international : vous choisissez à l’étape suivante.</p>
               <Button asChild className="w-full bg-action text-action-foreground hover:bg-action/90"><Link to="/checkout">Passer la commande</Link></Button>
               <Button variant="ghost" className="w-full" onClick={close}><ArrowLeft />Continuer les achats</Button>

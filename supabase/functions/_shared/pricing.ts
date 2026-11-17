@@ -12,12 +12,20 @@ export interface PricingCatalog {
 }
 
 /**
- * Promotion réglée dans le dashboard : un pourcentage, une période (dates incluses, heure d'Abidjan = UTC)
- * et les articles concernés. La même règle sert au site (prix barrés) et au serveur (prix facturé).
+ * Promotion réglée dans le dashboard, sur une période (dates incluses, heure d'Abidjan = UTC) et des articles choisis :
+ * - « percent » : un pourcentage sur le prix de chaque article (prix barrés) ;
+ * - « amount » : une remise fixe sur la commande dès un nombre d'articles achetés (ex. -2 500 FCFA dès 2 produits).
+ * La même règle sert au site (affichage) et au serveur (prix facturé).
  */
 export interface Promotion {
   enabled: boolean;
+  /** Absent dans les promotions enregistrées avant l'ajout de la remise fixe : « percent ». */
+  kind?: "percent" | "amount";
   percent: number;
+  /** Remise fixe en FCFA (kind « amount »). */
+  amount?: number;
+  /** Nombre d'articles concernés à acheter pour avoir la remise fixe (quantités comptées). */
+  minItems?: number;
   /** AAAA-MM-JJ, premier et dernier jour inclus. */
   startDate: string;
   endDate: string;
@@ -33,10 +41,18 @@ export interface Promotion {
 
 const DAY = /^\d{4}-\d{2}-\d{2}$/;
 
+export const promotionKind = (promo: Promotion) => (promo.kind === "amount" ? "amount" : "percent");
+export const promotionMinItems = (promo: Promotion) => promo.minItems ?? 2;
+
 /** La promotion est-elle en cours à cette date ? */
 export function promotionActive(promo: Promotion | undefined | null, now: Date = new Date()): boolean {
   if (!promo?.enabled) return false;
-  if (!Number.isInteger(promo.percent) || promo.percent < 1 || promo.percent > 90) return false;
+  if (promotionKind(promo) === "amount") {
+    const amount = promo.amount ?? 0;
+    const min = promotionMinItems(promo);
+    if (!Number.isInteger(amount) || amount < 5 || amount > 1_000_000) return false;
+    if (!Number.isInteger(min) || min < 1 || min > 20) return false;
+  } else if (!Number.isInteger(promo.percent) || promo.percent < 1 || promo.percent > 90) return false;
   if (!DAY.test(promo.startDate ?? "") || !DAY.test(promo.endDate ?? "")) return false;
   const today = now.toISOString().slice(0, 10);
   return today >= promo.startDate && today <= promo.endDate;
@@ -45,13 +61,31 @@ export function promotionActive(promo: Promotion | undefined | null, now: Date =
 /** Prix réduit, arrondi aux 5 FCFA (plus petite pièce). */
 export const discountedPrice = (price: number, percent: number) => Math.max(5, Math.round((price * (100 - percent)) / 100 / 5) * 5);
 
-/** Pourcentage de réduction d'un article du panier (0 s'il n'est pas concerné). */
+/** L'article (soin, « pack-<id> » ou « acc-… ») fait-il partie des articles en promotion ? */
+export function promotionCovers(promo: Promotion, itemId: string): boolean {
+  if (itemId.startsWith("acc-")) return promo.includeAccessories;
+  if (promo.scope === "selection") return promo.productIds.includes(itemId);
+  if (itemId.startsWith("pack-")) return promo.includePacks;
+  return true;
+}
+
+/** Pourcentage de réduction d'un article du panier (0 s'il n'est pas concerné ou si la promotion est une remise fixe). */
 export function promotionPercent(promo: Promotion | undefined | null, itemId: string, now: Date = new Date()): number {
-  if (!promo || !promotionActive(promo, now)) return 0;
-  if (itemId.startsWith("acc-")) return promo.includeAccessories ? promo.percent : 0;
-  if (promo.scope === "selection") return promo.productIds.includes(itemId) ? promo.percent : 0;
-  if (itemId.startsWith("pack-")) return promo.includePacks ? promo.percent : 0;
-  return promo.percent;
+  if (!promo || !promotionActive(promo, now) || promotionKind(promo) !== "percent") return 0;
+  return promotionCovers(promo, itemId) ? promo.percent : 0;
+}
+
+/**
+ * Remise fixe sur la commande : le montant de la promotion dès que le panier compte assez d'articles concernés
+ * (quantités comptées), sans dépasser le prix de ces articles. `missing` : articles qu'il reste à ajouter pour l'avoir.
+ */
+export function orderDiscount(promo: Promotion | undefined | null, lines: { id: string; quantity: number; lineTotal: number }[], now: Date = new Date()): { discount: number; missing: number } {
+  if (!promo || !promotionActive(promo, now) || promotionKind(promo) !== "amount") return { discount: 0, missing: 0 };
+  const covered = lines.filter((l) => promotionCovers(promo, l.id));
+  const count = covered.reduce((sum, l) => sum + l.quantity, 0);
+  const min = promotionMinItems(promo);
+  if (count < min) return { discount: 0, missing: min - count };
+  return { discount: Math.min(promo.amount ?? 0, covered.reduce((sum, l) => sum + l.lineTotal, 0)), missing: 0 };
 }
 
 /** Identifiant panier d'un accessoire dans une couleur : « acc-<accessoire>::<couleur> ». */
@@ -123,7 +157,7 @@ export interface CartLine { id: string; quantity: number }
 export interface PricedLine { id: string; name: string; unitPrice: number; quantity: number; lineTotal: number }
 
 export type PricingResult =
-  | { ok: true; lines: PricedLine[]; subtotal: number; deliveryFee: number; feeConfirmed: boolean; total: number; destination: ResolvedDestination }
+  | { ok: true; lines: PricedLine[]; subtotal: number; discount: number; deliveryFee: number; feeConfirmed: boolean; total: number; destination: ResolvedDestination }
   | { ok: false; error: string };
 
 export const MAX_LINES = 30;
@@ -183,8 +217,9 @@ export function priceOrder(catalog: PricingCatalog, delivery: PricingDelivery, r
   const destination = resolveDestination(delivery, rawDestination);
   if ("error" in destination) return { ok: false, error: destination.error };
   const subtotal = lines.reduce((sum, l) => sum + l.lineTotal, 0);
+  const { discount } = orderDiscount(promotion, lines, now);
   const deliveryFee = destination.fee ?? 0;
-  return { ok: true, lines, subtotal, deliveryFee, feeConfirmed: destination.fee !== null, total: subtotal + deliveryFee, destination };
+  return { ok: true, lines, subtotal, discount, deliveryFee, feeConfirmed: destination.fee !== null, total: subtotal - discount + deliveryFee, destination };
 }
 
 /** Contrôle des coordonnées saisies par le client. Renvoie un message d'erreur, ou null si tout est correct. */

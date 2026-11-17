@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, R
 import type { SiteContent } from "./types";
 import { defaultContent } from "./defaults";
 import { resolveImage } from "./images";
-import { BackendStatus, clearDraft, loadDraft, loadRemote, mergeContent, saveDraft, saveRemote } from "./store";
+import { BackendStatus, clearDraft, loadCache, loadDraft, loadRemote, mergeContent, saveCache, saveDraft, saveRemote } from "./store";
 import type { Accessory, GammePack, Product } from "@/data/products";
 import { packToProduct } from "@/data/products";
 import { accessoryItemId, discountedPrice, promotionActive, promotionPercent } from "../../supabase/functions/_shared/pricing";
@@ -18,6 +18,8 @@ interface ContentContextType {
   /** Vrai quand le site tourne sur l'ordinateur de développement et que la base est injoignable. */
   localPreview: boolean;
   updatedAt: string | null;
+  /** Vrai dès que le contenu affiché est le vrai : reçu de la base, ou gardé de la visite précédente. */
+  ready: boolean;
   save: (next: SiteContent) => Promise<void>;
   resetLocal: () => void;
 }
@@ -26,10 +28,15 @@ const ContentContext = createContext<ContentContextType | undefined>(undefined);
 
 export const ContentProvider = ({ children }: { children: ReactNode }) => {
   // Sur l'ordinateur de développement, l'aperçu local s'affiche tout de suite, sans attendre la base.
-  const [content, setContent] = useState<SiteContent>(() => {
+  // Sinon, le dernier contenu reçu lors d'une visite précédente, en attendant la base.
+  const [initial] = useState(() => {
     const draft = import.meta.env.DEV ? loadDraft() : null;
-    return draft ? mergeContent(defaultContent, draft) : defaultContent;
+    if (draft) return { content: mergeContent(defaultContent, draft), ready: true };
+    const cached = loadCache();
+    return cached ? { content: mergeContent(defaultContent, cached), ready: true } : { content: defaultContent, ready: false };
   });
+  const [content, setContent] = useState<SiteContent>(initial.content);
+  const [ready, setReady] = useState(initial.ready);
   const [status, setStatus] = useState<BackendStatus>("checking");
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
 
@@ -41,7 +48,10 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
       if (remote.status === "online" && remote.data) {
         setContent(mergeContent(defaultContent, remote.data));
         setUpdatedAt(remote.updatedAt);
+        saveCache(remote.data, remote.updatedAt);
       }
+      // Base jointe (même vide) ou vraiment injoignable après plusieurs essais : on affiche ce qu'on a.
+      setReady(true);
     });
     return () => { cancelled = true; };
   }, []);
@@ -52,7 +62,9 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
   const save = useCallback(async (next: SiteContent) => {
     if (saveTarget === "remote") {
       await saveRemote(next);
-      setUpdatedAt(new Date().toISOString());
+      const now = new Date().toISOString();
+      setUpdatedAt(now);
+      saveCache(next, now);
     } else if (saveTarget === "local") {
       saveDraft(next);
     } else {
@@ -66,7 +78,7 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
     setContent(defaultContent);
   }, []);
 
-  const value = useMemo(() => ({ content, status, saveTarget, localPreview, updatedAt, save, resetLocal }), [content, status, saveTarget, localPreview, updatedAt, save, resetLocal]);
+  const value = useMemo(() => ({ content, status, saveTarget, localPreview, updatedAt, ready, save, resetLocal }), [content, status, saveTarget, localPreview, updatedAt, ready, save, resetLocal]);
   return <ContentContext.Provider value={value}>{children}</ContentContext.Provider>;
 };
 

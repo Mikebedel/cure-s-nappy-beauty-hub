@@ -1,3 +1,4 @@
+import { promotionShort } from "@/content/promotionText";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tag } from "lucide-react";
@@ -10,7 +11,7 @@ const AdminMarketing = () => {
   const promo = useContent().content.promotion;
   const day = (iso: string) => new Date(`${iso}T12:00:00Z`).toLocaleDateString("fr-FR", { day: "numeric", month: "long" });
   const promoText = !promo.enabled || !promo.startDate || !promo.endDate ? "Aucune promotion active."
-    : promotionActive(promo) ? `En cours : -${promo.percent} % jusqu'au ${day(promo.endDate)} inclus.`
+    : promotionActive(promo) ? `En cours : ${promotionShort(promo)} jusqu'au ${day(promo.endDate)} inclus.`
     : `-${promo.percent} % du ${day(promo.startDate)} au ${day(promo.endDate)} (pas en cours aujourd'hui).`;
   return (
   <div className="space-y-6">

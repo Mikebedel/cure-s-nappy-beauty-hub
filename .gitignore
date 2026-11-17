@@ -26,3 +26,4 @@ dist-ssr
 # Fichiers locaux de l outil Supabase
 supabase/.temp/
 deno.lock
+mise-en-ligne/

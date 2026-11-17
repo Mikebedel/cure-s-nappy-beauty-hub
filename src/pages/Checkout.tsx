@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, User, CreditCard, Truck, MessageCircle, ShieldCheck, Clock, Loader2, Building2, Globe2 } from "lucide-react";
 import { OTHER, resolveDestination } from "../../supabase/functions/_shared/pricing";
 import { useCart } from "@/contexts/CartContext";
+import { useOrderDiscount } from "@/hooks/useOrderDiscount";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -57,7 +58,9 @@ const Checkout = () => {
   const destination = "error" in resolved ? null : resolved;
   const feeToConfirm = destination?.fee === null;
   const deliveryFee = destination?.fee ?? 0;
-  const grandTotal = totalPrice + deliveryFee;
+  // Remise fixe de la promotion : affichée ici, recalculée par le serveur à la commande.
+  const { discount } = useOrderDiscount();
+  const grandTotal = totalPrice - discount + deliveryFee;
   // Sans tarif connu, le total n'est pas définitif : on ne peut pas payer en ligne.
   const online = payment === "online" && !feeToConfirm;
 
@@ -123,6 +126,7 @@ const Checkout = () => {
       "Bonjour Cure's Nappy, je souhaite passer cette commande :",
       ...items.map(({ product, quantity }) => `• ${product.name} × ${quantity} — ${(product.price * quantity).toLocaleString("fr-FR")} FCFA`),
       `Sous-total : ${totalPrice.toLocaleString("fr-FR")} FCFA`,
+      discount > 0 ? `Remise promotion : -${discount.toLocaleString("fr-FR")} FCFA` : "",
       destination ? `Livraison ${destination.place} : ${feeToConfirm ? "à confirmer" : `${deliveryFee.toLocaleString("fr-FR")} FCFA`}` : "",
       `Total : ${grandTotal.toLocaleString("fr-FR")} FCFA`,
     ].filter(Boolean).join("\n"),
@@ -353,6 +357,12 @@ const Checkout = () => {
                   <span className="text-muted-foreground">Sous-total</span>
                   <span>{totalPrice.toLocaleString("fr-FR")} FCFA</span>
                 </div>
+                {discount > 0 && (
+                  <div className="flex justify-between gap-4 text-sm font-semibold text-primary">
+                    <span>Remise promotion</span>
+                    <span>-{discount.toLocaleString("fr-FR")} FCFA</span>
+                  </div>
+                )}
                 <div className="flex justify-between gap-4 text-sm">
                   <span className="text-muted-foreground">Livraison</span>
                   <span>{!destination ? "—" : feeToConfirm ? "À confirmer" : `${deliveryFee.toLocaleString("fr-FR")} FCFA`}</span>

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { priceOrder, checkCustomer, promotionActive, promotionPercent, discountedPrice, type Promotion } from "../../supabase/functions/_shared/pricing";
+import { priceOrder, checkCustomer, promotionActive, promotionPercent, discountedPrice, orderDiscount, type Promotion } from "../../supabase/functions/_shared/pricing";
 import { defaultContent } from "@/content/defaults";
 
 const catalog = defaultContent.catalog;
@@ -147,5 +147,48 @@ describe("promotion", () => {
     const result = priceOrder(catalog, delivery, [{ id: "8", quantity: 1 }], abidjan("Cocody"), null, during);
     if (!result.ok) throw new Error(result.error);
     expect(result.lines[0].unitPrice).toBe(huile.price);
+  });
+});
+
+describe("remise fixe dès plusieurs produits", () => {
+  // -2 500 FCFA dès 2 produits, du 20 au 27 décembre 2026.
+  const promo: Promotion = { ...defaultContent.promotion, enabled: true, kind: "amount", amount: 2500, minItems: 2, startDate: "2026-12-20", endDate: "2026-12-27" };
+  const during = new Date("2026-12-22T10:00:00Z");
+  const huile = catalog.products.find((p) => p.id === "8")!;
+
+  it("rien avec un seul produit ; le panier sait combien il en manque", () => {
+    const result = priceOrder(catalog, delivery, [{ id: "8", quantity: 1 }], abidjan("Cocody"), promo, during);
+    if (!result.ok) throw new Error(result.error);
+    expect(result.discount).toBe(0);
+    expect(result.total).toBe(huile.price + 1500);
+    expect(orderDiscount(promo, [{ id: "8", quantity: 1, lineTotal: huile.price }], during)).toEqual({ discount: 0, missing: 1 });
+  });
+
+  it("-2 500 FCFA une seule fois dès 2 produits (quantités comptées), prix unitaires inchangés", () => {
+    const two = priceOrder(catalog, delivery, [{ id: "8", quantity: 2 }], abidjan("Cocody"), promo, during);
+    if (!two.ok) throw new Error(two.error);
+    expect(two.lines[0].unitPrice).toBe(huile.price);
+    expect(two.discount).toBe(2500);
+    expect(two.total).toBe(huile.price * 2 - 2500 + 1500);
+    const many = priceOrder(catalog, delivery, [{ id: "8", quantity: 3 }, { id: "pack-gamme-minie", quantity: 1 }], abidjan("Cocody"), promo, during);
+    if (!many.ok) throw new Error(many.error);
+    expect(many.discount).toBe(2500);
+    expect(promotionPercent(promo, "8", during)).toBe(0);
+  });
+
+  it("seulement du 20 au 27 décembre inclus", () => {
+    for (const [date, expected] of [["2026-12-19T23:59:00Z", 0], ["2026-12-20T00:00:00Z", 2500], ["2026-12-27T23:59:00Z", 2500], ["2026-12-28T00:00:00Z", 0]] as const) {
+      const result = priceOrder(catalog, delivery, [{ id: "8", quantity: 2 }], abidjan("Cocody"), promo, new Date(date));
+      if (!result.ok) throw new Error(result.error);
+      expect(result.discount).toBe(expected);
+    }
+  });
+
+  it("ne compte que les articles concernés, et une promotion enregistrée sans type reste un pourcentage", () => {
+    const soinsSeuls: Promotion = { ...promo, includePacks: false };
+    expect(orderDiscount(soinsSeuls, [{ id: "8", quantity: 1, lineTotal: 6500 }, { id: "pack-gamme-minie", quantity: 1, lineTotal: 22000 }], during)).toEqual({ discount: 0, missing: 1 });
+    const ancienne = { ...promo, kind: undefined, percent: 20 } as Promotion;
+    expect(orderDiscount(ancienne, [{ id: "8", quantity: 2, lineTotal: 13000 }], during).discount).toBe(0);
+    expect(promotionPercent(ancienne, "8", during)).toBe(20);
   });
 });

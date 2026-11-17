@@ -22,6 +22,8 @@ interface Receipt {
   deliveryEstimate: string | null;
   items: { name: string; unitPrice: number; quantity: number }[];
   subtotal: number;
+  /** Remise de la promotion (absente sur les anciens reçus). */
+  discount?: number;
   deliveryFee: number;
   total: number;
   paymentMethod: string | null;
@@ -210,6 +212,7 @@ const OrderReceipt = () => {
 
         <div className="ml-auto max-w-xs space-y-1.5 text-sm">
           <div className="flex justify-between"><span className="text-muted-foreground">Sous-total</span><span>{fcfa(receipt.subtotal)}</span></div>
+          {!!receipt.discount && <div className="flex justify-between text-primary font-semibold"><span>Remise promotion</span><span>-{fcfa(receipt.discount)}</span></div>}
           <div className="flex justify-between"><span className="text-muted-foreground">Livraison</span><span>{receipt.deliveryFeeConfirmed ? fcfa(receipt.deliveryFee) : "À confirmer"}</span></div>
           <div className="flex justify-between border-t border-border pt-2 font-bold text-lg"><span>Total{!receipt.deliveryFeeConfirmed && <span className="block text-xs font-normal text-muted-foreground">hors expédition</span>}</span><span className="text-primary">{fcfa(receipt.total)}</span></div>
         </div>

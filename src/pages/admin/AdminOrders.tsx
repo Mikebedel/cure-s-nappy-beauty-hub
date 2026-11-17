@@ -21,6 +21,7 @@ interface Order {
   delivery_fee: number;
   delivery_fee_confirmed: boolean | null;
   subtotal: number;
+  discount: number | null;
   total: number;
   status: string;
   payment_method: string | null;
@@ -270,6 +271,7 @@ const AdminOrders = () => {
                 </ul>
                 <div className="border-t border-border mt-2 pt-2 space-y-1">
                   <div className="flex justify-between"><span className="text-muted-foreground">Produits</span><span>{fcfa(detail.subtotal)}</span></div>
+                  {!!detail.discount && <div className="flex justify-between text-primary"><span>Remise promotion</span><span>-{fcfa(detail.discount)}</span></div>}
                   <div className="flex justify-between"><span className="text-muted-foreground">Livraison</span><span>{detail.delivery_fee_confirmed === false ? "À confirmer" : fcfa(detail.delivery_fee)}</span></div>
                   <div className="flex justify-between font-bold text-base"><span>Total</span><span>{fcfa(detail.total)}</span></div>
                 </div>

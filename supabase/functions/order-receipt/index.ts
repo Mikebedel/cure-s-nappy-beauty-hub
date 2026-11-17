@@ -39,6 +39,7 @@ Deno.serve(async (req) => {
     deliveryEstimate: order.delivery_estimate,
     items: (items ?? []).map((i) => ({ name: i.product_name, unitPrice: i.product_price, quantity: i.quantity })),
     subtotal: order.subtotal,
+    discount: order.discount ?? 0,
     deliveryFee: order.delivery_fee,
     total: order.total,
     paymentMethod: order.payment_method,

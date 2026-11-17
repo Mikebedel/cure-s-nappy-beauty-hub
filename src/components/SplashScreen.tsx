@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import logo from "@/assets/logo.jpg";
+import { useContent } from "@/content/ContentProvider";
 
 const SplashScreen = () => {
   // Affiché une seule fois par visite, jamais dans l'administration.
@@ -9,18 +10,30 @@ const SplashScreen = () => {
     } catch { return false; }
   });
   const [fadeOut, setFadeOut] = useState(false);
+  const [minDone, setMinDone] = useState(false);
+  const [maxDone, setMaxDone] = useState(false);
+  // Le vrai contenu (prix, textes, photos) : on ne montre pas le contenu d'origine du code à la place.
+  const { ready } = useContent();
 
   useEffect(() => {
     if (hidden) return;
     try { sessionStorage.setItem("curesnappy-splash-seen", "true"); } catch { /* stockage indisponible */ }
-    const t1 = setTimeout(() => setFadeOut(true), 1100);
-    const t2 = setTimeout(() => setHidden(true), 1700);
+    const t1 = setTimeout(() => setMinDone(true), 1100);
+    // Au plus 12 s d'attente : sur une connexion très lente, le contenu se met à jour dès qu'il arrive.
+    const t2 = setTimeout(() => setMaxDone(true), 12000);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (hidden || fadeOut || !minDone || !(ready || maxDone)) return;
+    setFadeOut(true);
+    const t = setTimeout(() => setHidden(true), 600);
+    return () => clearTimeout(t);
+  }, [hidden, fadeOut, minDone, ready, maxDone]);
 
   if (hidden) return null;
 
@@ -40,7 +53,7 @@ const SplashScreen = () => {
           />
         </div>
         <div className="h-1 w-40 bg-secondary rounded-full overflow-hidden">
-          <div className="h-full bg-primary animate-[loader_1.1s_ease-in-out_forwards]" />
+          <div className={`h-full bg-primary ${minDone && !ready ? "w-full animate-pulse" : "animate-[loader_1.1s_ease-in-out_forwards]"}`} />
         </div>
       </div>
       <style>{`

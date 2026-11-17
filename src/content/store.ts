@@ -18,10 +18,24 @@ const isMissingTable = (code = "", message = "") => code === "PGRST205" || code 
 const withTimeout = <T,>(promise: PromiseLike<T>, ms: number) =>
   Promise.race([promise, new Promise<never>((_, reject) => setTimeout(() => reject(new Error("timeout")), ms))]);
 
-/** Lit le contenu enregistré dans la base. */
-export const loadRemote = async (): Promise<{ status: BackendStatus; data: Partial<SiteContent> | null; updatedAt: string | null }> => {
+type RemoteResult = { status: BackendStatus; data: Partial<SiteContent> | null; updatedAt: string | null };
+
+/**
+ * Lit le contenu enregistré dans la base, avec de la patience : la base (à Paris) répond parfois en plus de 10 s
+ * sur une connexion lente. On réessaie au lieu d'abandonner, sinon le site montrait le contenu d'origine du code.
+ */
+export const loadRemote = async (): Promise<RemoteResult> => {
+  let last: RemoteResult = { status: "offline", data: null, updatedAt: null };
+  for (const ms of [8000, 15000, 25000]) {
+    last = await loadRemoteOnce(ms);
+    if (last.status !== "offline") return last;
+  }
+  return last;
+};
+
+const loadRemoteOnce = async (timeout: number): Promise<RemoteResult> => {
   try {
-    const { data, error } = await withTimeout(db.from(TABLE).select("data, updated_at").eq("id", ROW_ID).maybeSingle(), 4000);
+    const { data, error } = await withTimeout(db.from(TABLE).select("data, updated_at").eq("id", ROW_ID).maybeSingle(), timeout);
     if (error) {
       if (isMissingTable(error.code, error.message)) return { status: "not-set-up", data: null, updatedAt: null };
       if (isNetworkError(error.message)) return { status: "offline", data: null, updatedAt: null };
@@ -38,6 +52,20 @@ export const saveRemote = async (content: SiteContent) => {
   if (error) throw new Error(isMissingTable(error.code, error.message)
     ? "La table du contenu n'existe pas encore dans la base : appliquez la migration du dossier supabase/migrations."
     : error.message);
+};
+
+/** Dernier contenu reçu de la base, gardé dans le navigateur : la visite suivante l'affiche tout de suite. */
+const CACHE_KEY = "curesnappy-content-cache";
+export const loadCache = (): Partial<SiteContent> | null => {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    return raw ? (JSON.parse(raw) as { data: Partial<SiteContent> }).data : null;
+  } catch {
+    return null;
+  }
+};
+export const saveCache = (data: Partial<SiteContent>, updatedAt: string | null) => {
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify({ data, updatedAt })); } catch { /* stockage plein ou bloqué */ }
 };
 
 export const loadDraft = (): Partial<SiteContent> | null => {

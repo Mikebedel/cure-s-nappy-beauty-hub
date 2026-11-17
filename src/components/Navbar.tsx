@@ -1,3 +1,4 @@
+import { promotionShort } from "@/content/promotionText";
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ShoppingBag, Menu, X, Home, Tag } from "lucide-react";
@@ -81,7 +82,7 @@ const Navbar = () => {
       {promotion && (
         <Link to="/boutique" className="mx-auto mb-1.5 flex max-w-max items-center gap-2 rounded-full bg-accent px-4 py-1.5 text-xs sm:text-sm font-semibold text-accent-foreground shadow-soft hover:brightness-95 transition">
           <Tag className="h-3.5 w-3.5 shrink-0" />
-          <span className="sm:hidden whitespace-nowrap">{promotion.badge || `-${promotion.percent} %`} sur le site · jusqu'au {promoEnd}</span>
+          <span className="sm:hidden whitespace-nowrap">{promotion.kind === "amount" ? promotionShort(promotion) : `${promotion.badge || promotionShort(promotion)} sur le site`} · jusqu'au {promoEnd}</span>
           <span className="hidden sm:inline truncate max-w-[70vw]">{promotion.banner} · jusqu'au {promoEnd}</span>
         </Link>
       )}

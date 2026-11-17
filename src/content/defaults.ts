@@ -21,7 +21,10 @@ export const defaultContent: SiteContent = {
 
   promotion: {
     enabled: false,
+    kind: "percent",
     percent: 20,
+    amount: 2500,
+    minItems: 2,
     startDate: "",
     endDate: "",
     scope: "all",

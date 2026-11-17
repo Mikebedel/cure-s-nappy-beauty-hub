@@ -66,6 +66,7 @@ Deno.serve(async (req) => {
       delivery_fee: priced.deliveryFee,
       delivery_fee_confirmed: priced.feeConfirmed,
       subtotal: priced.subtotal,
+      discount: priced.discount,
       total: priced.total,
       payment_method: online ? "jeko" : "a_regler",
       payment_channel: online ? method : null,
