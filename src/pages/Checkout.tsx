@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Price } from "@/components/Price";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, User, CreditCard, Truck, MessageCircle, ShieldCheck, Clock, Loader2, Building2, Globe2 } from "lucide-react";
 import { OTHER, resolveDestination } from "../../supabase/functions/_shared/pricing";
 import { useCart } from "@/contexts/CartContext";
 import { useOrderDiscount } from "@/hooks/useOrderDiscount";
-import { savePendingCheckout, takeCheckoutPrefill, usePendingCheckout } from "@/hooks/usePendingCheckout";
+import { markLeftToPay, savePendingCheckout, takeCheckoutPrefill, usePendingCheckout } from "@/hooks/usePendingCheckout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,7 +37,17 @@ const Checkout = () => {
   const openCart = useCartNavigation();
   // Retour d'un paiement non abouti : panier et fiche remis tels que la cliente les avait laissés.
   const [prefill] = useState(takeCheckoutPrefill);
-  const { pending, restore } = usePendingCheckout(items.length === 0);
+  // Seulement à l'arrivée sur la page (panier vide en revenant du paiement), jamais pendant l'envoi.
+  const [emptyOnArrival] = useState(items.length === 0);
+  const { pending, restore } = usePendingCheckout(emptyOnArrival, true);
+
+  // Bouton « retour » du téléphone depuis la page de paiement : le navigateur remontre la page figée
+  // (bouton « Traitement… » qui tourne sans fin). On la recharge pour repartir du panier gardé.
+  useEffect(() => {
+    const onShow = (event: PageTransitionEvent) => { if (event.persisted) window.location.reload(); };
+    window.addEventListener("pageshow", onShow);
+    return () => window.removeEventListener("pageshow", onShow);
+  }, []);
 
   const choices: PaymentChoice[] = [...(delivery.onlinePayment ? ["online" as const] : []), ...(delivery.payLater ? ["later" as const] : [])];
   const [payment, setPayment] = useState<PaymentChoice>(choices[0] ?? "later");
@@ -96,7 +106,9 @@ const Checkout = () => {
     setFailed(null);
 
     // Le site n'envoie que les articles et les quantités : le serveur recalcule les prix et le total.
+    // Au plus 45 s d'attente : sur une connexion qui coupe, on rend la main au lieu de tourner sans fin.
     const { data, error } = await supabase.functions.invoke("create-order", {
+      signal: AbortSignal.timeout(45000),
       body: {
         payment: online ? "online" : "later",
         method: online ? method : undefined,
@@ -125,6 +137,7 @@ const Checkout = () => {
         form, mode, method, payerPhone,
       });
     }
+    if (online) markLeftToPay(data.receiptToken);
     clearCart();
     if (data.paymentUrl) {
       // Page de paiement de l'opérateur ; elle renvoie ensuite vers le reçu.

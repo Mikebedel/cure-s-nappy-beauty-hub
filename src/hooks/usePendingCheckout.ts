@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/contexts/CartContext";
@@ -20,6 +20,13 @@ export interface CheckoutSnapshot {
 
 const KEY = "curesnappy-pending-checkout";
 const PREFILL_KEY = "curesnappy-checkout-prefill";
+/** Posé juste avant de partir vers la page de paiement : au retour (bouton « retour »), on reprend tout seul. */
+const LEFT_KEY = "curesnappy-left-to-pay";
+
+export const markLeftToPay = (token: string) => { try { sessionStorage.setItem(LEFT_KEY, token); } catch { /* rien */ } };
+const takeLeftToPay = () => {
+  try { const t = sessionStorage.getItem(LEFT_KEY); sessionStorage.removeItem(LEFT_KEY); return t; } catch { return null; }
+};
 const MAX_AGE = 3 * 24 * 3600 * 1000;
 
 export const savePendingCheckout = (snapshot: Omit<CheckoutSnapshot, "at">) => {
@@ -56,7 +63,7 @@ export const takeCheckoutPrefill = (): CheckoutSnapshot | null => {
 };
 
 /** La commande non payée gardée dans ce navigateur, si elle l'est vraiment (vérifié auprès du serveur), et de quoi la reprendre. */
-export const usePendingCheckout = (verify = true) => {
+export const usePendingCheckout = (verify = true, autoRestore = false) => {
   const { replaceCart } = useCart();
   const navigate = useNavigate();
   const [pending, setPending] = useState<CheckoutSnapshot | null>(() => (verify ? null : readPendingCheckout()));
@@ -68,18 +75,24 @@ export const usePendingCheckout = (verify = true) => {
     let cancelled = false;
     supabase.functions.invoke("order-receipt", { body: { token: snapshot.token } }).then(({ data }) => {
       if (cancelled || !data) return;
-      if (data.paymentStatus === "payee" || data.status !== "nouvelle") clearPendingCheckout(snapshot.token);
-      else setPending(snapshot);
+      if (data.paymentStatus === "payee" || data.status !== "nouvelle") { clearPendingCheckout(snapshot.token); takeLeftToPay(); return; }
+      setPending(snapshot);
+      // Retour de la page de paiement sans avoir payé : panier et fiche remis directement.
+      if (autoRestore && takeLeftToPay() === snapshot.token) restoreRef.current?.(snapshot);
     });
     return () => { cancelled = true; };
-  }, [verify]);
+  }, [verify, autoRestore]);
 
   const restore = useCallback((snapshot: CheckoutSnapshot | null = pending) => {
     if (!snapshot) return;
     replaceCart(snapshot.items);
     try { sessionStorage.setItem(PREFILL_KEY, JSON.stringify(snapshot)); } catch { /* rien */ }
+    // Déjà sur la page de commande : on la recharge pour relire la fiche.
+    if (window.location.pathname === "/checkout") { window.location.reload(); return; }
     navigate("/checkout");
   }, [pending, replaceCart, navigate]);
+  const restoreRef = useRef(restore);
+  restoreRef.current = restore;
 
   return { pending, restore };
 };
