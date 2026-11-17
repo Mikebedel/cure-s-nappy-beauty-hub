@@ -1,8 +1,9 @@
 import { createContext, useContext, useState, useEffect, useMemo, useRef, ReactNode } from "react";
 import { Product } from "@/data/products";
 import { useCatalog } from "@/content/ContentProvider";
-import { Check, ShoppingBag } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { toast } from "sonner";
+import { useCartNavigation } from "@/hooks/use-cart-navigation";
 
 export interface CartItem {
   product: Product;
@@ -15,11 +16,31 @@ interface CartContextType {
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
+  /** Remet un panier gardé (commande à reprendre après un paiement non abouti). */
+  replaceCart: (lines: { id: string; quantity: number }[]) => void;
   totalItems: number;
   totalPrice: number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
+
+/** Notification d'ajout : toute la carte est un bouton qui ouvre le panier (pratique au téléphone). */
+const AddedToast = ({ id, product, first }: { id: string | number; product: Product; first: boolean }) => {
+  const openCart = useCartNavigation();
+  return (
+    <button type="button" onClick={() => { toast.dismiss(id); openCart(); }}
+      data-testid={first ? "first-add-notice" : "add-notice"}
+      aria-label={`${product.name} ajouté au panier. Voir le panier`}
+      className={`${first ? "first-add-notice " : ""}flex items-center gap-3 w-full text-left bg-card text-card-foreground border border-primary/30 rounded-2xl p-3 shadow-soft active:scale-[0.98] transition-transform`}>
+      <img src={product.image} alt="" className="w-12 h-12 rounded-xl object-cover shrink-0" />
+      <span className="min-w-0 flex-1">
+        <span className="font-heading font-bold flex items-center gap-1.5 text-sm"><Check className="w-4 h-4 text-primary shrink-0" />{first ? "Votre premier soin est ajouté" : "Ajouté au panier"}</span>
+        <span className="block text-sm text-muted-foreground truncate">{product.name}</span>
+      </span>
+      <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-primary text-primary-foreground px-3 py-2 text-xs font-semibold">Voir le panier<ArrowRight className="w-3.5 h-3.5" /></span>
+    </button>
+  );
+};
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const { findItem } = useCatalog();
@@ -52,19 +73,12 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   }, [stored]);
 
   const addToCart = (product: Product) => {
-    if (!firstAddShown.current) {
+    const first = !firstAddShown.current;
+    if (first) {
       firstAddShown.current = true;
       localStorage.setItem("curesnappy-first-add-seen", "true");
-      toast.custom(() => (
-        <div role="status" data-testid="first-add-notice" className="first-add-notice flex items-center gap-4 w-full bg-card text-card-foreground border border-primary/30 rounded-2xl p-4 shadow-soft">
-          <img src={product.image} alt="" className="w-14 h-14 rounded-xl object-cover shrink-0" />
-          <div className="min-w-0"><p className="font-heading font-bold flex items-center gap-2"><Check className="w-4 h-4 text-primary" />Votre premier soin est ajouté</p><p className="text-sm text-muted-foreground">{product.name}</p></div>
-          <ShoppingBag className="w-5 h-5 text-primary shrink-0" />
-        </div>
-      ), { duration: 4500 });
-    } else {
-      toast.success(`${product.name} ajouté au panier`, { duration: 2400 });
     }
+    toast.custom((id) => <AddedToast id={id} product={product} first={first} />, { duration: first ? 4500 : 3000 });
     setStored((prev) => prev.some((i) => i.id === product.id)
       ? prev.map((i) => (i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i))
       : [...prev, { id: product.id, quantity: 1 }]);
@@ -83,13 +97,15 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const clearCart = () => setStored([]);
+  const replaceCart = (lines: { id: string; quantity: number }[]) =>
+    setStored(lines.filter((l) => typeof l.id === "string" && Number.isInteger(l.quantity) && l.quantity > 0));
 
   const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
   const totalPrice = items.reduce((sum, i) => sum + i.product.price * i.quantity, 0);
 
   return (
     <CartContext.Provider
-      value={{ items, addToCart, removeFromCart, updateQuantity, clearCart, totalItems, totalPrice }}
+      value={{ items, addToCart, removeFromCart, updateQuantity, clearCart, replaceCart, totalItems, totalPrice }}
     >
       {children}
     </CartContext.Provider>

@@ -5,6 +5,7 @@ import { ArrowLeft, MapPin, User, CreditCard, Truck, MessageCircle, ShieldCheck,
 import { OTHER, resolveDestination } from "../../supabase/functions/_shared/pricing";
 import { useCart } from "@/contexts/CartContext";
 import { useOrderDiscount } from "@/hooks/useOrderDiscount";
+import { savePendingCheckout, takeCheckoutPrefill, usePendingCheckout } from "@/hooks/usePendingCheckout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,17 +35,21 @@ const Checkout = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const openCart = useCartNavigation();
+  // Retour d'un paiement non abouti : panier et fiche remis tels que la cliente les avait laissés.
+  const [prefill] = useState(takeCheckoutPrefill);
+  const { pending, restore } = usePendingCheckout(items.length === 0);
 
   const choices: PaymentChoice[] = [...(delivery.onlinePayment ? ["online" as const] : []), ...(delivery.payLater ? ["later" as const] : [])];
   const [payment, setPayment] = useState<PaymentChoice>(choices[0] ?? "later");
-  const [form, setForm] = useState({
+  const [form, setForm] = useState(() => ({
     firstName: "", lastName: "", phone: "", email: "", address: "",
     commune: "", city: "", otherCity: "", country: "", otherCountry: "", foreignCity: "",
-  });
+    ...(prefill?.form ?? {}),
+  }));
   const modes: DeliveryMode[] = ["abidjan", ...(delivery.national.enabled ? ["national" as const] : []), ...(delivery.international.enabled ? ["international" as const] : [])];
-  const [mode, setMode] = useState<DeliveryMode>("abidjan");
+  const [mode, setMode] = useState<DeliveryMode>(() => (prefill && modes.includes(prefill.mode as DeliveryMode) ? prefill.mode as DeliveryMode : "abidjan"));
   const [method, setMethod] = useState<OnlineMethod | "">(delivery.onlineMethods[0] ?? "");
-  const [payerPhone, setPayerPhone] = useState("");
+  const [payerPhone, setPayerPhone] = useState(prefill?.payerPhone ?? "");
   const [loading, setLoading] = useState(false);
   const [failed, setFailed] = useState<string | null>(null);
 
@@ -99,6 +104,8 @@ const Checkout = () => {
         items: items.map(({ product, quantity }) => ({ id: product.id, quantity })),
         destination: destinationInput,
         customer: { firstName: form.firstName, lastName: form.lastName, phone: form.phone, email: form.email, address: form.address },
+        // La commande non payée qu'elle remplace (annulée par le serveur).
+        replaces: prefill?.token,
       },
     });
 
@@ -110,6 +117,14 @@ const Checkout = () => {
       return;
     }
 
+    // Paiement en ligne : panier et fiche gardés, pour les retrouver si le paiement n'aboutit pas.
+    if (online) {
+      savePendingCheckout({
+        token: data.receiptToken,
+        items: items.map(({ product, quantity }) => ({ id: product.id, quantity })),
+        form, mode, method, payerPhone,
+      });
+    }
     clearCart();
     if (data.paymentUrl) {
       // Page de paiement de l'opérateur ; elle renvoie ensuite vers le reçu.
@@ -136,6 +151,13 @@ const Checkout = () => {
     return (
       <div className="container mx-auto pt-32 pb-20 text-center">
         <h1 className="font-heading font-bold mb-5">Aucun produit dans votre panier</h1>
+        {pending && (
+          <div className="mx-auto mb-6 max-w-md rounded-2xl border border-primary/30 bg-card p-5 text-left">
+            <p className="font-semibold mb-1">Votre dernière commande n'a pas été payée</p>
+            <p className="text-sm text-muted-foreground mb-4">Retrouvez votre panier et vos coordonnées pour payer avec un autre moyen.</p>
+            <Button className="w-full" onClick={() => restore()}><CreditCard />Reprendre ma commande</Button>
+          </div>
+        )}
         <Button asChild className="bg-action text-action-foreground">
           <Link to="/boutique">Voir la boutique</Link>
         </Button>
@@ -169,6 +191,11 @@ const Checkout = () => {
         </button>
 
         <h1 className="font-heading text-3xl md:text-4xl font-bold mb-8">Finaliser la commande</h1>
+        {prefill && (
+          <p role="status" className="mb-6 rounded-2xl border border-accent/50 bg-accent/15 px-4 py-3 text-sm">
+            <strong>Votre paiement{prefill.method && paymentMethodLabels[prefill.method as OnlineMethod] ? ` par ${paymentMethodLabels[prefill.method as OnlineMethod]}` : ""} n'a pas abouti.</strong> Votre panier et vos coordonnées sont retrouvés : choisissez un moyen de paiement puis validez.
+          </p>
+        )}
 
         <form onSubmit={handleSubmit}>
           <div className="grid lg:grid-cols-3 gap-8">

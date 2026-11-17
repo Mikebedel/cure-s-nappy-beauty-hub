@@ -3,6 +3,7 @@ import { Price } from "@/components/Price";
 import { Trash2, Plus, Minus, ArrowLeft, ShoppingBag, X } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useOrderDiscount } from "@/hooks/useOrderDiscount";
+import { usePendingCheckout } from "@/hooks/usePendingCheckout";
 import { useContent } from "@/content/ContentProvider";
 import { Button } from "@/components/ui/button";
 import { useEffect, useRef, useState } from "react";
@@ -11,6 +12,7 @@ const Panier = () => {
   const { items, updateQuantity, removeFromCart, totalPrice } = useCart();
   const { delivery } = useContent().content;
   const { discount, missing, amount } = useOrderDiscount();
+  const { pending, restore } = usePendingCheckout(items.length === 0);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -56,6 +58,13 @@ const Panier = () => {
           <div className="p-8 text-center space-y-4">
             <ShoppingBag className="h-8 w-8 mx-auto text-primary" />
             <p className="font-semibold">Votre panier est vide</p>
+            {pending && (
+              <div className="rounded-2xl border border-primary/30 bg-secondary/60 p-4 text-left">
+                <p className="font-semibold text-sm">Votre dernière commande n'a pas été payée</p>
+                <p className="text-sm text-muted-foreground mb-3">Retrouvez votre panier et vos coordonnées pour payer avec un autre moyen.</p>
+                <Button className="w-full" onClick={() => restore()}>Reprendre ma commande</Button>
+              </div>
+            )}
             <Button asChild className="bg-action text-action-foreground hover:bg-action/90"><Link to="/boutique">Voir la boutique</Link></Button>
           </div>
         ) : (

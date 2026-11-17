@@ -1,3 +1,4 @@
+import { clearPendingCheckout, readPendingCheckout, usePendingCheckout } from "@/hooks/usePendingCheckout";
 import { useCallback, useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { CheckCircle2, Clock, Download, MessageCircle, Share2, Loader2, CreditCard, AlertCircle, Link2 } from "lucide-react";
@@ -50,6 +51,9 @@ const OrderReceipt = () => {
   const [error, setError] = useState(false);
   const [checks, setChecks] = useState(0);
   const [shareOpen, setShareOpen] = useState(false);
+  // Panier et fiche gardés avant le paiement : pour payer avec un autre moyen si celui-ci n'aboutit pas.
+  const { restore } = usePendingCheckout(false);
+  const [snapshot] = useState(() => { const s = readPendingCheckout(); return s?.token === token ? s : null; });
 
   const load = useCallback(async () => {
     const { data, error: fnError } = await supabase.functions.invoke("order-receipt", { body: { token } });
@@ -84,6 +88,10 @@ const OrderReceipt = () => {
   }
 
   const paid = receipt.paymentStatus === "payee";
+  if (paid || receipt.status === "annulee") clearPendingCheckout(token);
+  const otherMethod = snapshot && !paid && receipt.status === "nouvelle"
+    ? <Button size="lg" variant={failed || returnedWithError ? "default" : "outline"} onClick={() => restore(snapshot)}><CreditCard />Payer avec un autre moyen</Button>
+    : null;
   const link = window.location.href;
   const shareText = `Mon reçu Cure's Nappy — commande ${receipt.orderNumber} (${fcfa(receipt.total)}) : ${link}`;
   const teamText = `Bonjour Cure's Nappy, je vous écris au sujet de ma commande ${receipt.orderNumber}.`;
@@ -118,7 +126,8 @@ const OrderReceipt = () => {
               {returnedWithError ? "Le paiement ne semble pas avoir abouti." : awaitingPhone && checks < maxChecks ? "Une demande de paiement vient d’être envoyée sur votre téléphone. Validez-la avec votre code secret Mobile Money : cette page se met à jour toute seule." : checks < maxChecks ? "Nous vérifions votre paiement auprès de Jèko…" : "Nous n’avons pas encore reçu la confirmation de votre paiement."}{receipt.paymentUrl ? " Si vous n’avez pas terminé le paiement, vous pouvez le reprendre." : ""}
             </p>
             <div className="flex flex-wrap gap-3">
-              {receipt.paymentUrl && <Button asChild size="lg"><a href={receipt.paymentUrl}><CreditCard />Reprendre le paiement</a></Button>}
+              {otherMethod}
+              {receipt.paymentUrl && <Button asChild size="lg" variant={otherMethod && returnedWithError ? "outline" : "default"}><a href={receipt.paymentUrl}><CreditCard />Reprendre le paiement</a></Button>}
               <Button size="lg" variant="outline" onClick={() => { setChecks(0); load(); }}><Loader2 className={checks < maxChecks ? "animate-spin" : ""} />Vérifier à nouveau</Button>
             </div>
           </>
@@ -126,9 +135,9 @@ const OrderReceipt = () => {
           <>
             <AlertCircle className="h-10 w-10 mb-3 text-destructive" />
             <h1 className="font-heading font-bold !text-3xl md:!text-4xl mb-2">Paiement non abouti</h1>
-            <p className="text-muted-foreground text-lg mb-4">Aucun montant n’a été débité pour cette commande. Vous pouvez repasser commande ou nous écrire sur WhatsApp, nous vous aidons à finaliser.</p>
+            <p className="text-muted-foreground text-lg mb-4">Aucun montant n’a été débité pour cette commande. {otherMethod ? "Votre panier et vos coordonnées sont gardés : choisissez un autre moyen de paiement (Wave, Orange Money, MTN…)." : "Vous pouvez repasser commande ou nous écrire sur WhatsApp, nous vous aidons à finaliser."}</p>
             <div className="flex flex-wrap gap-3">
-              <Button asChild size="lg"><Link to="/boutique">Repasser commande</Link></Button>
+              {otherMethod ?? <Button asChild size="lg"><Link to="/boutique">Repasser commande</Link></Button>}
               <Button asChild size="lg" variant="outline"><a href={`https://wa.me/${contact.whatsapp}?text=${encodeURIComponent(`Bonjour, mon paiement pour la commande ${receipt.orderNumber} n'a pas abouti.`)}`} target="_blank" rel="noopener noreferrer"><MessageCircle />Écrire sur WhatsApp</a></Button>
             </div>
           </>

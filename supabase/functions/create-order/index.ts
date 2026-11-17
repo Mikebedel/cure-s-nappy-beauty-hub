@@ -84,9 +84,19 @@ Deno.serve(async (req) => {
       throw itemsError;
     }
 
+    // La cliente revient d'un paiement non abouti et choisit un autre moyen : l'ancienne commande,
+    // jamais payée, est annulée. Le jeton secret du reçu et le même numéro de téléphone sont exigés.
+    let replacedOne = false;
+    if (typeof body.replaces === "string" && /^[0-9a-f-]{36}$/i.test(body.replaces)) {
+      const { data: replaced } = await db.from("orders").update({ status: "annulee" })
+        .eq("receipt_token", body.replaces).eq("customer_phone", phone)
+        .neq("payment_status", "payee").eq("status", "nouvelle").neq("id", order.id).select("id");
+      replacedOne = (replaced?.length ?? 0) > 0;
+    }
+
     // Fiche client (pour l'onglet Clients du dashboard).
     const { data: existing } = await db.from("customers").select("id, orders_count").eq("phone", phone).maybeSingle();
-    if (existing) await db.from("customers").update({ name: customerName, email, orders_count: (existing.orders_count ?? 0) + 1, last_order_at: new Date().toISOString() }).eq("id", existing.id);
+    if (existing) await db.from("customers").update({ name: customerName, email, orders_count: (existing.orders_count ?? 0) + (replacedOne ? 0 : 1), last_order_at: new Date().toISOString() }).eq("id", existing.id);
     else await db.from("customers").insert({ name: customerName, phone, email, orders_count: 1, total_spent: 0, last_order_at: new Date().toISOString() });
 
     if (!online) {

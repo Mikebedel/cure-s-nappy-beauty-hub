@@ -107,7 +107,13 @@ export async function confirmPayment(db: SupabaseClient, reference: string): Pro
 
   // La condition payment_status <> 'payee' garantit qu'un paiement n'est traité qu'une fois.
   const { data: updated } = await db.from("orders")
-    .update({ payment_status: "payee", paid_at: pr.transaction?.executedAt ? new Date(pr.transaction.executedAt.replace(" ", "T") + "Z").toISOString() : new Date().toISOString(), payment_channel: pr.paymentMethod ?? order.payment_channel })
+    .update({
+      payment_status: "payee",
+      paid_at: pr.transaction?.executedAt ? new Date(pr.transaction.executedAt.replace(" ", "T") + "Z").toISOString() : new Date().toISOString(),
+      payment_channel: pr.paymentMethod ?? order.payment_channel,
+      // Commande remplacée (la cliente a choisi un autre moyen) mais finalement payée : on la remet à traiter.
+      ...(order.status === "annulee" ? { status: "nouvelle" } : {}),
+    })
     .eq("id", order.id).neq("payment_status", "payee")
     .select("*").maybeSingle();
 

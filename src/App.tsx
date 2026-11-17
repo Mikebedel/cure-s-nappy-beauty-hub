@@ -100,9 +100,10 @@ const App = () => (
         <ContentProvider>
         <CartProvider>
           <Toaster />
-          <Sonner />
           <SplashScreen />
           <BrowserRouter>
+            {/* Dans le routeur : la notification « ajouté au panier » ouvre le panier d'un toucher. */}
+            <Sonner />
             <ScrollToTop />
             <Routes>
               {/* Admin login */}
