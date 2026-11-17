@@ -101,7 +101,7 @@ Deno.serve(async (req) => {
 
     if (!online) {
       await sendReceiptEmail(db, order).catch((e) => console.error("Envoi du reçu impossible", e));
-      return json(req, { orderNumber, receiptToken: order.receipt_token, paymentUrl: null });
+      return json(req, { orderNumber: order.order_number, receiptToken: order.receipt_token, paymentUrl: null });
     }
 
     const siteUrl = (Deno.env.get("SITE_URL") ?? req.headers.get("Origin") ?? "").replace(/\/$/, "");
@@ -118,7 +118,7 @@ Deno.serve(async (req) => {
       await db.from("orders").update({ payment_provider_id: payment.id, payment_url: payment.redirectUrl }).eq("id", order.id);
       // MTN et Moov : rien à ouvrir, la cliente valide sur son téléphone pendant que le reçu attend la confirmation.
       const push = PUSH_METHODS.includes(method);
-      return json(req, { orderNumber, receiptToken: order.receipt_token, paymentUrl: push ? null : payment.redirectUrl, awaitingPhone: push });
+      return json(req, { orderNumber: order.order_number, receiptToken: order.receipt_token, paymentUrl: push ? null : payment.redirectUrl, awaitingPhone: push });
     } catch (error) {
       console.error("Ouverture du paiement impossible", error);
       await db.from("orders").update({ status: "annulee" }).eq("id", order.id);

@@ -18,6 +18,8 @@ import Conseils from "./pages/Conseils";
 import ArticlePage from "./pages/ArticlePage";
 import APropos from "./pages/APropos";
 import Contact from "./pages/Contact";
+import AdminTeam from "./pages/admin/AdminTeam";
+import ChangePassword from "./admin/ChangePassword";
 import ProductDetail from "./pages/ProductDetail";
 import PackDetail from "./pages/PackDetail";
 import Panier from "./pages/Panier";
@@ -60,6 +62,17 @@ const ProtectedAdmin = ({ children }: { children: React.ReactNode }) => {
   if (!isAdmin) return <Navigate to="/" replace />;
   // Mot de passe validé : il faut encore le code de la double authentification.
   if (aal !== "aal2") return <AdminMfa />;
+  // Admin ajouté avec un mot de passe provisoire : il choisit le sien avant d'entrer.
+  if (user.user_metadata?.must_change_password) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <div className="w-full max-w-md rounded-3xl border border-border bg-card p-6 shadow-soft">
+          <h1 className="font-heading text-2xl font-bold mb-2">Choisissez votre mot de passe</h1>
+          <ChangePassword required />
+        </div>
+      </div>
+    );
+  }
   return <>{children}</>;
 };
 
@@ -134,6 +147,7 @@ const App = () => (
                 <Route path="rapports" element={<AdminReports />} />
                 <Route path="support" element={<AdminSupport />} />
                 <Route path="videos" element={<AdminVideos />} />
+                <Route path="administrateurs" element={<AdminTeam />} />
               </Route>
 
               {/* Public routes */}

@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Lock, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useContent } from "@/content/ContentProvider";
@@ -56,7 +56,7 @@ const AdminLogin = () => {
     <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="font-heading text-2xl">Cure's Nappy</CardTitle>
+          <h1 className="font-heading text-2xl font-semibold leading-none tracking-tight">Cure's Nappy</h1>
           <p className="text-sm text-muted-foreground">Connexion Administration</p>
         </CardHeader>
         <CardContent>

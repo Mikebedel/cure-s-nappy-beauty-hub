@@ -33,6 +33,8 @@ export async function createPaymentRequest(params: { amount: number; reference: 
   const res = await fetch(`${API}/payment_requests`, {
     method: "POST",
     headers: headers(),
+    // Jèko qui ne répond pas ne doit pas bloquer la cliente : on abandonne après 20 s.
+    signal: AbortSignal.timeout(20000),
     body: JSON.stringify({
       storeId: env("JEKO_STORE_ID"),
       amountCents: params.amount * 100,
@@ -54,8 +56,8 @@ export async function createPaymentRequest(params: { amount: number; reference: 
 
 /** Demande à Jèko l'état réel d'une demande de paiement : on ne se fie jamais au navigateur. */
 export async function fetchPaymentRequest(id: string) {
-  const res = await fetch(`${API}/payment_requests/${encodeURIComponent(id)}`, { headers: headers() });
-  if (!res.ok) return null;
+  const res = await fetch(`${API}/payment_requests/${encodeURIComponent(id)}`, { headers: headers(), signal: AbortSignal.timeout(15000) }).catch(() => null);
+  if (!res || !res.ok) return null;
   return await res.json().catch(() => null) as {
     id: string; status: string; reference?: string; amountCents?: number; currency?: string; paymentMethod?: string;
     transaction?: { amount?: number | { amount?: number; currency?: string }; executedAt?: string; status?: string };

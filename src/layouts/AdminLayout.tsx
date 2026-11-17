@@ -2,7 +2,7 @@ import { useConfirm } from "@/admin/useConfirm";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, ShoppingCart, Package, Users, BarChart3, Megaphone, Star, FileText, MessageSquare, Video,
-  LogOut, Menu, Home, Store, Layers, Sparkles, BookOpen, Info, Phone, Truck, ExternalLink, Save, Undo2, Loader2, AlertTriangle, CloudOff, Cloud, BadgePercent,
+  LogOut, Menu, Home, Store, Layers, Sparkles, BookOpen, Info, Phone, Truck, ExternalLink, Save, Undo2, Loader2, AlertTriangle, CloudOff, Cloud, BadgePercent, ShieldCheck,
 } from "lucide-react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
@@ -40,6 +40,12 @@ const navGroups = [
       { label: "Avis", path: "/admin/avis", icon: Star },
       { label: "Rapports", path: "/admin/rapports", icon: FileText },
       { label: "Support", path: "/admin/support", icon: MessageSquare },
+    ],
+  },
+  {
+    title: "Sécurité",
+    items: [
+      { label: "Administrateurs", path: "/admin/administrateurs", icon: ShieldCheck },
     ],
   },
 ];
