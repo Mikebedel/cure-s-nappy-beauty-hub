@@ -35,7 +35,7 @@ const Footer = () => {
         <div className="container mx-auto py-12 md:py-16">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
             <div className="sm:col-span-2">
-              <img src={wordmark} alt="Cure’s Nappy" className="w-44 bg-background px-3 py-2 rounded-xl mb-5" />
+              <img src={wordmark} alt="Cure’s Nappy" className="w-44 mb-5 brightness-0 invert" />
               <p className="text-deep-foreground/80 max-w-sm leading-relaxed">{footer.tagline}</p>
               <p className="mt-4 font-heading text-lg text-accent">{footer.quote}</p>
               <div className="mt-5 flex flex-wrap gap-3">

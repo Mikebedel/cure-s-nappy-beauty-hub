@@ -213,3 +213,15 @@ html { scroll-behavior: smooth; }
   .receipt { border: none !important; box-shadow: none !important; padding: 0 !important; }
   .store-page { animation: none !important; }
 }
+
+/* Motif de la marque (gribouillis) : seulement en touche, jamais sur tout le fond.
+   Posé derrière le contenu du bloc ; l'opacité se règle avec --motif-opacity. */
+.motif { isolation: isolate; } /* le bloc doit déjà être positionné (relative, fixed…) */
+.motif::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; border-radius: inherit; background-image: url("./assets/motif-couleurs.webp"); background-size: 280px auto; background-repeat: repeat; opacity: var(--motif-opacity, 0.06); }
+.motif--light::before { background-image: url("./assets/motif-blanc.webp"); }
+@media (min-width: 768px) { .motif::before { background-size: 420px auto; } }
+
+/* Écran de chargement : le logo respire (zoom, dézoom) tant que le site charge. */
+@keyframes logo-breathe { 0%, 100% { transform: scale(0.94); } 50% { transform: scale(1.04); } }
+.splash-logo { animation: logo-breathe 1.6s ease-in-out infinite; will-change: transform; }
+@media (prefers-reduced-motion: reduce) { .splash-logo { animation: none; } }

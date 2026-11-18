@@ -76,7 +76,7 @@ const BoutiqueSpotlight = () => {
   return (
     <section className="px-3 pt-[88px]">
       <div
-        className="relative overflow-hidden rounded-[2rem] bg-primary text-primary-foreground"
+        className="motif motif--light [--motif-opacity:0.03] relative overflow-hidden rounded-[2rem] bg-primary text-primary-foreground"
         role="group"
         aria-roledescription="diaporama"
         aria-label="Nos soins à l'affiche"
@@ -85,15 +85,6 @@ const BoutiqueSpotlight = () => {
         onFocusCapture={() => setPaused(true)}
         onBlurCapture={() => setPaused(false)}
       >
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 opacity-[0.07]"
-          style={{
-            backgroundImage:
-              "linear-gradient(hsl(var(--primary-foreground)/0.5) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--primary-foreground)/0.5) 1px, transparent 1px)",
-            backgroundSize: "48px 48px",
-          }}
-        />
         <div className="container mx-auto relative z-10 pt-8 pb-6 md:pt-12 md:pb-8">
           <div className="grid">
             {items.map(({ spotlight, product }, i) => (

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import logo from "@/assets/logo.jpg";
+import logo from "@/assets/logo-detoure.webp";
 import { useContent } from "@/content/ContentProvider";
 
 const SplashScreen = () => {
@@ -40,7 +40,7 @@ const SplashScreen = () => {
   return (
     <div
       aria-hidden="true"
-      className={`fixed inset-0 z-[200] flex items-center justify-center bg-background transition-opacity duration-500 ${
+      className={`motif [--motif-opacity:0.06] fixed inset-0 z-[200] flex items-center justify-center bg-background transition-opacity duration-500 ${
         fadeOut ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
     >
@@ -49,7 +49,7 @@ const SplashScreen = () => {
           <img
             src={logo}
             alt="Cure's Nappy"
-            className="h-32 w-32 md:h-40 md:w-40 object-contain animate-pulse"
+            className="splash-logo h-44 w-auto md:h-52 object-contain"
           />
         </div>
         <div className="h-1 w-40 bg-secondary rounded-full overflow-hidden">

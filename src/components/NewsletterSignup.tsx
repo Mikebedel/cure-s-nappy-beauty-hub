@@ -33,7 +33,7 @@ const NewsletterSignup = ({ source = "footer", className = "" }: { source?: "foo
 
   const message = state === "done" ? n.success : state === "already" ? n.already : state === "error" ? "L'inscription n'a pas pu aboutir. Réessaie dans un instant." : "";
   return (
-    <div className={`rounded-[1.75rem] border border-border bg-card px-4 py-4 sm:px-5 sm:py-5 md:px-8 md:py-6 flex flex-col lg:flex-row lg:items-center gap-3 sm:gap-4 lg:gap-8 ${className}`}>
+    <div className={`motif relative [--motif-opacity:0.06] rounded-[1.75rem] border border-border bg-card px-4 py-4 sm:px-5 sm:py-5 md:px-8 md:py-6 flex flex-col lg:flex-row lg:items-center gap-3 sm:gap-4 lg:gap-8 ${className}`}>
       <div className="flex items-start gap-4 min-w-0 lg:flex-1">
         <span className="hidden sm:inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary"><Mail className="h-5 w-5" strokeWidth={1.7} /></span>
         <div className="min-w-0">
